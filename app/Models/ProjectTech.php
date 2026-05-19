@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
+class ProjectTech extends Pivot
+{
+    protected $fillable = [
+        'level',
+    ];
+}
