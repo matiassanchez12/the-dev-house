@@ -55,7 +55,7 @@ export default function Index({ auth, projects, techs, filters }: Props) {
                 header={
                     <div className="flex justify-between items-center">
                         <h2 className="font-semibold text-xl text-foreground leading-tight">
-                            2
+                            Projects
                         </h2>
                         {auth.user && (
                             <Link href={route('projects.create')}>
