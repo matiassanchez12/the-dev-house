@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-cp .env.example .env
+
 if [ -z "$APP_KEY" ]; then
     echo "Generating application key..."
     php artisan key:generate --force
