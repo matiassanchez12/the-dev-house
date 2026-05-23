@@ -72,6 +72,25 @@ services:
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
+    bootstrap:
+        build:
+            context: './vendor/laravel/sail/runtimes/8.5'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'sail-8.5/app'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            WWWGROUP: '${WWWGROUP}'
+        volumes:
+            - '.:/var/www/html'
+            - './docker/bootstrap.sh:/docker/bootstrap.sh'
+        networks:
+            - sail
+        depends_on:
+            mysql:
+                condition: service_healthy
+        entrypoint: ['sh', '/docker/bootstrap.sh']        
 networks:
     sail:
         driver: bridge
