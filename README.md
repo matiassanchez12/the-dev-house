@@ -34,45 +34,36 @@ Plataforma de colaboración para desarrolladores. Construida con Laravel 12, Rea
 
 ---
 
-## 🚀 Inicio Rápido
+## Requirements
 
-### Opción A: Con Laravel Sail (Recomendado)
-
-**Prerrequisitos**:
-- Docker Desktop instalado y corriendo
+- Docker Desktop (with WSL2 backend on Windows)
 - Git
 
-**Pasos**:
+## Quick Start
 
 ```bash
-# 1. Clonar el repositorio
-git clone <repo-url>
-cd dev-collab-platform
+# Clone and enter the project
+git clone https://github.com/matiassanchez12/the-dev-house.git
+cd the-dev-house
 
-# 2. Copiar variables de entorno
-cp .env.example .env
+# Download sail and install php deps in docker
+docker run --rm \
+-u "$(id -u):$(id -g)" \
+-v "$(pwd):/var/www/html" \
+-w /var/www/html \
+laravelsail/php83-composer:latest \
+composer install --ignore-platform-reqs
 
-# 3. Instalar dependencias de PHP
-composer install
+# Start containers — setup runs automatically (migrations, seeders, npm build)
+docker compose up -d
 
-# 4. Generar APP_KEY
-php artisan key:generate
-
-# 5. Levantar servicios Docker (MySQL, Redis, Mailpit)
-./vendor/bin/sail up -d
-
-# 6. Correr migraciones
-./vendor/bin/sail artisan migrate
-
-# 7. (Opcional) Seedear datos de prueba
-./vendor/bin/sail artisan db:seed
-
-# 8. Instalar dependencias de Node
-npm install
-
-# 9. Iniciar Vite para desarrollo
-npm run dev
+# utils 
+sudo chown -R $USER:$USER .
 ```
+
+## API Documentation
+
+REST API documentation is available at http://localhost/docs/api.
 
 **Accesos con Sail**:
 
