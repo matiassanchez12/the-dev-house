@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import PublicLayout from '@/Layouts/public-layout';
+import PublicLayout from '@/layouts/public';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

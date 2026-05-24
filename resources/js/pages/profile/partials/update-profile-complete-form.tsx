@@ -1,5 +1,5 @@
-import InputError from '@/Components/input-error';
-import PrimaryButton from '@/Components/primary-button';
+import InputError from '@/components/input-error';
+import PrimaryButton from '@/components/primary-button';
 import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';

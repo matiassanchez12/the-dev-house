@@ -1,9 +1,9 @@
-import Checkbox from '@/Components/checkbox';
-import InputError from '@/Components/input-error';
-import InputLabel from '@/Components/input-label';
-import PrimaryButton from '@/Components/primary-button';
-import TextInput from '@/Components/text-input';
-import GuestLayout from '@/Layouts/guest-layout';
+import Checkbox from '@/components/checkbox';
+import InputError from '@/components/input-error';
+import InputLabel from '@/components/input-label';
+import PrimaryButton from '@/components/primary-button';
+import TextInput from '@/components/text-input';
+import GuestLayout from '@/layouts/guest';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {

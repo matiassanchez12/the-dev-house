@@ -1,5 +1,5 @@
-import PrimaryButton from '@/Components/primary-button';
-import GuestLayout from '@/Layouts/guest-layout';
+import PrimaryButton from '@/components/primary-button';
+import GuestLayout from '@/layouts/guest';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }) {

@@ -1,11 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/authenticated-layout';
+import AuthenticatedLayout from '@/layouts/authenticated';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Tech, Project as ProjectType } from '@/types';
+import { Tech } from '@/types';
 
 interface Props {
     auth: {
@@ -15,27 +15,23 @@ interface Props {
             email: string;
         } | null;
     };
-    project: ProjectType & {
-        techs: Tech[];
-    };
     techs: Tech[];
 }
 
-export default function Edit({ auth, project, techs }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        title: project.title,
-        description: project.description,
-        vision: project.vision ?? '',
-        techs: project.techs.map((t) => t.id) as number[],
-        repository_url: project.repository_url ?? '',
-        demo_url: project.demo_url ?? '',
+export default function Create({ auth, techs }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        title: '',
+        description: '',
+        vision: '',
+        techs: [] as number[],
+        repository_url: '',
+        demo_url: '',
         images: [] as File[],
-        remove_images: [] as string[],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/projects/${project.slug}`, {
+        post('/projects', {
             forceFormData: true,
             onSuccess: () => {
                 // Reset form on success
@@ -57,19 +53,13 @@ export default function Edit({ auth, project, techs }: Props) {
         }
     };
 
-    const handleRemoveImage = (imagePath: string) => {
-        setData('remove_images', [...data.remove_images, imagePath]);
-        // Remove from preview
-        setData('images', data.images.filter((img: any) => img.path !== imagePath));
-    };
-
     return (
         <>
-            <Head title={`Editar ${project.title}`} />
+            <Head title="Crear Proyecto" />
             <AuthenticatedLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Editar Proyecto
+                    <h2 className="font-semibold text-xl text-foreground leading-tight">
+                        Crear Nuevo Proyecto
                     </h2>
                 }
             >
@@ -79,7 +69,7 @@ export default function Edit({ auth, project, techs }: Props) {
                             <CardHeader>
                                 <CardTitle>Información del Proyecto</CardTitle>
                                 <CardDescription>
-                                    Actualizá los detalles de tu proyecto
+                                    Compartí los detalles de tu proyecto para atraer colaboradores
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -134,7 +124,7 @@ export default function Edit({ auth, project, techs }: Props) {
                                             {techs.map((tech) => (
                                                 <label
                                                     key={tech.id}
-                                                    className="flex items-center space-x-2 p-3 border rounded-md cursor-pointer hover:bg-gray-50"
+                                                    className="flex items-center space-x-2 p-3 border rounded-md cursor-pointer hover:bg-muted"
                                                 >
                                                     <input
                                                         type="checkbox"
@@ -181,36 +171,9 @@ export default function Edit({ auth, project, techs }: Props) {
                                         </div>
                                     </div>
 
-                                    {/* Imágenes existentes */}
-                                    {project.images && project.images.length > 0 && (
-                                        <div>
-                                            <Label>Imágenes Actuales</Label>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                                                {project.images.map((image, index) => (
-                                                    <div key={index} className="relative group">
-                                                        <img
-                                                            src={`/storage/${image}`}
-                                                            alt={`Imagen ${index + 1}`}
-                                                            className="w-full h-32 object-cover rounded-lg"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveImage(image)}
-                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Nuevas imágenes */}
+                                    {/* Imágenes */}
                                     <div>
-                                        <Label htmlFor="images">Agregar Más Imágenes (opcional)</Label>
+                                        <Label htmlFor="images">Imágenes del Proyecto (opcional)</Label>
                                         <Input
                                             id="images"
                                             type="file"
@@ -219,7 +182,7 @@ export default function Edit({ auth, project, techs }: Props) {
                                             onChange={handleImageChange}
                                             className="mt-2"
                                         />
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        <p className="text-sm text-muted-foreground mt-1">
                                             Podés subir múltiples imágenes (max 2MB cada una)
                                         </p>
                                         {errors.images && (
@@ -230,9 +193,9 @@ export default function Edit({ auth, project, techs }: Props) {
                                     {/* Botones */}
                                     <div className="flex gap-4 pt-4">
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                                            {processing ? 'Creando...' : 'Crear Proyecto'}
                                         </Button>
-                                        <Link href={route('projects.show', project.slug)}>
+                                        <Link href={route('projects.index')}>
                                             <Button type="button" variant="outline">
                                                 Cancelar
                                             </Button>

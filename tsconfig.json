@@ -18,9 +18,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./resources/js/*"],
-      "@components/*": ["./resources/js/Components/*"],
-      "@layouts/*": ["./resources/js/Layouts/*"],
-      "@pages/*": ["./resources/js/Pages/*"]
+      "@components/*": ["resources/js/components/*"],
+      "@layouts/*": ["./resources/js/layouts/*"],
+      "@pages/*": ["./resources/js/pages/*"]
     },
     "baseUrl": "."
   },

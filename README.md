@@ -59,6 +59,8 @@ docker compose up -d
 
 # utils 
 sudo chown -R $USER:$USER .
+
+npx autoskills
 ```
 
 ## API Documentation
