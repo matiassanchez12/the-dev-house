@@ -1,4 +1,4 @@
-# Dev Collab Platform
+# The Dev House
 
 Plataforma de colaboración para desarrolladores. Construida con Laravel 12, React, TypeScript e Inertia.js.
 
