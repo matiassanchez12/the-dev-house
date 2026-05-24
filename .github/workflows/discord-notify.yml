@@ -16,7 +16,7 @@ jobs:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
           COMPARE_URL: ${{ github.event.compare }}
         run: |
-          WEBHOOK=$(echo "$DISCORD_WEBHOOK_DEV_HOUSE" | xargs)
+          WEBHOOK=$(echo "$DISCORD_WEBHOOK" | xargs)
           if [ -z "$WEBHOOK" ]; then
             echo "ERROR: DISCORD_WEBHOOK_DEV_HOUSE is empty"
             exit 1
