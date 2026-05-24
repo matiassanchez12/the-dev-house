@@ -1,4 +1,4 @@
-# Dev Collab Platform - Workflow de Desarrollo
+# The Dev House - Workflow de Desarrollo
 
 > **Objetivo**: Este documento establece las convenciones, preferencias y workflow para que cualquier desarrollador (humano o AI) pueda colaborar consistentemente en este proyecto.
 
