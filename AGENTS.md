@@ -18,6 +18,22 @@ Use these skills for detailed patterns on-demand:
 | `vitest` | Unit testing, React Testing Library | [SKILL.md](skills/vitest/SKILL.md) |
 | `tdd` | Test-Driven Development workflow | [SKILL.md](skills/tdd/SKILL.md) |
 | `zod-4` | New API (z.email(), z.uuid()) | [SKILL.md](skills/zod-4/SKILL.md) |
+| `accessibility` | a11y patterns, ARIA, screen reader testing | [.agents/addyosmani/web-quality-skills/accessibility/SKILL.md](.agents/addyosmani/web-quality-skills/accessibility/SKILL.md) |
+| `seo` | Meta tags, structured data, performance | [.agents/addyosmani/web-quality-skills/seo/SKILL.md](.agents/addyosmani/web-quality-skills/seo/SKILL.md) |
+| `laravel-patterns` | Laravel architectural patterns & best practices | [.agents/affaan-m/everything-claude-code/laravel-patterns/SKILL.md](.agents/affaan-m/everything-claude-code/laravel-patterns/SKILL.md) |
+| `vite` | Vite config, plugins, build optimization | [.agents/antfu/skills/vite/SKILL.md](.agents/antfu/skills/vite/SKILL.md) |
+| `frontend-design` | Design systems, component architecture | [.agents/anthropics/skills/frontend-design/SKILL.md](.agents/anthropics/skills/frontend-design/SKILL.md) |
+| `tailwind-css-patterns` | Tailwind utility patterns & workflows | [.agents/giuseppe-trisciuoglio/developer-kit/tailwind-css-patterns/SKILL.md](.agents/giuseppe-trisciuoglio/developer-kit/tailwind-css-patterns/SKILL.md) |
+| `php-pro` | Advanced PHP patterns, performance | [.agents/jeffallan/claude-skills/php-pro/SKILL.md](.agents/jeffallan/claude-skills/php-pro/SKILL.md) |
+| `laravel-specialist` | Laravel-specific patterns & optimizations | [.agents/jeffallan/claude-skills/laravel-specialist/SKILL.md](.agents/jeffallan/claude-skills/laravel-specialist/SKILL.md) |
+| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui integration | [.agents/secondsky/claude-skills/tailwind-v4-shadcn/SKILL.md](.agents/secondsky/claude-skills/tailwind-v4-shadcn/SKILL.md) |
+| `shadcn` | shadcn/ui component patterns | [.agents/shadcn/ui/shadcn/SKILL.md](.agents/shadcn/ui/shadcn/SKILL.md) |
+| `nodejs-best-practices` | Node.js backend patterns & conventions | [.agents/sickn33/antigravity-awesome-skills/nodejs-best-practices/SKILL.md](.agents/sickn33/antigravity-awesome-skills/nodejs-best-practices/SKILL.md) |
+| `react-best-practices` | React performance & architecture | [.agents/vercel-labs/agent-skills/react-best-practices/SKILL.md](.agents/vercel-labs/agent-skills/react-best-practices/SKILL.md) |
+| `composition-patterns` | Component composition patterns | [.agents/vercel-labs/agent-skills/composition-patterns/SKILL.md](.agents/vercel-labs/agent-skills/composition-patterns/SKILL.md) |
+| `typescript-advanced` | Advanced TypeScript patterns | [.agents/wshobson/agents/typescript-advanced-types/SKILL.md](.agents/wshobson/agents/typescript-advanced-types/SKILL.md) |
+| `nodejs-backend` | Node.js backend architecture | [.agents/wshobson/agents/nodejs-backend-patterns/SKILL.md](.agents/wshobson/agents/nodejs-backend-patterns/SKILL.md) |
+| `bash-defensive` | Defensive bash scripting | [.agents/wshobson/agents/bash-defensive-patterns/SKILL.md](.agents/wshobson/agents/bash-defensive-patterns/SKILL.md) |
 
 ### Auto-invoke Skills
 
@@ -26,7 +42,6 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Action | Skill |
 |--------|-------|
 | Committing changes | `prowler-commit` |
-| Creating API endpoints | `jsonapi` |
 | Creating Zod schemas | `zod-4` |
 | Creating new skills | `skill-creator` |
 | Fixing bug | `tdd` |
