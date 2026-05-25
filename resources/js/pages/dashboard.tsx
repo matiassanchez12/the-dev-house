@@ -1,7 +1,26 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import {
+    Folder,
+    Users,
+    MessageSquare,
+    CheckCircle,
+    CircleDot,
+    Check,
+    X,
+    Clock,
+    Plus,
+    ArrowRight,
+} from 'lucide-react';
 import AuthenticatedLayout from '@/layouts/authenticated';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Project, JoinRequest, User, Tech } from '@/types';
 
@@ -41,7 +60,14 @@ interface DashboardProps {
     })[];
 }
 
-export default function Dashboard({ auth, stats, createdProjects, participatingProjects, pendingRequests, sentRequests }: DashboardProps) {
+export default function Dashboard({
+    auth,
+    stats,
+    createdProjects,
+    participatingProjects,
+    pendingRequests,
+    sentRequests,
+}: DashboardProps) {
     const { post, processing } = useForm({});
 
     const handleApproveRequest = (joinRequestId: number) => {
@@ -59,91 +85,115 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                 header={
                     <div className="flex justify-between items-center">
                         <h2 className="font-semibold text-xl text-foreground leading-tight">
-                            👋 Hola, {auth.user?.name}
+                            Hola, {auth.user?.name}
                         </h2>
                         <Link href={route('projects.create')}>
-                            <Button>🚀 Crear Proyecto</Button>
+                            <Button>
+                                <Plus className="size-4 mr-2" />
+                                Crear Proyecto
+                            </Button>
                         </Link>
                     </div>
                 }
             >
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-                        
                         {/* === ESTADÍSTICAS === */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Mis Proyectos</CardTitle>
-                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                    </svg>
+                                    <CardTitle className="text-sm font-medium">
+                                        Mis Proyectos
+                                    </CardTitle>
+                                    <Folder className="size-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{stats.projects_created}</div>
-                                    <p className="text-xs text-muted-foreground">Proyectos creados</p>
+                                    <div className="text-2xl font-bold">
+                                        {stats.projects_created}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Proyectos creados
+                                    </p>
                                 </CardContent>
                             </Card>
 
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Unido a</CardTitle>
-                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
+                                    <CardTitle className="text-sm font-medium">
+                                        Unido a
+                                    </CardTitle>
+                                    <Users className="size-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{stats.projects_joined}</div>
-                                    <p className="text-xs text-muted-foreground">Proyectos como participante</p>
+                                    <div className="text-2xl font-bold">
+                                        {stats.projects_joined}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Proyectos como participante
+                                    </p>
                                 </CardContent>
                             </Card>
 
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Solicitudes Pendientes</CardTitle>
-                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                    </svg>
+                                    <CardTitle className="text-sm font-medium">
+                                        Solicitudes Pendientes
+                                    </CardTitle>
+                                    <MessageSquare className="size-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{stats.pending_requests_received}</div>
-                                    <p className="text-xs text-muted-foreground">Esperan tu respuesta</p>
+                                    <div className="text-2xl font-bold">
+                                        {stats.pending_requests_received}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Esperan tu respuesta
+                                    </p>
                                 </CardContent>
                             </Card>
 
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Aprobadas</CardTitle>
-                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                                    <CardTitle className="text-sm font-medium">
+                                        Aprobadas
+                                    </CardTitle>
+                                    <CheckCircle className="size-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{stats.requests_approved}</div>
-                                    <p className="text-xs text-muted-foreground">Solicitudes aprobadas</p>
+                                    <div className="text-2xl font-bold">
+                                        {stats.requests_approved}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Solicitudes aprobadas
+                                    </p>
                                 </CardContent>
                             </Card>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            
                             {/* === MIS PROYECTOS (como creator) === */}
                             <Card className="lg:col-span-2">
                                 <CardHeader>
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <CardTitle>Mis Proyectos</CardTitle>
-                                            <CardDescription>Proyectos que creaste y estás liderando</CardDescription>
+                                            <CardDescription>
+                                                Proyectos que creaste y estás liderando
+                                            </CardDescription>
                                         </div>
                                         <Link href={route('projects.index')}>
-                                            <Button variant="outline" size="sm">Ver todos</Button>
+                                            <Button variant="outline" size="sm">
+                                                Ver todos
+                                                <ArrowRight className="size-3 ml-2" />
+                                            </Button>
                                         </Link>
                                     </div>
                                 </CardHeader>
                                 <CardContent>
                                     {createdProjects.length === 0 ? (
                                         <div className="text-center py-8">
-                                            <p className="text-muted-foreground mb-4">Aún no creaste ningún proyecto</p>
+                                            <p className="text-muted-foreground mb-4">
+                                                Aún no creaste ningún proyecto
+                                            </p>
                                             <Link href={route('projects.create')}>
                                                 <Button>Crear mi primer proyecto</Button>
                                             </Link>
@@ -159,7 +209,13 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                                                     )}
                                                     <CardHeader>
                                                         <CardTitle className="text-base">
-                                                            <Link href={route('projects.show', project.slug)} className="hover:text-primary">
+                                                            <Link
+                                                                href={route(
+                                                                    'projects.show',
+                                                                    project.slug
+                                                                )}
+                                                                className="hover:text-primary"
+                                                            >
                                                                 {project.title}
                                                             </Link>
                                                         </CardTitle>
@@ -169,32 +225,58 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                                                     </CardHeader>
                                                     <CardContent>
                                                         <div className="flex flex-wrap gap-1 mb-2">
-                                                            {project.techs?.slice(0, 3).map((tech) => (
-                                                                <Badge key={tech.id} variant="secondary" className="text-xs">
-                                                                    {tech.name}
-                                                                </Badge>
-                                                            ))}
+                                                            {project.techs
+                                                                ?.slice(0, 3)
+                                                                .map((tech) => (
+                                                                    <Badge
+                                                                        key={tech.id}
+                                                                        variant="secondary"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        {tech.name}
+                                                                    </Badge>
+                                                                ))}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">
-                                                            {project.participants?.length || 0} participantes
+                                                            {project.participants
+                                                                ?.length || 0}{' '}
+                                                            participantes
                                                         </div>
                                                     </CardContent>
                                                     <CardFooter>
                                                         <Badge
-                                                            variant={
-                                                                project.status === 'open'
-                                                                    ? 'default'
-                                                                    : project.status === 'completed'
-                                                                    ? 'destructive'
-                                                                    : 'secondary'
-                                                            }
-                                                            className="text-xs"
+                                                            variant="secondary"
+                                                            className={`text-xs gap-1.5 ${
+                                                                project.status ===
+                                                                'open'
+                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                                    : project.status ===
+                                                                      'completed'
+                                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                                    : ''
+                                                            }`}
                                                         >
-                                                            {project.status === 'open'
-                                                                ? '🟢 Abierto'
-                                                                : project.status === 'completed'
-                                                                ? '✅ Completado'
-                                                                : '🔴 Cerrado'}
+                                                            {project.status ===
+                                                                'open' && (
+                                                                <>
+                                                                    <CircleDot className="size-3" />
+                                                                    Abierto
+                                                                </>
+                                                            )}
+                                                            {project.status ===
+                                                                'completed' && (
+                                                                <>
+                                                                    <CheckCircle className="size-3" />
+                                                                    Completado
+                                                                </>
+                                                            )}
+                                                            {project.status ===
+                                                                'closed' && (
+                                                                <>
+                                                                    <CircleDot className="size-3" />
+                                                                    Cerrado
+                                                                </>
+                                                            )}
                                                         </Badge>
                                                     </CardFooter>
                                                 </Card>
@@ -209,45 +291,78 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                                 <CardHeader>
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <CardTitle>Proyectos donde Participo</CardTitle>
-                                            <CardDescription>Proyectos a los que te uniste como colaborador</CardDescription>
+                                            <CardTitle>
+                                                Proyectos donde Participo
+                                            </CardTitle>
+                                            <CardDescription>
+                                                Proyectos a los que te uniste como
+                                                colaborador
+                                            </CardDescription>
                                         </div>
                                         <Link href={route('projects.index')}>
-                                            <Button variant="outline" size="sm">Explorar más</Button>
+                                            <Button variant="outline" size="sm">
+                                                Explorar más
+                                                <ArrowRight className="size-3 ml-2" />
+                                            </Button>
                                         </Link>
                                     </div>
                                 </CardHeader>
                                 <CardContent>
                                     {participatingProjects.length === 0 ? (
                                         <div className="text-center py-8">
-                                            <p className="text-gray-500">Aún no te uniste a ningún proyecto</p>
+                                            <p className="text-muted-foreground">
+                                                Aún no te uniste a ningún proyecto
+                                            </p>
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {participatingProjects.map((project) => (
-                                                <Card key={project.id}>
-                                                    <CardHeader>
-                                                        <CardTitle className="text-base">
-                                                            <Link href={route('projects.show', project.slug)} className="hover:text-blue-600">
-                                                                {project.title}
-                                                            </Link>
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Por: {project.creator?.name}
-                                                        </CardDescription>
-                                                    </CardHeader>
-                                                    <CardContent>
-                                                        {project.pivot?.role && (
-                                                            <Badge variant="outline" className="mb-2">
-                                                                📌 {project.pivot.role}
-                                                            </Badge>
-                                                        )}
-                                                        <div className="text-xs text-gray-500">
-                                                            {project.techs?.length || 0} tecnologías
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
+                                            {participatingProjects.map(
+                                                (project) => (
+                                                    <Card key={project.id}>
+                                                        <CardHeader>
+                                                            <CardTitle className="text-base">
+                                                                <Link
+                                                                    href={route(
+                                                                        'projects.show',
+                                                                        project.slug
+                                                                    )}
+                                                                    className="hover:text-primary"
+                                                                >
+                                                                    {
+                                                                        project.title
+                                                                    }
+                                                                </Link>
+                                                            </CardTitle>
+                                                            <CardDescription>
+                                                                Por:{' '}
+                                                                {
+                                                                    project.creator
+                                                                        ?.name
+                                                                }
+                                                            </CardDescription>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            {project.pivot
+                                                                ?.role && (
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    className="mb-2"
+                                                                >
+                                                                    {
+                                                                        project
+                                                                            .pivot.role
+                                                                    }
+                                                                </Badge>
+                                                            )}
+                                                            <div className="text-xs text-muted-foreground">
+                                                                {project.techs
+                                                                    ?.length || 0}{' '}
+                                                                tecnologías
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                )
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>
@@ -258,45 +373,79 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                                 <CardHeader>
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <CardTitle>Solicitudes Pendientes</CardTitle>
-                                            <CardDescription>Personas que quieren unirse a tus proyectos</CardDescription>
+                                            <CardTitle>
+                                                Solicitudes Pendientes
+                                            </CardTitle>
+                                            <CardDescription>
+                                                Personas que quieren unirse a tus
+                                                proyectos
+                                            </CardDescription>
                                         </div>
                                         <Link href={route('join-requests.index')}>
-                                            <Button variant="outline" size="sm">Ver todas</Button>
+                                            <Button variant="outline" size="sm">
+                                                Ver todas
+                                            </Button>
                                         </Link>
                                     </div>
                                 </CardHeader>
                                 <CardContent>
                                     {pendingRequests.length === 0 ? (
-                                        <p className="text-gray-500 text-center py-4">No tenés solicitudes pendientes</p>
+                                        <p className="text-muted-foreground text-center py-4">
+                                            No tenés solicitudes pendientes
+                                        </p>
                                     ) : (
                                         <div className="space-y-3">
                                             {pendingRequests.map((request) => (
-                                                <div key={request.id} className="border rounded-lg p-3 space-y-2">
+                                                <div
+                                                    key={request.id}
+                                                    className="border rounded-lg p-3 space-y-2"
+                                                >
                                                     <div>
-                                                        <h4 className="font-semibold text-sm">{request.applicant.name}</h4>
-                                                        <p className="text-xs text-gray-600">
-                                                            Quiere unirse a: <span className="font-medium">{request.project.title}</span>
+                                                        <h4 className="font-semibold text-sm">
+                                                            {
+                                                                request
+                                                                    .applicant.name
+                                                            }
+                                                        </h4>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Quiere unirse a:{' '}
+                                                            <span className="font-medium">
+                                                                {
+                                                                    request
+                                                                        .project
+                                                                        .title
+                                                                }
+                                                            </span>
                                                         </p>
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <Button
                                                             variant="default"
                                                             size="sm"
-                                                            onClick={() => handleApproveRequest(request.id)}
+                                                            onClick={() =>
+                                                                handleApproveRequest(
+                                                                    request.id
+                                                                )
+                                                            }
                                                             disabled={processing}
                                                             className="flex-1 text-xs"
                                                         >
-                                                            ✅ Aprobar
+                                                            <Check className="size-3 mr-1" />
+                                                            Aprobar
                                                         </Button>
                                                         <Button
                                                             variant="destructive"
                                                             size="sm"
-                                                            onClick={() => handleRejectRequest(request.id)}
+                                                            onClick={() =>
+                                                                handleRejectRequest(
+                                                                    request.id
+                                                                )
+                                                            }
                                                             disabled={processing}
                                                             className="flex-1 text-xs"
                                                         >
-                                                            ❌ Rechazar
+                                                            <X className="size-3 mr-1" />
+                                                            Rechazar
                                                         </Button>
                                                     </div>
                                                 </div>
@@ -312,26 +461,46 @@ export default function Dashboard({ auth, stats, createdProjects, participatingP
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <CardTitle>Mis Solicitudes</CardTitle>
-                                            <CardDescription>Solicitudes que enviaste y esperan respuesta</CardDescription>
+                                            <CardDescription>
+                                                Solicitudes que enviaste y esperan
+                                                respuesta
+                                            </CardDescription>
                                         </div>
                                         <Link href={route('join-requests.index')}>
-                                            <Button variant="outline" size="sm">Ver historial</Button>
+                                            <Button variant="outline" size="sm">
+                                                Ver historial
+                                            </Button>
                                         </Link>
                                     </div>
                                 </CardHeader>
                                 <CardContent>
                                     {sentRequests.length === 0 ? (
-                                        <p className="text-gray-500 text-center py-4">No enviaste solicitudes</p>
+                                        <p className="text-muted-foreground text-center py-4">
+                                            No enviaste solicitudes
+                                        </p>
                                     ) : (
                                         <div className="space-y-3">
                                             {sentRequests.map((request) => (
-                                                <div key={request.id} className="border rounded-lg p-3">
-                                                    <h4 className="font-semibold text-sm">{request.project.title}</h4>
-                                                    <p className="text-xs text-gray-600 mb-2">
-                                                        Por: {request.project.creator?.name}
+                                                <div
+                                                    key={request.id}
+                                                    className="border rounded-lg p-3"
+                                                >
+                                                    <h4 className="font-semibold text-sm">
+                                                        {request.project.title}
+                                                    </h4>
+                                                    <p className="text-xs text-muted-foreground mb-2">
+                                                        Por:{' '}
+                                                        {
+                                                            request.project.creator
+                                                                ?.name
+                                                        }
                                                     </p>
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        ⏳ Pendiente de aprobación
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="text-xs"
+                                                    >
+                                                        <Clock className="size-3 mr-1" />
+                                                        Pendiente de aprobación
                                                     </Badge>
                                                 </div>
                                             ))}
