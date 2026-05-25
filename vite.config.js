@@ -13,9 +13,8 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
-            '@components': '/resources/js/Components',
-            '@layouts': '/resources/js/Layouts',
-            '@pages': '/resources/js/pages',
+            '@components': '/resources/js/components',
+            '@layouts': '/resources/js/layouts',
         },
     },
     server: {
