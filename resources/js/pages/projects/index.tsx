@@ -2,11 +2,10 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import PublicLayout from '@/layouts/public';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ProjectCard } from '@/components/projects/project-card';
 import { Input } from '@/components/ui/input';
 import { Tech, Project as ProjectType } from '@/types';
-import { CircleDot, CheckCircle, CircleX } from 'lucide-react';
 
 interface Props {
     auth: {
@@ -133,74 +132,11 @@ export default function Index({ auth, projects, techs, filters }: Props) {
                                 </div>
                             ) : (
                                 projects.data.map((project) => (
-                                    <Card key={project.id} className="flex flex-col">
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">
-                                                <Link
-                                                    href={route('projects.show', project.slug)}
-                                                    className="hover:text-primary transition"
-                                                >
-                                                    {project.title}
-                                                </Link>
-                                            </CardTitle>
-                                            <CardDescription className="line-clamp-2">
-                                                {project.description}
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="flex-1">
-                                            {/* Techs */}
-                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                {project.techs?.slice(0, 5).map((tech) => (
-                                                    <Badge key={tech.id} variant="secondary">
-                                                        {tech.name}
-                                                    </Badge>
-                                                ))}
-                                                {project.techs && project.techs.length > 5 && (
-                                                    <Badge variant="outline">
-                                                        +{project.techs.length - 5}
-                                                    </Badge>
-                                                )}
-                                            </div>
-
-                                            {/* Creator */}
-                                            <div className="text-sm text-muted-foreground">
-                                                Por: {project.creator?.name}
-                                            </div>
-                                        </CardContent>
-                                        <CardFooter>
-                                            <Badge
-                                                variant={
-                                                    project.status === 'open'
-                                                        ? 'secondary'
-                                                        : project.status === 'completed'
-                                                        ? 'default'
-                                                        : 'outline'
-                                                }
-                                                className={
-                                                    project.status === 'open'
-                                                        ? 'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400'
-                                                        : project.status === 'completed'
-                                                        ? 'bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400'
-                                                        : ''
-                                                }
-                                            >
-                                                {project.status === 'open' && (
-                                                    <CircleDot className="h-3 w-3" />
-                                                )}
-                                                {project.status === 'completed' && (
-                                                    <CheckCircle className="h-3 w-3" />
-                                                )}
-                                                {project.status === 'closed' && (
-                                                    <CircleX className="h-3 w-3" />
-                                                )}
-                                                {project.status === 'open'
-                                                    ? 'Abierto'
-                                                    : project.status === 'completed'
-                                                    ? 'Completado'
-                                                    : 'Cerrado'}
-                                            </Badge>
-                                        </CardFooter>
-                                    </Card>
+                                    <ProjectCard
+                                        key={project.id}
+                                        project={project}
+                                        variant="default"
+                                    />
                                 ))
                             )}
                         </div>
