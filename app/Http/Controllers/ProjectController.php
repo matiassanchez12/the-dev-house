@@ -41,7 +41,7 @@ class ProjectController extends Controller
 
         $techs = Tech::orderBy('name')->get();
 
-        return Inertia::render('Projects/Index', [
+        return Inertia::render('projects/index', [
             'projects' => $projects,
             'techs' => $techs,
             'filters' => [
@@ -58,7 +58,7 @@ class ProjectController extends Controller
     {
         $techs = Tech::orderBy('name')->get();
 
-        return Inertia::render('Projects/Create', [
+        return Inertia::render('projects/create', [
             'techs' => $techs,
         ]);
     }
@@ -84,7 +84,7 @@ class ProjectController extends Controller
     {
         $project->load(['creator.techs', 'techs', 'participants.user']);
 
-        return Inertia::render('Projects/Show', [
+        return Inertia::render('projects/show', [
             'project' => $project,
         ]);
     }
@@ -98,7 +98,7 @@ class ProjectController extends Controller
 
         $techs = Tech::orderBy('name')->get();
 
-        return Inertia::render('Projects/Edit', [
+        return Inertia::render('projects/edit', [
             'project' => $project,
             'techs' => $techs,
         ]);

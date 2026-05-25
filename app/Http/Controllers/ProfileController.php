@@ -29,7 +29,7 @@ class ProfileController extends Controller
         $userTechs = $user->techs()->withPivot('years_experience', 'proficiency')->get();
         $allTechs = Tech::orderBy('name')->get();
 
-        return Inertia::render('Profile/Edit', [
+        return Inertia::render('profile/edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
             'userTechs' => $userTechs,

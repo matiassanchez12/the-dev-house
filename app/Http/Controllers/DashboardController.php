@@ -20,6 +20,6 @@ class DashboardController extends Controller
     {
         $data = $this->dashboardService->getDashboardData(Auth::user());
 
-        return Inertia::render('Dashboard', $data);
+        return Inertia::render('dashboard', $data);
     }
 }

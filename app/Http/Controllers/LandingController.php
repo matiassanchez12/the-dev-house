@@ -20,7 +20,7 @@ class LandingController extends Controller
             ->limit(6)
             ->get();
 
-        return Inertia::render('Landing', [
+        return Inertia::render('landing', [
             'projects' => [
                 'data' => $projects,
                 'total' => Project::where('status', 'open')->count(),
