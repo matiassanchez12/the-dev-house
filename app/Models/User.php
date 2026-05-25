@@ -14,16 +14,25 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Get the route key name for implicit route binding.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'bio',
         'avatar',
+        'bio',
+        'email',
+        'name',
+        'password',
+        'slug',
     ];
 
     /**
