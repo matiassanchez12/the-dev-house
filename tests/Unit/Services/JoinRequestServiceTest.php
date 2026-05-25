@@ -1,0 +1,198 @@
+<?php
+
+namespace Tests\Unit\Services;
+
+use App\Models\JoinRequest;
+use App\Models\Project;
+use App\Models\Tech;
+use App\Models\User;
+use App\Services\JoinRequestService;
+use App\Services\Exceptions\DuplicateJoinRequestException;
+use App\Services\Exceptions\SelfJoinException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class JoinRequestServiceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private JoinRequestService $service;
+    private User $user;
+    private User $projectOwner;
+    private Project $project;
+    private array $techIds;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->service = new JoinRequestService();
+
+        $this->projectOwner = User::factory()->create();
+        $this->user = User::factory()->create();
+
+        $techs = Tech::factory()->count(2)->create();
+        $this->techIds = $techs->pluck('id')->toArray();
+
+        $this->project = Project::factory()->create([
+            'user_id' => $this->projectOwner->id,
+        ]);
+        $this->project->techs()->attach($this->techIds);
+    }
+
+    // === validateCanCreate tests ===
+
+    /** @test */
+    public function validate_can_create_throws_on_duplicate_request(): void
+    {
+        // Create existing pending request
+        JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->expectException(DuplicateJoinRequestException::class);
+
+        $this->service->validateCanCreate($this->project, $this->user);
+    }
+
+    /** @test */
+    public function validate_can_create_throws_on_self_join(): void
+    {
+        $this->expectException(SelfJoinException::class);
+
+        $this->service->validateCanCreate($this->project, $this->projectOwner);
+    }
+
+    /** @test */
+    public function validate_can_create_passes_for_new_request(): void
+    {
+        // Should not throw
+        $this->service->validateCanCreate($this->project, $this->user);
+
+        $this->assertTrue(true);
+    }
+
+    // === create tests ===
+
+    /** @test */
+    public function create_produces_pending_join_request(): void
+    {
+        $message = 'I would like to join this amazing project!';
+
+        $joinRequest = $this->service->create($this->project, $this->user, $message);
+
+        $this->assertEquals('pending', $joinRequest->status);
+        $this->assertEquals($this->project->id, $joinRequest->project_id);
+        $this->assertEquals($this->user->id, $joinRequest->user_id);
+        $this->assertEquals($message, $joinRequest->message);
+    }
+
+    /** @test */
+    public function create_saves_message_content(): void
+    {
+        $message = 'This is my detailed message explaining why I want to join.';
+
+        $joinRequest = $this->service->create($this->project, $this->user, $message);
+
+        $this->assertDatabaseHas('join_requests', [
+            'id' => $joinRequest->id,
+            'message' => $message,
+            'status' => 'pending',
+        ]);
+    }
+
+    // === approve tests ===
+
+    /** @test */
+    public function approve_sets_status_to_approved_and_attaches_participant(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->service->approve($joinRequest);
+
+        $joinRequest->refresh();
+        $this->assertEquals('approved', $joinRequest->status);
+        $this->assertNotNull($joinRequest->reviewed_at);
+
+        $this->assertTrue(
+            $this->project->participants()->where('user_id', $this->user->id)->exists()
+        );
+    }
+
+    /** @test */
+    public function approve_does_not_duplicate_participant(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        // Call approve twice
+        $this->service->approve($joinRequest);
+        $this->service->approve($joinRequest);
+
+        $this->assertEquals(
+            1,
+            $this->project->participants()->where('user_id', $this->user->id)->count()
+        );
+    }
+
+    // === reject tests ===
+
+    /** @test */
+    public function reject_sets_status_to_rejected(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->service->reject($joinRequest);
+
+        $joinRequest->refresh();
+        $this->assertEquals('rejected', $joinRequest->status);
+        $this->assertNotNull($joinRequest->reviewed_at);
+    }
+
+    /** @test */
+    public function reject_does_not_attach_participant(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->service->reject($joinRequest);
+
+        $this->assertFalse(
+            $this->project->participants()->where('user_id', $this->user->id)->exists()
+        );
+    }
+
+    // === cancel tests ===
+
+    /** @test */
+    public function cancel_deletes_join_request(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $joinRequestId = $joinRequest->id;
+
+        $this->service->cancel($joinRequest);
+
+        $this->assertDatabaseMissing('join_requests', ['id' => $joinRequestId]);
+    }
+}

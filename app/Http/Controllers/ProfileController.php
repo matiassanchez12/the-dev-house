@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Profile\UpdateCompleteProfileRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Tech;
+use App\Services\ProfileService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        private ProfileService $profileService
+    ) {}
+
     /**
      * Display the user's profile form.
      */
@@ -51,57 +56,25 @@ class ProfileController extends Controller
     /**
      * Update the user's complete profile (bio, avatar, techs).
      */
-    public function updateComplete(Request $request): RedirectResponse
+    public function updateComplete(UpdateCompleteProfileRequest $request): RedirectResponse
     {
         $user = $request->user();
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'bio' => ['nullable', 'string', 'max:1000'],
-            'avatar' => ['nullable', 'image', 'max:2048'], // 2MB max
-            'techs' => ['array'],
-            'techs.*.id' => ['exists:techs,id'],
-            'techs.*.years_experience' => ['nullable', 'numeric', 'min:0', 'max:50'],
-            'techs.*.proficiency' => ['nullable', 'numeric', 'min:1', 'max:5'],
-        ]);
-
-        // Handle avatar upload
+        // Handle avatar upload via service
         if ($request->hasFile('avatar')) {
-            // Delete old avatar
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-            
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $avatarPath;
+            $this->profileService->updateAvatar($user, $request->file('avatar'));
         }
 
         // Update bio
         if (isset($validated['bio'])) {
             $user->bio = $validated['bio'];
+            $user->save();
         }
 
-        $user->save();
-
-        // Sync techs with pivot data
+        // Sync techs with pivot data via service
         if (isset($validated['techs'])) {
-            $techsToSync = [];
-            foreach ($validated['techs'] as $tech) {
-                // Convert proficiency number to string (migration expects string)
-                $proficiencyMap = [
-                    1 => 'basic',
-                    2 => 'intermediate',
-                    3 => 'advanced',
-                    4 => 'expert',
-                    5 => 'master',
-                ];
-                $proficiencyValue = isset($tech['proficiency']) ? $proficiencyMap[$tech['proficiency']] ?? null : null;
-                
-                $techsToSync[$tech['id']] = [
-                    'years_experience' => $tech['years_experience'] ?? null,
-                    'proficiency' => $proficiencyValue,
-                ];
-            }
-            $user->techs()->sync($techsToSync);
+            $this->profileService->syncTechs($user, $validated['techs']);
         }
 
         return Redirect::route('profile.edit')->with('success', 'Perfil actualizado exitosamente!');
@@ -118,10 +91,9 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        $this->profileService->deleteAccount($user);
+
         Auth::logout();
-
-        $user->delete();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

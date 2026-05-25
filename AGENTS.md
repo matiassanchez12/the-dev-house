@@ -4,6 +4,32 @@
 
 - Start here for cross-project norms. This is a Laravel + React + Inertia.js monolith.
 - Component docs override this file when guidance conflicts.
+- **Project context** (domain model, architecture): See `docs.md` for the full picture.
+
+---
+
+## Project Overview
+
+**DevCollab** — A platform for developers to collaborate on projects.
+
+### Domain Entities
+
+| Entity | Description | Key Relationships |
+|--------|-------------|------------------|
+| `User` | Developer with profile, techs, avatar | hasMany Projects (creator), belongsToMany Projects (participant), hasMany JoinRequests |
+| `Project` | A collaborative project with title, description, techs | belongsTo User (creator), belongsToMany User (participants), belongsToMany Tech, hasMany JoinRequest, hasMany Message |
+| `JoinRequest` | Request to join a project | belongsTo Project, belongsTo User (applicant) |
+| `Tech` | Technology/tag (React, Laravel, etc.) | belongsToMany Project, belongsToMany User |
+| `Message` | Chat message in a project | belongsTo Project, belongsTo User |
+
+### Status Flow
+
+```
+Project status: draft → open → in_progress → completed
+JoinRequest status: pending → approved | rejected
+```
+
+---
 
 ## Available Skills
 
@@ -65,6 +91,33 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 - **Models**: `use HasFactory;` required. Relationships before custom methods. `$fillable` sorted alphabetically.
 - **Migrations**: One migration per table change. Never modify existing migrations — create new ones.
 - **Naming**: `ProjectController`, `ProjectTest`, `test_can_[action]_[entity]`.
+
+### Service Layer Architecture
+
+Business logic lives in **Services**, not Controllers. Controllers remain thin.
+
+```
+app/
+├── Http/
+│   ├── Controllers/          # Thin: routing + validation + response
+│   └── Requests/            # FormRequest classes for validation
+├── Services/                # Business logic, DB access, orchestration
+│   ├── ProjectService.php
+│   ├── JoinRequestService.php
+│   ├── ProfileService.php
+│   └── DashboardService.php
+├── Policies/                # Authorization (ownership checks)
+│   ├── ProjectPolicy.php
+│   └── JoinRequestPolicy.php
+└── Models/
+```
+
+**Service rules**:
+- One service per aggregate/resource (ProjectService handles Project + related operations)
+- Services receive primitive types or arrays, return models/collections
+- Controllers inject services via constructor or `app()` helper
+- Policies handle authorization, Services handle business logic
+- Keep Eloquent in Models, never in Controllers
 
 ### Frontend (React 18 + TypeScript + Inertia.js)
 

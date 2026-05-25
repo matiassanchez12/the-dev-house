@@ -1,0 +1,43 @@
+# OpenSpec Configuration — dev-collab-platform
+schema: spec-driven
+
+context: |
+  Tech stack: Laravel 12, React 18, Inertia.js, TypeScript, Tailwind CSS
+  Architecture: Monolith SPA — Laravel renders React directly via Inertia
+  Testing: Laravel phpunit (Feature + Unit), RefreshDatabase per test
+  Style: Shadcn/ui components, CVA for variants, ESLint + Prettier
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns (Controllers: validation→logic→response)
+    - Use FormRequest when validation has >10 rules
+    tdd: true
+    test_command: php artisan test
+  verify:
+    test_command: php artisan test
+    build_command: npm run build
+    coverage_threshold: 80
+
+testing:
+  runner: php artisan test
+  framework: PHPUnit 11
+  layers:
+    unit: true
+    integration: true
+    e2e: false
+  coverage: true
+  quality:
+    linter: pint
+    type_checker: null
+    formatter: pint
