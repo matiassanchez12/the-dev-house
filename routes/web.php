@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\JoinRequestController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -43,5 +44,6 @@ Route::middleware('auth')->group(function () {
 
 // Rutas con parámetros (SIEMPRE AL FINAL para que no capturen otras rutas)
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/users/{user:slug}', [UserController::class, 'show'])->name('users.show');
 
 require __DIR__.'/auth.php';
