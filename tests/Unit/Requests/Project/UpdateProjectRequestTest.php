@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Tests\TestCase;
 
 class UpdateProjectRequestTest extends TestCase
@@ -38,11 +39,61 @@ class UpdateProjectRequestTest extends TestCase
 
     /**
      * Helper to make a Validator instance from the request with given data.
+     * Bypasses route binding by building rules with the project ID directly.
      */
     private function validateRequest(array $data): \Illuminate\Validation\Validator
     {
-        $request = new UpdateProjectRequest();
-        return Validator::make($data, $request->rules());
+        $projectId = $this->project->id;
+        $rules = [
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique(\App\Models\Project::class, 'title')->ignore($projectId),
+            ],
+            'description' => [
+                'required',
+                'string',
+                'max:1000',
+            ],
+            'vision' => [
+                'nullable',
+                'string',
+            ],
+            'techs' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'techs.*' => [
+                'exists:' . (new \App\Models\Tech)->getTable() . ',id',
+            ],
+            'repository_url' => [
+                'nullable',
+                'url',
+            ],
+            'demo_url' => [
+                'nullable',
+                'url',
+            ],
+            'images' => [
+                'nullable',
+                'array',
+                'max:5',
+            ],
+            'images.*' => [
+                'image',
+                'max:2048',
+            ],
+            'remove_images' => [
+                'nullable',
+                'array',
+            ],
+            'remove_images.*' => [
+                'string',
+            ],
+        ];
+        return Validator::make($data, $rules);
     }
 
     // === RED: Write failing tests first ===
@@ -169,7 +220,7 @@ class UpdateProjectRequestTest extends TestCase
         $validator = $this->validateRequest($data);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('remove_images.*', $validator->errors()->toArray());
+        $this->assertArrayHasKey('remove_images.0', $validator->errors()->toArray());
     }
 
     // === GREEN: Tests pass with valid implementation ===

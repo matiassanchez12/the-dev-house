@@ -216,7 +216,7 @@ class StoreProjectRequestTest extends TestCase
         $validator = $this->validateRequest($data);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('images', $validator->errors()->toArray());
+        $this->assertArrayHasKey('images.0', $validator->errors()->toArray());
     }
 
     /** @test */

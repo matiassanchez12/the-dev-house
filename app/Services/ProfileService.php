@@ -95,7 +95,7 @@ class ProfileService
     }
 
     /**
-     * Delete user's account, avatar, and cascade-related records.
+     * Delete user's account. Database FK constraints handle cascade deletes.
      */
     public function deleteAccount(User $user): void
     {
@@ -108,10 +108,6 @@ class ProfileService
             }
         }
 
-        // Delete join requests sent by this user (cascade should handle via DB)
-        $user->sentJoinRequests()->delete();
-
-        // Delete the user
         $user->delete();
     }
 }

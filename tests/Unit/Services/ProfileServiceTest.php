@@ -117,7 +117,7 @@ class ProfileServiceTest extends TestCase
         $tech2 = Tech::factory()->create();
 
         $techsData = [
-            ['id' => $tech1->id, 'proficiency' => 'beginner', 'years_experience' => 2],
+            ['id' => $tech1->id, 'proficiency' => 'basic', 'years_experience' => 2],
             ['id' => $tech2->id, 'proficiency' => 'advanced', 'years_experience' => 5],
         ];
 
@@ -127,7 +127,7 @@ class ProfileServiceTest extends TestCase
         $this->assertCount(2, $this->user->techs);
 
         $syncedTech1 = $this->user->techs->find($tech1->id);
-        $this->assertEquals('beginner', $syncedTech1->pivot->proficiency);
+        $this->assertEquals('basic', $syncedTech1->pivot->proficiency);
         $this->assertEquals(2, $syncedTech1->pivot->years_experience);
     }
 
@@ -135,7 +135,7 @@ class ProfileServiceTest extends TestCase
     public function sync_techs_replaces_existing_techs(): void
     {
         $oldTech = Tech::factory()->create();
-        $this->user->techs()->attach($oldTech->id, ['proficiency' => 'beginner']);
+        $this->user->techs()->attach($oldTech->id, ['proficiency' => 'basic']);
 
         $newTech = Tech::factory()->create();
         $techsData = [['id' => $newTech->id, 'proficiency' => 'intermediate']];
@@ -151,7 +151,7 @@ class ProfileServiceTest extends TestCase
     public function sync_techs_with_empty_array_removes_all_techs(): void
     {
         $tech = Tech::factory()->create();
-        $this->user->techs()->attach($tech->id, ['proficiency' => 'beginner']);
+        $this->user->techs()->attach($tech->id, ['proficiency' => 'basic']);
 
         $this->service->syncTechs($this->user, []);
 

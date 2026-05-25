@@ -46,7 +46,12 @@ class UpdateCompleteProfileRequest extends FormRequest
             ],
             'techs.*.proficiency' => [
                 'nullable',
-                Rule::in(['beginner', 'intermediate', 'advanced']),
+                Rule::in(['basic', 'intermediate', 'advanced', 'expert', 'master']),
+            ],
+            'techs.*.years_experience' => [
+                'nullable',
+                'integer',
+                'min:0',
             ],
         ];
     }
@@ -64,7 +69,7 @@ class UpdateCompleteProfileRequest extends FormRequest
             'avatar.max' => 'El avatar no puede exceder 2MB.',
             'avatar.mimes' => 'El avatar debe ser JPG, PNG o WEBP.',
             'techs.*.id.exists' => 'La tecnología seleccionada no es válida.',
-            'techs.*.proficiency.in' => 'La proficiencia debe ser: beginner, intermediate o advanced.',
+            'techs.*.proficiency.in' => 'La proficiencia debe ser: basic, intermediate, advanced, expert o master.',
         ];
     }
 }

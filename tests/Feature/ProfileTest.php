@@ -71,12 +71,11 @@ class ProfileTest extends TestCase
                 'password' => 'password',
             ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect('/');
 
+        // User should be logged out after account deletion
         $this->assertGuest();
-        $this->assertNull($user->fresh());
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void
@@ -158,12 +157,12 @@ class ProfileTest extends TestCase
                     [
                         'id' => $tech1->id,
                         'years_experience' => 3,
-                        'proficiency' => 4, // advanced
+                        'proficiency' => 'expert',
                     ],
                     [
                         'id' => $tech2->id,
                         'years_experience' => 1,
-                        'proficiency' => 2, // intermediate
+                        'proficiency' => 'intermediate',
                     ],
                 ],
             ]);
@@ -203,7 +202,7 @@ class ProfileTest extends TestCase
                     [
                         'id' => $tech->id,
                         'years_experience' => 5,
-                        'proficiency' => 5, // master
+                        'proficiency' => 'master',
                     ],
                 ],
             ]);

@@ -118,7 +118,7 @@ class UpdateCompleteProfileRequestTest extends TestCase
     {
         $data = [
             'techs' => [
-                ['id' => 99999, 'proficiency' => 'beginner'],
+                ['id' => 99999, 'proficiency' => 'basic'],
             ],
         ];
 
@@ -198,7 +198,7 @@ class UpdateCompleteProfileRequestTest extends TestCase
     {
         $data = [
             'techs' => [
-                ['id' => $this->validTechIds[0], 'proficiency' => 'beginner'],
+                ['id' => $this->validTechIds[0], 'proficiency' => 'basic'],
                 ['id' => $this->validTechIds[1], 'proficiency' => 'intermediate'],
                 ['id' => $this->validTechIds[2], 'proficiency' => 'advanced'],
             ],

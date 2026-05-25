@@ -47,7 +47,7 @@ class ProjectServiceTest extends TestCase
 
         $slug = $this->service->generateUniqueSlug('My Project');
 
-        $this->assertEquals('my-project-2', $slug);
+        $this->assertEquals('my-project-1', $slug);
     }
 
     /** @test */

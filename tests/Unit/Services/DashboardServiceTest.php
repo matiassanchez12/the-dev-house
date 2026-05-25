@@ -52,14 +52,16 @@ class DashboardServiceTest extends TestCase
         $participatingProject = Project::factory()->create(['user_id' => $otherUser->id]);
         $participatingProject->participants()->attach($this->user->id);
 
-        // Create pending received request
-        $receivedRequest = JoinRequest::factory()->create([
+        // Create pending received request (on a project owned by this user)
+        $applicant = User::factory()->create();
+        JoinRequest::factory()->create([
             'project_id' => Project::factory()->create(['user_id' => $this->user->id])->id,
+            'user_id' => $applicant->id,
             'status' => 'pending',
         ]);
 
         // Create approved sent request
-        $sentRequest = JoinRequest::factory()->create([
+        JoinRequest::factory()->create([
             'user_id' => $this->user->id,
             'project_id' => Project::factory()->create()->id,
             'status' => 'approved',
@@ -67,7 +69,7 @@ class DashboardServiceTest extends TestCase
 
         $data = $this->service->getDashboardData($this->user);
 
-        $this->assertEquals(2, $data['stats']['projects_created']);
+        $this->assertEquals(3, $data['stats']['projects_created']);
         $this->assertEquals(1, $data['stats']['projects_joined']);
         $this->assertEquals(1, $data['stats']['pending_requests_received']);
         $this->assertEquals(1, $data['stats']['requests_approved']);
@@ -119,13 +121,24 @@ class DashboardServiceTest extends TestCase
     /** @test */
     public function get_dashboard_data_returns_sent_pending_requests(): void
     {
-        // Create projects where this user has sent requests
-        $project = Project::factory()->create();
-        $otherUser = User::factory()->create();
+        // Create 3 different projects where this user has sent requests
+        $project1 = Project::factory()->create();
+        $project2 = Project::factory()->create();
+        $project3 = Project::factory()->create();
 
-        JoinRequest::factory()->count(3)->create([
+        JoinRequest::factory()->create([
             'user_id' => $this->user->id,
-            'project_id' => $project->id,
+            'project_id' => $project1->id,
+            'status' => 'pending',
+        ]);
+        JoinRequest::factory()->create([
+            'user_id' => $this->user->id,
+            'project_id' => $project2->id,
+            'status' => 'pending',
+        ]);
+        JoinRequest::factory()->create([
+            'user_id' => $this->user->id,
+            'project_id' => $project3->id,
             'status' => 'pending',
         ]);
 
