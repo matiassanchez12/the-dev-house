@@ -1,8 +1,8 @@
-# DevCollab — Project Documentation
+# DevHouse — Project Documentation
 
 ## Overview
 
-DevCollab is a collaborative platform where developers create projects, recruit team members, and work together. The platform connects project creators with potential collaborators based on technologies used.
+DevHouse is a collaborative platform where developers create projects, recruit team members, and work together. The platform connects project creators with potential collaborators based on technologies used.
 
 ---
 
