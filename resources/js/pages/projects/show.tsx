@@ -93,7 +93,13 @@ export default function Show({ auth, project }: Props) {
                                             {project.title}
                                         </CardTitle>
                                         <CardDescription className="mt-2">
-                                            Por: {project.creator.name}
+                                            Por:{' '}
+                                            <Link
+                                                href={route('users.show', project.creator.slug)}
+                                                className="hover:underline text-foreground font-medium"
+                                            >
+                                                {project.creator.name}
+                                            </Link>
                                         </CardDescription>
                                     </div>
                                     <Badge

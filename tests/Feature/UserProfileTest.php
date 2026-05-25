@@ -199,7 +199,7 @@ class UserProfileTest extends TestCase
 
         // Verify sorting (5 years > 4 years > 3 years)
         $this->assertEquals('React', $response->viewData('page')['props']['user']['techs'][0]['name']);
-        $this->assertEquals(5, $response->viewData('page')['props']['user']['techs'][0]['pivot']['years_experience']);
+        $this->assertEquals(5, $response->viewData('page')['props']['user']['techs'][0]['years']);
     }
 
     /**
