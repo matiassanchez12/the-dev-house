@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
 // Rutas con parámetros (SIEMPRE AL FINAL para que no capturen otras rutas)
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/{user:slug}', [UserController::class, 'show'])->name('users.show');
 
 require __DIR__.'/auth.php';

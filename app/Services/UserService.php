@@ -2,10 +2,43 @@
 
 namespace App\Services;
 
+use App\Models\Tech;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
 {
+    /**
+     * Get discoverable users with optional search and tech filters.
+     *
+     * @param array{q?: string|null, tech?: string|null, page?: int, per_page?: int} $filters
+     * @return LengthAwarePaginator
+     */
+    public function getDiscoverableUsers(array $filters = []): LengthAwarePaginator
+    {
+        $query = User::query()
+            ->withCount('techs')
+            ->withCount('createdProjects')
+            ->with(['techs' => function ($q) {
+                $q->select('techs.id', 'name', 'slug')
+                  ->limit(5);
+            }]);
+
+        if (! empty($filters['q'])) {
+            $query->where('name', 'LIKE', '%' . $filters['q'] . '%');
+        }
+
+        if (! empty($filters['tech'])) {
+            $query->whereHas('techs', function ($q) use ($filters) {
+                $q->where('slug', $filters['tech']);
+            });
+        }
+
+        $perPage = $filters['per_page'] ?? 12;
+
+        return $query->paginate($perPage);
+    }
+
     /**
      * Get public profile data for a user with eager loaded relations.
      *
