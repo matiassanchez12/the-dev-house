@@ -1,9 +1,42 @@
 import { Head, Link } from '@inertiajs/react';
+import { Rocket, Users, MessageSquare, Zap, GitBranch, CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ThemeToggle from '@/components/theme-toggle';
 import { Project as ProjectType, Tech } from '@/types';
+
+// Static JSX elements hoisted outside component (rendering-hoist-jsx)
+const heroBadge = (
+    <Badge variant="secondary" className="mb-4">
+        <Star className="size-3 mr-1" />
+        Nueva versión disponible
+    </Badge>
+);
+
+const statItems = [
+    { value: '500+', label: 'Proyectos Activos' },
+    { value: '2,000+', label: 'Desarrolladores' },
+    { value: '1,200+', label: 'Colaboraciones' },
+];
+
+const featureItems = [
+    {
+        icon: Rocket,
+        title: 'Creá tu Proyecto',
+        description: 'Compartí tu idea y encontrá desarrolladores talentosos para hacerla realidad',
+    },
+    {
+        icon: Users,
+        title: 'Unite a Equipos',
+        description: 'Explorá proyectos y sumate a los que se alineen con tus intereses y habilidades',
+    },
+    {
+        icon: MessageSquare,
+        title: 'Comunicación Fluida',
+        description: 'Chat integrado y sistema de solicitudes para coordinar con tu equipo',
+    },
+];
 
 interface Props {
     auth: {
@@ -23,60 +56,69 @@ export default function Landing({ auth, projects }: Props) {
     return (
         <>
             <Head title="Dev Collab Platform" />
-            <div className="min-h-screen bg-gradient-to-b from-background to-card">
+            <div className="min-h-screen bg-background">
                 {/* Header con ThemeToggle */}
                 <header className="container mx-auto px-4 py-4 flex justify-end">
                     <ThemeToggle />
                 </header>
 
                 {/* Hero Section */}
-                <section className="container mx-auto px-4 py-10 text-center">
-                    <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                        Conectá Desarrolladores,<br />Creá Proyectos Increíbles
-                    </h1>
-                    <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                        La plataforma donde desarrolladores de todo el mundo se unen para colaborar en proyectos open source y comerciales.
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                        {auth.user ? (
-                            <Link href={route('projects.create')}>
-                                <Button size="lg" className="text-lg px-8">
-                                    🚀 Crear Proyecto
-                                </Button>
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href={route('register')}>
+                <section className="container mx-auto px-4 py-16 md:py-24">
+                    <div className="text-center max-w-3xl mx-auto">
+                        <div className="animate-fade-in-up" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
+                            {heroBadge}
+                        </div>
+                        <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground animate-fade-in-up" style={{ '--stagger-delay': '100ms' } as React.CSSProperties}>
+                            Conectá Desarrolladores,<br />Creá Proyectos Increíbles
+                        </h1>
+                        <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in-up" style={{ '--stagger-delay': '200ms' } as React.CSSProperties}>
+                            La plataforma donde desarrolladores de todo el mundo se unen para colaborar en proyectos open source y comerciales.
+                        </p>
+                        <div className="flex gap-4 justify-center animate-fade-in-up" style={{ '--stagger-delay': '300ms' } as React.CSSProperties}>
+                            {auth.user ? (
+                                <Link href={route('projects.create')}>
                                     <Button size="lg" className="text-lg px-8">
-                                        Comenzar Gratis
+                                        <Rocket className="size-5 mr-2" />
+                                        Crear Proyecto
                                     </Button>
                                 </Link>
-                                <Link href={route('login')}>
-                                    <Button variant="outline" size="lg" className="text-lg px-8">
-                                        Iniciar Sesión
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
+                            ) : (
+                                <>
+                                    <Link href={route('register')}>
+                                        <Button size="lg" className="text-lg px-8">
+                                            Comenzar Gratis
+                                        </Button>
+                                    </Link>
+                                    <Link href={route('login')}>
+                                        <Button variant="outline" size="lg" className="text-lg px-8">
+                                            Iniciar Sesión
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Floating tech badges */}
+                    <div className="flex flex-wrap gap-2 justify-center mt-12 animate-fade-in-up" style={{ '--stagger-delay': '400ms' } as React.CSSProperties}>
+                        {['React', 'Laravel', 'TypeScript', 'Vue', 'Python'].map((tech) => (
+                            <Badge key={tech} variant="outline" className="text-sm px-3 py-1">
+                                {tech}
+                            </Badge>
+                        ))}
                     </div>
                 </section>
 
                 {/* Stats Section */}
-                <section className="bg-primary text-primary-foreground py-12">
+                <section className="bg-primary text-primary-foreground py-16">
                     <div className="container mx-auto px-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                            <div>
-                                <div className="text-4xl font-bold mb-2">{projects.total}+</div>
-                                <div className="text-primary-foreground/80">Proyectos Activos</div>
-                            </div>
-                            <div>
-                                <div className="text-4xl font-bold mb-2">100+</div>
-                                <div className="text-primary-foreground/80">Desarrolladores</div>
-                            </div>
-                            <div>
-                                <div className="text-4xl font-bold mb-2">50+</div>
-                                <div className="text-primary-foreground/80">Colaboraciones</div>
-                            </div>
+                            {statItems.map((stat, index) => (
+                                <div key={stat.label} className="animate-fade-in-up" style={{ '--stagger-delay': `${index * 100}ms` } as React.CSSProperties}>
+                                    <div className="text-4xl md:text-5xl font-bold mb-2 font-display">{stat.value}</div>
+                                    <div className="text-primary-foreground/80">{stat.label}</div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -84,15 +126,15 @@ export default function Landing({ auth, projects }: Props) {
                 {/* Featured Projects Section */}
                 <section className="container mx-auto px-4 py-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold mb-4">Proyectos Destacados</h2>
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">Proyectos Destacados</h2>
+                        <p className="text-muted-foreground max-w-xl mx-auto">
                             Explorá los últimos proyectos y encontrá el tuyo
                         </p>
                     </div>
 
                     {projects.data.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg mb-4">
+                            <p className="text-muted-foreground text-lg mb-4">
                                 No hay proyectos aún. ¡Sé el primero en crear uno!
                             </p>
                             {auth.user ? (
@@ -110,21 +152,24 @@ export default function Landing({ auth, projects }: Props) {
                             {projects.data.map((project) => (
                                 <Card key={project.id} className="flex flex-col hover:shadow-lg transition-shadow">
                                     <CardHeader>
-                                        <CardTitle className="text-lg">
-                                            <Link
-                                                href={route('projects.show', project.slug)}
-                                                className="hover:text-blue-600 transition"
-                                            >
-                                                {project.title}
-                                            </Link>
-                                        </CardTitle>
+                                        <div className="flex items-start justify-between gap-2">
+                                            <CardTitle className="text-lg">
+                                                <Link
+                                                    href={route('projects.show', project.slug)}
+                                                    className="hover:text-primary transition"
+                                                >
+                                                    {project.title}
+                                                </Link>
+                                            </CardTitle>
+                                            <Star className="size-4 text-amber-500 shrink-0 mt-1" />
+                                        </div>
                                         <CardDescription className="line-clamp-2">
                                             {project.description}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="flex-1">
                                         {/* Techs */}
-                                        <div className="flex flex-wrap gap-1 mb-3">
+                                        <div className="flex flex-wrap gap-1.5 mb-3">
                                             {project.techs?.slice(0, 5).map((tech) => (
                                                 <Badge key={tech.id} variant="secondary">
                                                     {tech.name}
@@ -138,7 +183,7 @@ export default function Landing({ auth, projects }: Props) {
                                         </div>
 
                                         {/* Creator */}
-                                        <div className="text-sm text-gray-500">
+                                        <div className="text-sm text-muted-foreground">
                                             Por: {project.creator?.name}
                                         </div>
                                     </CardContent>
@@ -148,15 +193,26 @@ export default function Landing({ auth, projects }: Props) {
                                                 project.status === 'open'
                                                     ? 'default'
                                                     : project.status === 'completed'
-                                                    ? 'destructive'
-                                                    : 'secondary'
+                                                    ? 'secondary'
+                                                    : 'destructive'
                                             }
                                         >
-                                            {project.status === 'open'
-                                                ? '🟢 Abierto'
-                                                : project.status === 'completed'
-                                                ? '✅ Completado'
-                                                : '🔴 Cerrado'}
+                                            {project.status === 'open' ? (
+                                                <>
+                                                    <CheckCircle className="size-3 mr-1" />
+                                                    Abierto
+                                                </>
+                                            ) : project.status === 'completed' ? (
+                                                <>
+                                                    <CheckCircle className="size-3 mr-1" />
+                                                    Completado
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Zap className="size-3 mr-1" />
+                                                    Cerrado
+                                                </>
+                                            )}
                                         </Badge>
                                     </CardFooter>
                                 </Card>
@@ -167,73 +223,109 @@ export default function Landing({ auth, projects }: Props) {
                     <div className="text-center mt-12">
                         <Link href={route('projects.index')}>
                             <Button variant="outline" size="lg">
-                                Ver todos los proyectos →
+                                Ver todos los proyectos
+                                <ArrowRight className="size-4 ml-2" />
                             </Button>
                         </Link>
                     </div>
                 </section>
 
                 {/* Features Section */}
-                <section className="bg-gray-100 dark:bg-gray-800 py-20">
+                <section className="bg-accent/30 py-20">
                     <div className="container mx-auto px-4">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold mb-4">¿Por qué unirte?</h2>
-                            <p className="text-gray-600 dark:text-gray-400">
+                            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">¿Por qué unirte?</h2>
+                            <p className="text-muted-foreground max-w-xl mx-auto">
                                 Todo lo que necesitás para colaborar en proyectos de desarrollo
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="text-center p-6">
-                                <div className="text-4xl mb-4">🚀</div>
-                                <h3 className="text-xl font-semibold mb-2">Creá tu Proyecto</h3>
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Compartí tu idea y encontrá desarrolladores talentosos para hacerla realidad
-                                </p>
-                            </div>
-                            <div className="text-center p-6">
-                                <div className="text-4xl mb-4">🤝</div>
-                                <h3 className="text-xl font-semibold mb-2">Unite a Equipos</h3>
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Explorá proyectos y sumate a los que se alineen con tus intereses y habilidades
-                                </p>
-                            </div>
-                            <div className="text-center p-6">
-                                <div className="text-4xl mb-4">💬</div>
-                                <h3 className="text-xl font-semibold mb-2">Comunicación Fluida</h3>
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Chat integrado y sistema de solicitudes para coordinar con tu equipo
-                                </p>
-                            </div>
+                            {featureItems.map((feature, index) => (
+                                <div
+                                    key={feature.title}
+                                    className="text-center p-6 rounded-xl bg-background/50 hover:bg-background/80 transition-colors animate-fade-in-up"
+                                    style={{ '--stagger-delay': `${index * 100}ms` } as React.CSSProperties}
+                                >
+                                    <div className="inline-flex items-center justify-center size-12 rounded-full bg-primary/10 mb-4">
+                                        <feature.icon className="size-6 text-primary" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
+                                    <p className="text-muted-foreground">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
 
                 {/* CTA Section */}
-                <section className="container mx-auto px-4 py-20 text-center">
-                    <h2 className="text-3xl font-bold mb-4">¿Listo para comenzar?</h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                        Unite a nuestra comunidad de desarrolladores y llevá tus proyectos al siguiente nivel
-                    </p>
-                    {auth.user ? (
-                        <Link href={route('projects.index')}>
-                            <Button size="lg" className="text-lg px-8">
-                                Explorar Proyectos
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link href={route('register')}>
-                            <Button size="lg" className="text-lg px-8">
-                                Crear Cuenta Gratis
-                            </Button>
-                        </Link>
-                    )}
+                <section className="bg-accent text-accent-foreground py-20">
+                    <div className="container mx-auto px-4 text-center">
+                        <div className="inline-flex items-center justify-center size-16 rounded-full bg-accent-foreground/10 mb-6">
+                            <Zap className="size-8" />
+                        </div>
+                        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">¿Listo para comenzar?</h2>
+                        <p className="text-accent-foreground/80 mb-8 max-w-xl mx-auto">
+                            Unite a nuestra comunidad de desarrolladores y llevá tus proyectos al siguiente nivel
+                        </p>
+                        {auth.user ? (
+                            <Link href={route('projects.index')}>
+                                <Button size="lg" className="text-lg px-8 bg-accent-foreground text-accent hover:bg-accent-foreground/90">
+                                    Explorar Proyectos
+                                    <ArrowRight className="size-4 ml-2" />
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Link href={route('register')}>
+                                <Button size="lg" className="text-lg px-8 bg-accent-foreground text-accent hover:bg-accent-foreground/90">
+                                    Crear Cuenta Gratis
+                                    <ArrowRight className="size-4 ml-2" />
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
                 </section>
 
                 {/* Footer */}
-                <footer className="bg-gray-900 text-gray-300 py-8">
-                    <div className="container mx-auto px-4 text-center">
-                        <p>&copy; 2026 Dev Collab Platform. Todos los derechos reservados.</p>
+                <footer className="bg-foreground text-background py-12">
+                    <div className="container mx-auto px-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                            <div>
+                                <h3 className="font-display font-bold text-lg mb-4">DevCollab</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Conectando desarrolladores para crear proyectos increíbles.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-4">Platforma</h4>
+                                <ul className="space-y-2 text-sm">
+                                    <li><Link href={route('projects.index')} className="hover:underline">Proyectos</Link></li>
+                                    <li><Link href={route('register')} className="hover:underline">Unirse</Link></li>
+                                    <li><Link href="#" className="hover:underline">Documentación</Link></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-4">Recursos</h4>
+                                <ul className="space-y-2 text-sm">
+                                    <li><Link href="#" className="hover:underline">API</Link></li>
+                                    <li><Link href="#" className="hover:underline">Tutoriales</Link></li>
+                                    <li><Link href="#" className="hover:underline">Blog</Link></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-4">Comunidad</h4>
+                                <ul className="space-y-2 text-sm">
+                                    <li><Link href="#" className="hover:underline">Discord</Link></li>
+                                    <li><Link href="#" className="hover:underline">GitHub</Link></li>
+                                    <li><Link href="#" className="hover:underline">Twitter</Link></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="border-t border-background/10 pt-8 text-center text-sm">
+                            <p>&copy; 2026 DevCollab Platform. Todos los derechos reservados.</p>
+                        </div>
                     </div>
                 </footer>
             </div>
