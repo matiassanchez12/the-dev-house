@@ -9,6 +9,7 @@ use App\Models\Tech;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -94,7 +95,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $this->authorize('update', $project);
+        Gate::authorize('update', $project);
 
         $techs = Tech::orderBy('name')->get();
 
@@ -109,7 +110,7 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $this->authorize('update', $project);
+        Gate::authorize('update', $project);
 
         $project = $this->projectService->update($project, $request->validated());
 
@@ -122,7 +123,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $this->authorize('delete', $project);
+        Gate::authorize('delete', $project);
 
         $this->projectService->delete($project);
 

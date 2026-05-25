@@ -10,6 +10,7 @@ use App\Services\Exceptions\SelfJoinException;
 use App\Services\JoinRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class JoinRequestController extends Controller
@@ -56,7 +57,7 @@ class JoinRequestController extends Controller
      */
     public function approve(JoinRequest $joinRequest)
     {
-        $this->authorize('approve', $joinRequest);
+        Gate::authorize('approve', $joinRequest);
 
         if ($joinRequest->status !== 'pending') {
             return back()->withErrors([
@@ -74,7 +75,7 @@ class JoinRequestController extends Controller
      */
     public function reject(JoinRequest $joinRequest)
     {
-        $this->authorize('reject', $joinRequest);
+        Gate::authorize('reject', $joinRequest);
 
         if ($joinRequest->status !== 'pending') {
             return back()->withErrors([
@@ -92,7 +93,7 @@ class JoinRequestController extends Controller
      */
     public function cancel(JoinRequest $joinRequest)
     {
-        $this->authorize('cancel', $joinRequest);
+        Gate::authorize('cancel', $joinRequest);
 
         if ($joinRequest->status !== 'pending') {
             return back()->withErrors([
