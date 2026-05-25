@@ -99,6 +99,8 @@ class ProjectController extends Controller
 
         $techs = Tech::orderBy('name')->get();
 
+        $project->load(['creator.techs', 'techs']);
+
         return Inertia::render('projects/edit', [
             'project' => $project,
             'techs' => $techs,
