@@ -59,7 +59,7 @@ docker compose up -d
 
 # utils 
 sudo chown -R $USER:$USER .
-
+cp .env.example .env
 npx autoskills
 ```
 
