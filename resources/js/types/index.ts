@@ -77,3 +77,40 @@ export interface ProjectParticipant {
     updated_at: string;
     user?: User;
 }
+
+// Public user profile types
+export interface UserProfile {
+    id: number;
+    name: string;
+    bio: string | null;
+    avatar: string | null;
+    created_at?: string;
+    createdProjects: UserProject[];
+    participatingProjects: UserProject[];
+    techs: UserTech[];
+}
+
+export interface UserProject {
+    id: number;
+    title: string;
+    slug: string;
+    status: 'open' | 'closed' | 'completed';
+    creator: {
+        id: number;
+        name: string;
+        avatar?: string | null;
+    };
+    techs: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
+    participants_count: number;
+}
+
+export interface UserTech {
+    id: number;
+    name: string;
+    slug: string;
+    years: number | null;
+}
