@@ -1,7 +1,7 @@
-import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
+import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -36,11 +36,12 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
+                        placeholder="Tu nombre"
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <FormError message={errors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -53,11 +54,12 @@ export default function Register() {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
+                        placeholder="email@example.com"
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <FormError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -70,11 +72,12 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <FormError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -90,13 +93,14 @@ export default function Register() {
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        placeholder="••••••••"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
                         }
                         required
                     />
 
-                    <InputError
+                    <FormError
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
@@ -105,7 +109,7 @@ export default function Register() {
                 <div className="mt-4 flex items-center justify-end">
                     <Link
                         href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="rounded-md text-sm text-muted-foreground underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                         Already registered?
                     </Link>

@@ -1,8 +1,8 @@
 import Checkbox from '@/components/checkbox';
-import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
+import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -43,10 +43,11 @@ export default function Login({ status, canResetPassword }) {
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
+                        placeholder="email@example.com"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <FormError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -59,10 +60,11 @@ export default function Login({ status, canResetPassword }) {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
+                        placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <FormError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4 block">

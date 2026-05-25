@@ -1,6 +1,6 @@
-import InputError from '@/components/input-error';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
+import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -39,10 +39,11 @@ export default function ForgotPassword({ status }) {
                     value={data.email}
                     className="mt-1 block w-full"
                     isFocused={true}
+                    placeholder="email@example.com"
                     onChange={(e) => setData('email', e.target.value)}
                 />
 
-                <InputError message={errors.email} className="mt-2" />
+                <FormError message={errors.email} className="mt-2" />
 
                 <div className="mt-4 flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>

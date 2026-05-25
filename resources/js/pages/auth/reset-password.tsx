@@ -1,7 +1,7 @@
-import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
+import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -36,10 +36,11 @@ export default function ResetPassword({ token, email }) {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
+                        placeholder="email@example.com"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <FormError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -53,10 +54,11 @@ export default function ResetPassword({ token, email }) {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         isFocused={true}
+                        placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <FormError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -72,12 +74,13 @@ export default function ResetPassword({ token, email }) {
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        placeholder="••••••••"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
                         }
                     />
 
-                    <InputError
+                    <FormError
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
