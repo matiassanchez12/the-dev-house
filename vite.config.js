@@ -15,7 +15,7 @@ export default defineConfig({
             '@': '/resources/js',
             '@components': '/resources/js/Components',
             '@layouts': '/resources/js/Layouts',
-            '@pages': '/resources/js/Pages',
+            '@pages': '/resources/js/pages',
         },
     },
     server: {
