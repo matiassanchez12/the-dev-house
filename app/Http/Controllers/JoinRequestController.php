@@ -26,7 +26,7 @@ class JoinRequestController extends Controller
     {
         $data = $this->joinRequestService->getIndexData(Auth::user());
 
-        return Inertia::render('join-requests/index', $data);
+        return Inertia::render('join_requests/index', $data);
     }
 
     /**
