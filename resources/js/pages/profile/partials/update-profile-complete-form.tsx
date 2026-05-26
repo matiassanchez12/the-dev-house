@@ -32,6 +32,15 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         5: 'master',
     };
 
+    // Reverse map: string to number for range slider display
+    const stringToNumber: Record<string, number> = {
+        'basic': 1,
+        'intermediate': 2,
+        'advanced': 3,
+        'expert': 4,
+        'master': 5,
+    };
+
     const proficiencyLabels: Record<string, string> = {
         'basic': 'Principiante',
         'intermediate': 'Básico',
@@ -157,81 +166,144 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                     <p className="text-sm text-muted-foreground mb-4">
                         Seleccioná las tecnologías que conocés y tu nivel de experiencia
                     </p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {allTechs.map((tech) => {
-                            const userTech = data.techs.find((t) => t.id === tech.id);
-                            const isSelected = !!userTech;
+
+                    {/* Selected techs summary */}
+                    {data.techs.length > 0 && (
+                        <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
+                            <p className="text-sm text-muted-foreground mb-2">
+                                {data.techs.length} tecnología{data.techs.length !== 1 ? 's' : ''} seleccionada{data.techs.length !== 1 ? 's' : ''}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                                {data.techs.map((tech) => (
+                                    <span
+                                        key={tech.id}
+                                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                                    >
+                                        {allTechs.find((t) => t.id === tech.id)?.name}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleTechToggle(tech.id, false)}
+                                            className="hover:text-primary/70"
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Techs grouped by letter */}
+                    <div className="space-y-2">
+                        {Object.entries(
+                            allTechs.reduce((acc, tech) => {
+                                const letter = tech.name[0].toUpperCase();
+                                if (!acc[letter]) acc[letter] = [];
+                                acc[letter].push(tech);
+                                return acc;
+                            }, {} as Record<string, typeof allTechs>)
+                        ).sort(([a], [b]) => a.localeCompare(b)).map(([letter, techs]) => {
+                            const selectedCount = techs.filter((t) =>
+                                data.techs.some((ut) => ut.id === t.id)
+                            ).length;
 
                             return (
-                                <div
-                                    key={tech.id}
-                                    className={`border rounded-lg p-4 transition ${
-                                        isSelected ? 'border-primary bg-primary/5' : 'border-input'
-                                    }`}
-                                >
-                                    <label className="flex items-center justify-between mb-3">
+                                <details key={letter} className="group border border-border rounded-lg overflow-hidden">
+                                    <summary className="flex items-center justify-between px-4 py-2 cursor-pointer list-none bg-muted/30 hover:bg-muted/50 transition-colors">
                                         <div className="flex items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={isSelected}
-                                                onChange={(e) => handleTechToggle(tech.id, e.target.checked)}
-                                                className="rounded border-input text-primary focus:ring-primary"
+                                            <span className="font-semibold text-foreground">{letter}</span>
+                                            <span className="text-sm text-muted-foreground">
+                                                ({techs.length} tecnología{techs.length !== 1 ? 's' : ''})
+                                            </span>
+                                            {selectedCount > 0 && (
+                                                <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                                                    {selectedCount} seleccionada{selectedCount !== 1 ? 's' : ''}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <svg
+                                            className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
                                             />
-                                            <span className="font-medium text-foreground">{tech.name}</span>
-                                        </div>
-                                        {isSelected && (
-                                            <span className="text-xs text-primary">✓ Seleccionado</span>
-                                        )}
-                                    </label>
+                                        </svg>
+                                    </summary>
+                                    <div className="divide-y divide-border">
+                                        {techs.map((tech) => {
+                                            const userTech = data.techs.find((t) => t.id === tech.id);
+                                            const isSelected = !!userTech;
 
-                                    {isSelected && (
-                                        <div className="space-y-3 ml-6">
-                                            <div>
-                                                <label className="text-xs text-muted-foreground block mb-1">
-                                                    Años de experiencia
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max="50"
-                                                    value={userTech.years_experience}
-                                                    onChange={(e) =>
-                                                        handleTechUpdate(tech.id, 'years_experience', e.target.value)
-                                                    }
-                                                    className="w-full border-input rounded-md text-sm focus:border-primary focus:ring-1 focus:ring-primary bg-background"
-                                                    placeholder="Ej: 3"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-muted-foreground block mb-1">
-                                                    Nivel de dominio (1-5)
-                                                </label>
-                                                <input
-                                                    type="range"
-                                                    min="1"
-                                                    max="5"
-                                                    value={userTech.proficiency}
-                                                    onChange={(e) =>
-                                                        handleTechUpdate(tech.id, 'proficiency', parseInt(e.target.value))
-                                                    }
-                                                    className="w-full"
-                                                />
-                                                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                                                    <span>Principiante</span>
-                                                    <span className="font-medium text-primary">
-                                                        {userTech.proficiency === 1 && 'Principiante'}
-                                                        {userTech.proficiency === 2 && 'Básico'}
-                                                        {userTech.proficiency === 3 && 'Intermedio'}
-                                                        {userTech.proficiency === 4 && 'Avanzado'}
-                                                        {userTech.proficiency === 5 && 'Experto'}
-                                                    </span>
-                                                    <span>Experto</span>
+                                            return (
+                                                <div key={tech.id} className="px-4 py-3">
+                                                    <label className="flex items-center justify-between cursor-pointer">
+                                                        <div className="flex items-center gap-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isSelected}
+                                                                onChange={(e) => handleTechToggle(tech.id, e.target.checked)}
+                                                                className="rounded border-input text-primary focus:ring-primary"
+                                                            />
+                                                            <span className={`text-sm ${isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                                                                {tech.name}
+                                                            </span>
+                                                        </div>
+                                                        {isSelected && (
+                                                            <span className="text-xs text-primary">
+                                                                {proficiencyLabels[userTech.proficiency]}
+                                                            </span>
+                                                        )}
+                                                    </label>
+
+                                                    {isSelected && (
+                                                        <div className="mt-3 ml-6 space-y-3 p-3 bg-muted/30 rounded-lg">
+                                                            <div>
+                                                                <label className="text-xs text-muted-foreground block mb-1">
+                                                                    Años de experiencia
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    max="50"
+                                                                    value={userTech.years_experience}
+                                                                    onChange={(e) =>
+                                                                        handleTechUpdate(tech.id, 'years_experience', e.target.value)
+                                                                    }
+                                                                    className="w-full border border-input rounded-md text-sm px-2 py-1 bg-background focus:border-ring focus:ring-1 focus:ring-ring"
+                                                                    placeholder="Ej: 3"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-xs text-muted-foreground block mb-1">
+                                                                    Nivel: {proficiencyLabels[userTech.proficiency]}
+                                                                </label>
+                                                                <input
+                                                                    type="range"
+                                                                    min="1"
+                                                                    max="5"
+                                                                    value={stringToNumber[userTech.proficiency] || 3}
+                                                                    onChange={(e) =>
+                                                                        handleTechUpdate(tech.id, 'proficiency', parseInt(e.target.value))
+                                                                    }
+                                                                    className="w-full accent-primary"
+                                                                />
+                                                                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                                    <span>Principiante</span>
+                                                                    <span>Experto</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </details>
                             );
                         })}
                     </div>
