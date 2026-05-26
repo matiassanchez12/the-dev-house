@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tech, Project as ProjectType } from '@/types';
 import { ProjectForm } from '@/components/projects/project-form';
 import { useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 interface Props {
     auth: {
@@ -34,7 +35,11 @@ export default function Edit({ auth, project, techs }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        form.put(`/projects/${project.slug}`, { forceFormData: true });
+        form.put(`/projects/${project.slug}`, {
+            forceFormData: true,
+            onSuccess: () => toast.success('Proyecto actualizado exitosamente'),
+            onError: () => toast.error('Error al actualizar el proyecto'),
+        });
     };
 
     return (

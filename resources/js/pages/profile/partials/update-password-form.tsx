@@ -1,10 +1,11 @@
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
-import PrimaryButton from '@/components/primary-button';
+import { Button } from '@/components/ui/button';
 import TextInput from '@/components/text-input';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
@@ -29,8 +30,12 @@ export default function UpdatePasswordForm({ className = '' }) {
 
         put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                toast.success('Contraseña actualizada exitosamente');
+            },
             onError: (errors) => {
+                toast.error('Error al actualizar la contraseña');
                 if (errors.password) {
                     reset('password', 'password_confirmation');
                     passwordInput.current.focus();
@@ -122,7 +127,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <Button disabled={processing}>Save</Button>
 
                     <Transition
                         show={recentlySuccessful}

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tech } from '@/types';
 import { ProjectForm } from '@/components/projects/project-form';
 import { useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 interface Props {
     auth: {
@@ -29,7 +30,11 @@ export default function Create({ auth, techs }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        form.post('/projects', { forceFormData: true });
+        form.post('/projects', {
+            forceFormData: true,
+            onSuccess: () => toast.success('Proyecto creado exitosamente'),
+            onError: () => toast.error('Error al crear el proyecto'),
+        });
     };
 
     return (

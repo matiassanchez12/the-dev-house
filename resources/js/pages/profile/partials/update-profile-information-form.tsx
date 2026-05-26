@@ -1,9 +1,10 @@
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
-import PrimaryButton from '@/components/primary-button';
+import { Button } from '@/components/ui/button';
 import TextInput from '@/components/text-input';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -21,7 +22,10 @@ export default function UpdateProfileInformation({
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        patch(route('profile.update'), {
+            onSuccess: () => toast.success('Perfil actualizado exitosamente'),
+            onError: () => toast.error('Error al actualizar el perfil'),
+        });
     };
 
     return (
@@ -93,7 +97,7 @@ export default function UpdateProfileInformation({
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <Button disabled={processing}>Save</Button>
 
                     <Transition
                         show={recentlySuccessful}

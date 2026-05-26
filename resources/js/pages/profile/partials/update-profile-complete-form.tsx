@@ -1,10 +1,11 @@
 import InputError from '@/components/input-error';
-import PrimaryButton from '@/components/primary-button';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { Tech } from '@/types';
+import { toast } from 'sonner';
 
 interface UserTech extends Tech {
     pivot: {
@@ -101,6 +102,8 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         post(route('profile.update-complete'), {
             forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => toast.success('Perfil actualizado exitosamente'),
+            onError: () => toast.error('Error al actualizar el perfil'),
         });
     };
 
@@ -312,7 +315,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
 
                 {/* Submit Button */}
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Guardar Cambios</PrimaryButton>
+                    <Button disabled={processing}>Guardar Cambios</Button>
 
                     <Transition
                         show={recentlySuccessful}

@@ -6,7 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Project as ProjectType, Tech, User } from '@/types';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
     auth: {
@@ -28,11 +31,16 @@ export default function Show({ auth, project }: Props) {
     const { data, setData, post, processing, errors, reset } = useForm({
         message: '',
     });
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const handleDelete = () => {
-        if (confirm('¿Estás seguro de que querés eliminar este proyecto?')) {
-            destroy(route('projects.destroy', project.slug));
-        }
+        destroy(route('projects.destroy', project.slug), {
+            onSuccess: () => {
+                setShowDeleteDialog(false);
+                toast.success('Proyecto eliminado exitosamente');
+            },
+            onError: () => toast.error('Error al eliminar el proyecto'),
+        });
     };
 
     const handleJoinRequest = (e: React.FormEvent) => {
@@ -40,7 +48,9 @@ export default function Show({ auth, project }: Props) {
         post(route('join-requests.store', project.id), {
             onSuccess: () => {
                 reset('message');
+                toast.success('Solicitud de unión enviada');
             },
+            onError: () => toast.error('Error al enviar la solicitud'),
         });
     };
 
@@ -60,7 +70,7 @@ export default function Show({ auth, project }: Props) {
                                 <Link href={route('projects.edit', project.slug)}>
                                     <Button variant="outline">Editar</Button>
                                 </Link>
-                                <Button variant="destructive" onClick={handleDelete}>
+                                <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
                                     Eliminar
                                 </Button>
                             </div>
@@ -293,6 +303,26 @@ export default function Show({ auth, project }: Props) {
                         )}
                     </div>
                 </div>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Eliminar Proyecto</DialogTitle>
+                            <DialogDescription>
+                                ¿Estás seguro de que querés eliminar este proyecto? Esta acción no se puede deshacer.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="secondary" onClick={() => setShowDeleteDialog(false)}>
+                                Cancelar
+                            </Button>
+                            <Button variant="destructive" onClick={handleDelete}>
+                                Eliminar
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </PublicLayout>
         </>
     );

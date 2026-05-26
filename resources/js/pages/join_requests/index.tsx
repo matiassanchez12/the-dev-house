@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JoinRequest, Project, User } from '@/types';
+import { toast } from 'sonner';
 
 interface Props {
     auth: {
@@ -27,15 +28,24 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
     const { post, processing } = useForm({});
 
     const handleApprove = (joinRequestId: number) => {
-        post(route('join-requests.approve', joinRequestId));
+        post(route('join-requests.approve', joinRequestId), {
+            onSuccess: () => toast.success('Solicitud aprobada'),
+            onError: () => toast.error('Error al aprobar la solicitud'),
+        });
     };
 
     const handleReject = (joinRequestId: number) => {
-        post(route('join-requests.reject', joinRequestId));
+        post(route('join-requests.reject', joinRequestId), {
+            onSuccess: () => toast.success('Solicitud rechazada'),
+            onError: () => toast.error('Error al rechazar la solicitud'),
+        });
     };
 
     const handleCancel = (joinRequestId: number) => {
-        post(route('join-requests.cancel', joinRequestId));
+        post(route('join-requests.cancel', joinRequestId), {
+            onSuccess: () => toast.success('Solicitud cancelada'),
+            onError: () => toast.error('Error al cancelar la solicitud'),
+        });
     };
 
     return (

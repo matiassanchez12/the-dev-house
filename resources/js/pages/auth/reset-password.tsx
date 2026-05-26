@@ -1,5 +1,5 @@
 import InputLabel from '@/components/input-label';
-import PrimaryButton from '@/components/primary-button';
+import { Button } from '@/components/ui/button';
 import TextInput from '@/components/text-input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
@@ -87,9 +87,9 @@ export default function ResetPassword({ token, email }) {
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <Button className="ms-4" disabled={processing}>
                         Reset Password
-                    </PrimaryButton>
+                    </Button>
                 </div>
             </form>
         </GuestLayout>
