@@ -98,30 +98,19 @@ class ProjectTest extends TestCase
         );
     }
 
-    /**
-     * TEST 4: Ver formulario de creación (requiere auth)
-     * @todo Fix: 404 en testing con Laravel 11+ + Inertia. La ruta funciona en producción.
-     */
     public function test_can_view_create_project_form_when_authenticated(): void
     {
-        $this->markTestSkipped('Problema de configuración de testing con Inertia en Laravel 11+. La ruta funciona correctamente en producción.');
-        
-        // Crear usuario específico para este test
         $user = User::factory()->create();
-        
+
         $response = $this->actingAs($user)->get('/projects/create');
+
         $response->assertStatus(200);
     }
 
-    /**
-     * TEST 5: No puede ver formulario sin auth
-     * @todo Fix: 404 en testing. La ruta funciona en producción.
-     */
     public function test_cannot_view_create_form_without_authentication(): void
     {
-        $this->markTestSkipped('Problema de configuración de testing con Inertia en Laravel 11+. La ruta funciona correctamente en producción.');
-        
         $response = $this->get('/projects/create');
+
         $response->assertStatus(302);
     }
 
