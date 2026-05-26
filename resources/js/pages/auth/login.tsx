@@ -1,4 +1,4 @@
-import Checkbox from '@/components/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 import InputLabel from '@/components/input-label';
 import PrimaryButton from '@/components/primary-button';
 import TextInput from '@/components/text-input';
@@ -70,10 +70,10 @@ export default function Login({ status, canResetPassword }) {
                 <div className="mt-4 block">
                     <label className="flex items-center">
                         <Checkbox
-                            name="remember"
+                            id="remember"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
+                            onCheckedChange={(checked) =>
+                                setData('remember', checked === true)
                             }
                         />
                         <span className="ms-2 text-sm text-muted-foreground">

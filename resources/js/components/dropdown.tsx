@@ -38,7 +38,7 @@ const Trigger = ({ children }) => {
 const Content = ({
     align = 'right',
     width = '48',
-    contentClasses = 'py-1 bg-white',
+    contentClasses = 'py-1 bg-card dark:bg-card border border-border',
     children,
 }) => {
     const { open, setOpen } = useContext(DropDownContext);
@@ -74,7 +74,7 @@ const Content = ({
                 >
                     <div
                         className={
-                            `rounded-md ring-1 ring-black ring-opacity-5 ` +
+                            `rounded-md ring-1 ring-border dark:ring-ring ` +
                             contentClasses
                         }
                     >
