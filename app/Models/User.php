@@ -119,4 +119,39 @@ class User extends Authenticatable
     {
         return $this->onboarding_completed_at !== null;
     }
+
+    /**
+     * Boot the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->slug)) {
+                $baseSlug = static::generateSlug($user->name);
+                $slug = $baseSlug;
+                $counter = 1;
+
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+
+                $user->slug = $slug;
+            }
+        });
+    }
+
+    /**
+     * Generate a URL-friendly slug from a name, removing accents and special chars.
+     */
+    private static function generateSlug(string $name): string
+    {
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name);
+        $normalized = str_replace(["'", '"', '`'], '', $normalized);
+        $normalized = preg_replace('/[^a-z0-9]+/i', '-', $normalized);
+        $normalized = trim($normalized, '-');
+        $normalized = strtolower($normalized);
+
+        return $normalized ?: 'user';
+    }
 }
