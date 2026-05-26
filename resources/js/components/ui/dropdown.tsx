@@ -18,7 +18,7 @@ Dropdown.Content = ({
   children,
   ...props
 }: DropdownMenuContent.Props & { children?: React.ReactNode }) => (
-  <DropdownMenuContent align={align} className={cn('z-50', className)} {...props}>
+  <DropdownMenuContent align={align} className={cn('z-50 bg-card shadow-md rounded-lg border border-border min-w-[8rem] p-1', className)} {...props}>
     {children}
   </DropdownMenuContent>
 );
