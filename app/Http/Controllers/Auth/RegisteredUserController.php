@@ -47,6 +47,11 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Redirect to onboarding if not completed
+        if ($user->onboarding_completed_at === null) {
+            return redirect(route('onboarding.index'));
+        }
+
         return redirect(route('dashboard', absolute: false));
     }
 }
