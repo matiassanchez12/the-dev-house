@@ -82,6 +82,7 @@ class DashboardService
             'participatingProjects' => $participatingProjects,
             'pendingRequests' => $pendingRequests,
             'sentRequests' => $sentRequests,
+            'isOnboardingComplete' => $user->hasCompletedOnboarding(),
         ];
     }
 }
