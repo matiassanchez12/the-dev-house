@@ -115,3 +115,13 @@ export interface UserTech {
     slug: string;
     years: number | null;
 }
+
+export interface DiscoverableUser {
+    id: number;
+    name: string;
+    avatar: string | null;
+    bio: string | null;
+    techs: Array<{ id: number; name: string; slug: string }>;
+    created_projects_count: number;
+    joined_projects_count: number;
+}

@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Check, X, Clock } from 'lucide-react';
 import AuthenticatedLayout from '@/layouts/authenticated';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -93,7 +94,7 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                                                         onClick={() => handleApprove(request.id)}
                                                         disabled={processing}
                                                     >
-                                                        ✅ Aprobar
+                                                        <Check className="w-4 h-4" /> Aprobar
                                                     </Button>
                                                     <Button
                                                         variant="destructive"
@@ -101,7 +102,7 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                                                         onClick={() => handleReject(request.id)}
                                                         disabled={processing}
                                                     >
-                                                        ❌ Rechazar
+                                                        <X className="w-4 h-4" /> Rechazar
                                                     </Button>
                                                 </div>
                                             </div>
@@ -147,11 +148,12 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                                                                 : 'secondary'
                                                         }
                                                     >
+                                                        <Clock className="w-3 h-3" />{' '}
                                                         {request.status === 'approved'
-                                                            ? '✅ Aprobada'
+                                                            ? 'Aprobada'
                                                             : request.status === 'rejected'
-                                                            ? '❌ Rechazada'
-                                                            : '⏳ Pendiente'}
+                                                            ? 'Rechazada'
+                                                            : 'Pendiente'}
                                                     </Badge>
                                                 </div>
                                                 {request.status === 'pending' && (

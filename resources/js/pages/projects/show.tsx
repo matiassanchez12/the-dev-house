@@ -1,13 +1,12 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { CircleDot, CheckCircle, CircleX, GitBranch, ExternalLink, Send } from 'lucide-react';
 import PublicLayout from '@/layouts/public';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Project as ProjectType, Tech, User } from '@/types';
-import { CircleDot, CheckCircle, CircleX } from 'lucide-react';
 
 interface Props {
     auth: {
@@ -103,42 +102,40 @@ export default function Show({ auth, project }: Props) {
                                         </CardDescription>
                                     </div>
                                     <Badge
-                                        variant={
+                                        variant="secondary"
+                                        className={`gap-1.5 ${
                                             project.status === 'open'
-                                                ? 'secondary'
+                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                                 : project.status === 'completed'
-                                                ? 'default'
-                                                : 'outline'
-                                        }
-                                        className={
-                                            project.status === 'open'
-                                                ? 'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400'
-                                                : project.status === 'completed'
-                                                ? 'bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400'
+                                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                                                 : ''
-                                        }
+                                        }`}
                                     >
                                         {project.status === 'open' && (
-                                            <CircleDot className="h-3 w-3" />
+                                            <>
+                                                <CircleDot className="size-3" />
+                                                Abierto
+                                            </>
                                         )}
                                         {project.status === 'completed' && (
-                                            <CheckCircle className="h-3 w-3" />
+                                            <>
+                                                <CheckCircle className="size-3" />
+                                                Completado
+                                            </>
                                         )}
                                         {project.status === 'closed' && (
-                                            <CircleX className="h-3 w-3" />
+                                            <>
+                                                <CircleX className="size-3" />
+                                                Cerrado
+                                            </>
                                         )}
-                                        {project.status === 'open'
-                                            ? 'Abierto'
-                                            : project.status === 'completed'
-                                            ? 'Completado'
-                                            : 'Cerrado'}
                                     </Badge>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <h3 className="font-semibold mb-2">Descripción</h3>
-                                    <p className="text-gray-700 whitespace-pre-line">
+                                    <p className="text-foreground whitespace-pre-line">
                                         {project.description}
                                     </p>
                                 </div>
@@ -146,7 +143,7 @@ export default function Show({ auth, project }: Props) {
                                 {project.vision && (
                                     <div>
                                         <h3 className="font-semibold mb-2">Visión</h3>
-                                        <p className="text-gray-700 whitespace-pre-line">
+                                        <p className="text-foreground whitespace-pre-line">
                                             {project.vision}
                                         </p>
                                     </div>
@@ -173,9 +170,10 @@ export default function Show({ auth, project }: Props) {
                                             href={project.repository_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
+                                            className="text-primary hover:underline inline-flex items-center gap-1"
                                         >
-                                            📦 Ver Repositorio
+                                            <GitBranch className="size-4" />
+                                            Ver Repositorio
                                         </a>
                                     )}
                                     {project.demo_url && (
@@ -183,9 +181,10 @@ export default function Show({ auth, project }: Props) {
                                             href={project.demo_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
+                                            className="text-primary hover:underline inline-flex items-center gap-1"
                                         >
-                                            🚀 Ver Demo
+                                            <ExternalLink className="size-4" />
+                                            Ver <span className="hidden sm:inline">Demo</span>
                                         </a>
                                     )}
                                 </div>
@@ -259,7 +258,8 @@ export default function Show({ auth, project }: Props) {
                                             )}
                                         </div>
                                         <Button type="submit" className="w-full" disabled={processing}>
-                                            {processing ? 'Enviando...' : '🙋 Enviar Solicitud'}
+                                            <Send className="size-4 mr-2" />
+                                            {processing ? 'Enviando...' : 'Enviar Solicitud'}
                                         </Button>
                                     </form>
                                 </CardContent>

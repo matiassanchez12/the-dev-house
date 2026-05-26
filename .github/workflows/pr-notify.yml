@@ -1,0 +1,56 @@
+name: PR Discord Notify
+
+on:
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord PR Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_DEV_HOUSE }}
+          ACTION: ${{ github.event.action }}
+          AUTHOR: ${{ github.actor }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_STATE: ${{ github.event.pull_request.state }}
+          IS_MERGED: ${{ github.event.pull_request.merged }}
+        run: |
+          WEBHOOK=$(echo "$DISCORD_WEBHOOK" | xargs)
+          if [ -z "$WEBHOOK" ]; then
+            echo "ERROR: DISCORD_WEBHOOK_DEV_HOUSE is empty"
+            exit 1
+          fi
+
+          if [ "$ACTION" = "opened" ]; then
+            COLOR=5814783
+            TITLE="📋 Nuevo PR #${PR_NUMBER}"
+            DESC="**${AUTHOR}** abrió PR: **${PR_TITLE}**\n\nDe **${SOURCE_BRANCH}** → **${TARGET_BRANCH}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+          elif [ "$ACTION" = "closed" ]; then
+            if [ "$IS_MERGED" = "true" ]; then
+              COLOR=3066993
+              TITLE="✅ PR #${PR_NUMBER} Merged"
+              DESC="**${PR_TITLE}** fue merged a **${TARGET_BRANCH}**\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+            else
+              COLOR=1003876
+              TITLE="❌ PR #${PR_NUMBER} Cerrado"
+              DESC="**${PR_TITLE}** fue cerrado sin merge\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+            fi
+          elif [ "$ACTION" = "reopened" ]; then
+            COLOR=16772412
+            TITLE="🔄 PR #${PR_NUMBER} Reabierto"
+            DESC="**${PR_TITLE}** fue reabierto\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+          else
+            COLOR=5814783
+            TITLE="📋 PR #${PR_NUMBER} - ${ACTION}"
+            DESC="**${PR_TITLE}** - ${ACTION} por **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+          fi
+
+          curl -X POST "$WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{\"embeds\":[{\"title\":\"${TITLE}\",\"description\":\"${DESC}\",\"color\":${COLOR},\"footer\":{\"text\":\"devhouse\"}}]}"

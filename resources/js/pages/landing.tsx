@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import { Rocket, Users, MessageSquare, Zap, GitBranch, CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ProjectCard } from '@/components/projects/project-card';
 import ThemeToggle from '@/components/theme-toggle';
-import { Project as ProjectType, Tech } from '@/types';
+import { Project as ProjectType } from '@/types';
 
 // Static JSX elements hoisted outside component (rendering-hoist-jsx)
 const heroBadge = (
@@ -150,72 +150,11 @@ export default function Landing({ auth, projects }: Props) {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {projects.data.map((project) => (
-                                <Card key={project.id} className="flex flex-col hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-lg">
-                                                <Link
-                                                    href={route('projects.show', project.slug)}
-                                                    className="hover:text-primary transition"
-                                                >
-                                                    {project.title}
-                                                </Link>
-                                            </CardTitle>
-                                            <Star className="size-4 text-amber-500 shrink-0 mt-1" />
-                                        </div>
-                                        <CardDescription className="line-clamp-2">
-                                            {project.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex-1">
-                                        {/* Techs */}
-                                        <div className="flex flex-wrap gap-1.5 mb-3">
-                                            {project.techs?.slice(0, 5).map((tech) => (
-                                                <Badge key={tech.id} variant="secondary">
-                                                    {tech.name}
-                                                </Badge>
-                                            ))}
-                                            {project.techs && project.techs.length > 5 && (
-                                                <Badge variant="outline">
-                                                    +{project.techs.length - 5}
-                                                </Badge>
-                                            )}
-                                        </div>
-
-                                        {/* Creator */}
-                                        <div className="text-sm text-muted-foreground">
-                                            Por: {project.creator?.name}
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Badge
-                                            variant={
-                                                project.status === 'open'
-                                                    ? 'default'
-                                                    : project.status === 'completed'
-                                                    ? 'secondary'
-                                                    : 'destructive'
-                                            }
-                                        >
-                                            {project.status === 'open' ? (
-                                                <>
-                                                    <CheckCircle className="size-3 mr-1" />
-                                                    Abierto
-                                                </>
-                                            ) : project.status === 'completed' ? (
-                                                <>
-                                                    <CheckCircle className="size-3 mr-1" />
-                                                    Completado
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Zap className="size-3 mr-1" />
-                                                    Cerrado
-                                                </>
-                                            )}
-                                        </Badge>
-                                    </CardFooter>
-                                </Card>
+                                <ProjectCard
+                                    key={project.id}
+                                    project={project}
+                                    variant="featured"
+                                />
                             ))}
                         </div>
                     )}

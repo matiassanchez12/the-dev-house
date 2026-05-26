@@ -9,7 +9,7 @@ const proficiencyConfig = [
     { min: 6, label: 'Experto', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
     { min: 4, label: 'Avanzado', className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
     { min: 2, label: 'Intermedio', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-    { min: 0, label: 'Principiante', className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' },
+    { min: 0, label: 'Principiante', className: 'bg-muted text-foreground dark:bg-muted dark:text-muted-foreground' },
 ];
 
 function getProficiency(years: number | null) {
