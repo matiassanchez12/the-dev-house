@@ -1,9 +1,9 @@
 import DangerButton from '@/components/danger-button';
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
-import Modal from '@/components/modal';
 import SecondaryButton from '@/components/secondary-button';
 import TextInput from '@/components/text-input';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 
@@ -64,57 +64,59 @@ export default function DeleteUserForm({ className = '' }) {
                 Delete Account
             </DangerButton>
 
-            <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-foreground">
-                        Are you sure you want to delete your account?
-                    </h2>
+            <Dialog open={confirmingUserDeletion} onOpenChange={setConfirmingUserDeletion}>
+                <DialogContent>
+                    <form onSubmit={deleteUser} className="p-6">
+                        <h2 className="text-lg font-medium text-foreground">
+                            Are you sure you want to delete your account?
+                        </h2>
 
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Once your account is deleted, all of its resources and
-                        data will be permanently deleted. Please enter your
-                        password to confirm you would like to permanently delete
-                        your account.
-                    </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Once your account is deleted, all of its resources and
+                            data will be permanently deleted. Please enter your
+                            password to confirm you would like to permanently delete
+                            your account.
+                        </p>
 
-                    <div className="mt-6">
-                        <InputLabel
-                            htmlFor="password"
-                            value="Password"
-                            className="sr-only"
-                        />
+                        <div className="mt-6">
+                            <InputLabel
+                                htmlFor="password"
+                                value="Password"
+                                className="sr-only"
+                            />
 
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) =>
-                                setData('password', e.target.value)
-                            }
-                            className="mt-1 block w-3/4"
-                            isFocused
-                            placeholder="Password"
-                        />
+                            <TextInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
+                                className="mt-1 block w-3/4"
+                                isFocused
+                                placeholder="Password"
+                            />
 
-                        <InputError
-                            message={errors.password}
-                            className="mt-2"
-                        />
-                    </div>
+                            <InputError
+                                message={errors.password}
+                                className="mt-2"
+                            />
+                        </div>
 
-                    <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>
-                            Cancel
-                        </SecondaryButton>
+                        <div className="mt-6 flex justify-end">
+                            <SecondaryButton onClick={closeModal}>
+                                Cancel
+                            </SecondaryButton>
 
-                        <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
-                        </DangerButton>
-                    </div>
-                </form>
-            </Modal>
+                            <DangerButton className="ms-3" disabled={processing}>
+                                Delete Account
+                            </DangerButton>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }

@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface Props {
     children: ReactNode;
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function OnboardingLayout({ children, currentStep, totalSteps }: Props) {
+    const percent = (currentStep / totalSteps) * 100;
+
     return (
         <div className="min-h-screen bg-background">
             <Head title="Welcome to DevCollab" />
@@ -29,12 +32,7 @@ export default function OnboardingLayout({ children, currentStep, totalSteps }: 
                             Skip all <X className="size-3" />
                         </Link>
                     </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-primary rounded-full transition-all duration-300"
-                            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                        />
-                    </div>
+                    <Progress value={percent} className="h-1.5" />
                 </div>
 
                 {/* Content */}

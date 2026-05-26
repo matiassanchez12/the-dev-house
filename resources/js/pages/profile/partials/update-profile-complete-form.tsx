@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import PrimaryButton from '@/components/primary-button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -128,15 +129,14 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                     <div className="flex items-center gap-6">
                         <div className="relative">
                             {previewAvatar ? (
-                                <img
-                                    src={previewAvatar}
-                                    alt="Avatar preview"
-                                    className="w-24 h-24 rounded-full object-cover border-2 border-input"
-                                />
+                                <Avatar size="lg">
+                                    <AvatarImage src={previewAvatar} alt="Avatar preview" />
+                                    <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
                             ) : (
-                                <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center text-3xl text-muted-foreground">
-                                    {user.name.charAt(0).toUpperCase()}
-                                </div>
+                                <Avatar size="lg">
+                                    <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
                             )}
                         </div>
                         <div className="flex-1">
