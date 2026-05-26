@@ -1,11 +1,11 @@
-import DangerButton from '@/components/danger-button';
+import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
-import SecondaryButton from '@/components/secondary-button';
 import TextInput from '@/components/text-input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function DeleteUserForm({ className = '' }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
@@ -33,7 +33,10 @@ export default function DeleteUserForm({ className = '' }) {
         destroy(route('profile.destroy'), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
-            onError: () => passwordInput.current.focus(),
+            onError: () => {
+                toast.error('Error al eliminar la cuenta. Verificá tu contraseña.');
+                passwordInput.current.focus();
+            },
             onFinish: () => reset(),
         });
     };
@@ -60,9 +63,9 @@ export default function DeleteUserForm({ className = '' }) {
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>
+            <Button variant="destructive" onClick={confirmUserDeletion}>
                 Delete Account
-            </DangerButton>
+            </Button>
 
             <Dialog open={confirmingUserDeletion} onOpenChange={setConfirmingUserDeletion}>
                 <DialogContent>
@@ -106,13 +109,13 @@ export default function DeleteUserForm({ className = '' }) {
                         </div>
 
                         <div className="mt-6 flex justify-end">
-                            <SecondaryButton onClick={closeModal}>
+                            <Button variant="secondary" onClick={closeModal}>
                                 Cancel
-                            </SecondaryButton>
+                            </Button>
 
-                            <DangerButton className="ms-3" disabled={processing}>
+                            <Button variant="destructive" className="ms-3" disabled={processing}>
                                 Delete Account
-                            </DangerButton>
+                            </Button>
                         </div>
                     </form>
                 </DialogContent>

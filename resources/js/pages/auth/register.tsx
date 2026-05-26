@@ -1,5 +1,5 @@
 import InputLabel from '@/components/input-label';
-import PrimaryButton from '@/components/primary-button';
+import { Button } from '@/components/ui/button';
 import TextInput from '@/components/text-input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
@@ -114,9 +114,9 @@ export default function Register() {
                         Already registered?
                     </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <Button className="ms-4" disabled={processing}>
                         Register
-                    </PrimaryButton>
+                    </Button>
                 </div>
             </form>
         </GuestLayout>
