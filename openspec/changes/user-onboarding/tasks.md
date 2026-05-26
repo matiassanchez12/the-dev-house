@@ -45,13 +45,13 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Frontend
 
-- [ ] 3.1 Create `resources/js/layouts/onboarding.tsx` — centered max-w-2xl container, progress bar (step/total), Skip All link, no sidebar. Props: children, currentStep (1-4), title — **DEFERRED to PR2**
-- [ ] 3.2 Create `resources/js/pages/onboarding/index.tsx` — client-side step management with `useState`. Step 1: tech selection grid (allTechs, multi-select, proficiency slider per tech, converts to numeric 1-5). Step 2: Bio textarea with live character count (max 500). Step 3: Avatar upload with preview (image/*, max 2MB). Step 4: Project recommendations (fetch `/onboarding/recommendations`, show 3-5 project cards). Navigation: Back/Skip/Next buttons. On step 4 completion, redirect to `/dashboard` — **DEFERRED to PR2**
+- [x] 3.1 Create `resources/js/layouts/onboarding.tsx` — centered max-w-2xl container, progress bar (step/total), Skip All link, no sidebar. Props: children, currentStep (1-4), title — **DEFERRED to PR2**
+- [x] 3.2 Create `resources/js/pages/onboarding/index.tsx` — client-side step management with `useState`. Step 1: tech selection grid (allTechs, multi-select, proficiency slider per tech, converts to numeric 1-5). Step 2: Bio textarea with live character count (max 500). Step 3: Avatar upload with preview (image/*, max 2MB). Step 4: Project recommendations (fetch `/onboarding/recommendations`, show 3-5 project cards). Navigation: Back/Skip/Next buttons. On step 4 completion, redirect to `/dashboard` — **DEFERRED to PR2**
 
 ## Phase 4: Wiring & Integration
 
 - [x] 4.1 Update `app/Http/Controllers/DashboardController.php` — after registration, check `!$user->hasCompletedOnboarding()` and redirect to `/onboarding` instead of dashboard — **NOTE: Left as-is per user's instruction** (users can access dashboard even if onboarding incomplete; redirect from `/onboarding` handles the flow)
-- [ ] 4.2 Create `tests/Feature/OnboardingTest.php` — guest cannot access `/onboarding` (redirect to login); user can complete all 4 steps; user can skip at any point; completed user redirected to dashboard; recommendations return matching projects — **DEFERRED to PR2**
+- [x] 4.2 Create `tests/Feature/OnboardingTest.php` — guest cannot access `/onboarding` (redirect to login); user can complete all 4 steps; user can skip at any point; completed user redirected to dashboard; recommendations return matching projects — **DEFERRED to PR2**
 - [x] 4.3 Run full test suite — `php artisan test` — fix any failures
 
 ## Implementation Order
