@@ -31,6 +31,7 @@ class User extends Authenticatable
         'bio',
         'email',
         'name',
+        'onboarding_completed_at',
         'password',
         'slug',
     ];
@@ -55,6 +56,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'onboarding_completed_at' => 'datetime',
         ];
     }
 
@@ -108,5 +110,13 @@ class User extends Authenticatable
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Verificar si el usuario completó el onboarding.
+     */
+    public function hasCompletedOnboarding(): bool
+    {
+        return $this->onboarding_completed_at !== null;
     }
 }
