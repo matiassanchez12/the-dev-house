@@ -26,7 +26,7 @@ class OnboardingService
         $user->techs()->sync($syncData);
     }
 
-    public function saveBio(User $user, string $bio): void
+    public function saveBio(User $user, ?string $bio): void
     {
         $user->update(['bio' => $bio]);
     }

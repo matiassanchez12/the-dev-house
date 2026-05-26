@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Onboarding\SaveStep1Request;
+use App\Http\Requests\Onboarding\SaveStep2Request;
+use App\Http\Requests\Onboarding\SaveStep3Request;
+use App\Http\Requests\Onboarding\SaveStep4Request;
 use App\Services\OnboardingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,21 +37,20 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function saveStep1(Request $request)
+    public function saveStep1(SaveStep1Request $request)
     {
-        $techs = $request->input('techs', []);
-        $this->onboardingService->saveTechs(Auth::user(), $techs);
+        $this->onboardingService->saveTechs(Auth::user(), $request->validated()['techs']);
 
         return redirect()->route('onboarding.index');
     }
 
-    public function saveStep2(Request $request)
+    public function saveStep2(SaveStep2Request $request)
     {
-        $this->onboardingService->saveBio(Auth::user(), $request->input('bio', ''));
+        $this->onboardingService->saveBio(Auth::user(), $request->validated()['bio'] ?? null);
         return redirect()->route('onboarding.index');
     }
 
-    public function saveStep3(Request $request)
+    public function saveStep3(SaveStep3Request $request)
     {
         if ($request->hasFile('avatar')) {
             $this->onboardingService->saveAvatar(Auth::user(), $request->file('avatar'));
@@ -55,9 +58,9 @@ class OnboardingController extends Controller
         return redirect()->route('onboarding.index');
     }
 
-    public function saveStep4(Request $request)
+    public function saveStep4(SaveStep4Request $request)
     {
-        $joinRequests = $request->input('join_requests', []);
+        $joinRequests = $request->validated()['join_requests'] ?? [];
         if (!empty($joinRequests)) {
             $this->onboardingService->sendJoinRequests(Auth::user(), $joinRequests);
         }
