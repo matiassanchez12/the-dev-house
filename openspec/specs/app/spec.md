@@ -141,3 +141,27 @@ Role-based authorization.
 - `UpdateProjectRequest`: Same + `remove_images[]` (array of existing paths)
 - `StoreJoinRequestRequest`: message (required, min 10, max 500)
 - `UpdateCompleteProfileRequest`: bio (optional, max 1000), avatar (image, max 2MB, jpg/png/webp), techs (array of `{id, proficiency}`)
+
+### UI Component Requirements
+
+#### ui-dropdown — Accessible Dropdown Menu
+
+The system SHALL provide an accessible dropdown menu component built on `@radix-ui/react-dropdown-menu`. The dropdown MUST support full keyboard navigation and proper ARIA attributes for screen reader compatibility.
+
+The dropdown SHALL be triggered by a user action (click or Enter/Space on a trigger element) and SHALL close when the user presses Escape, clicks outside, or navigates to a menu item.
+
+**Scenarios**:
+- GIVEN a dropdown trigger button is visible and focused WHEN the user clicks the trigger button THEN the dropdown menu SHALL open immediately below the trigger AND focus SHALL remain on the trigger button AND the menu SHALL be visible with proper positioning
+- GIVEN a dropdown trigger button is visible and focused WHEN the user presses Enter or Space THEN the dropdown menu SHALL open AND the first menu item SHALL automatically receive focus AND the trigger SHALL remain focused
+- GIVEN an open dropdown menu with focus on the first item WHEN the user presses Arrow Down THEN focus SHALL move to the next menu item AND focus SHALL wrap to the first item when reaching the end WHEN the user presses Arrow Up THEN focus SHALL move to the previous menu item AND focus SHALL wrap to the last item when reaching the beginning
+- GIVEN an open dropdown menu WHEN the user presses Escape THEN the dropdown SHALL close AND focus SHALL return to the trigger button
+- GIVEN an open dropdown menu with focus on a menu item WHEN the user presses Enter THEN the menu item SHALL be selected AND the dropdown SHALL close AND focus SHALL return to the trigger button
+- GIVEN an open dropdown menu WHEN the user clicks anywhere outside the dropdown menu THEN the dropdown SHALL close
+
+#### custom-dropdown — Custom Dropdown Component
+
+(DEPRECATED — Replaced by `ui-dropdown` built on `@radix-ui/react-dropdown-menu` for improved accessibility and reduced code duplication)
+
+#### custom-modal — Custom Modal Component
+
+(DEPRECATED — Replaced by shadcn/ui `ui/dialog` (`@base-ui/react`) for improved accessibility and consistency)

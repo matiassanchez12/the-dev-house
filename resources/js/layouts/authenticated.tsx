@@ -1,6 +1,6 @@
 import ApplicationLogo from '@/components/application-logo';
 import ThemeToggle from '@/components/theme-toggle';
-import Dropdown from '@/components/dropdown';
+import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
 import ResponsiveNavLink from '@/components/responsive-nav-link';
 import { Link, usePage } from '@inertiajs/react';
