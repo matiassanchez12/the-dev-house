@@ -54,13 +54,18 @@ docker run --rm \
 laravelsail/php83-composer:latest \
 composer install --ignore-platform-reqs
 
+cp .env.example .env
+
 # Start containers — setup runs automatically (migrations, seeders, npm build)
 docker compose up -d
 
 # utils 
 sudo chown -R $USER:$USER .
-cp .env.example .env
+
 npx autoskills
+
+./vendor/bin/sail npm i
+./vendor/bin/sail npm run dev
 ```
 
 ## API Documentation
