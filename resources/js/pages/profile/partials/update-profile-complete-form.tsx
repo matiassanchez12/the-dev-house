@@ -23,13 +23,21 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     const [previewAvatar, setPreviewAvatar] = useState<string | null>(user.avatar ? `/storage/${user.avatar}` : null);
     const avatarInput = useRef<HTMLInputElement>(null);
 
-    // Convert proficiency string to number for the form
-    const proficiencyMap: Record<string, number> = {
-        'basic': 1,
-        'intermediate': 2,
-        'advanced': 3,
-        'expert': 4,
-        'master': 5,
+    // Convert proficiency number to string for the form
+    const proficiencyMap: Record<number, string> = {
+        1: 'basic',
+        2: 'intermediate',
+        3: 'advanced',
+        4: 'expert',
+        5: 'master',
+    };
+
+    const proficiencyLabels: Record<string, string> = {
+        'basic': 'Principiante',
+        'intermediate': 'Básico',
+        'advanced': 'Intermedio',
+        'expert': 'Avanzado',
+        'master': 'Experto',
     };
 
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
@@ -38,9 +46,9 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         techs: userTechs.map((ut) => ({
             id: ut.id,
             years_experience: ut.pivot?.years_experience ?? '',
-            proficiency: typeof ut.pivot?.proficiency === 'string' 
-                ? (proficiencyMap[ut.pivot.proficiency] ?? 3)
-                : (ut.pivot?.proficiency ?? 3),
+            proficiency: typeof ut.pivot?.proficiency === 'string'
+                ? ut.pivot.proficiency
+                : (ut.pivot?.proficiency ? proficiencyMap[ut.pivot.proficiency] : 'intermediate'),
         })),
         _method: 'post' as const,
     });
@@ -63,7 +71,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         if (checked) {
             setData('techs', [
                 ...data.techs,
-                { id: techId, years_experience: '', proficiency: 3 },
+                { id: techId, years_experience: '', proficiency: 'intermediate' },
             ]);
         } else {
             setData('techs', data.techs.filter((t) => t.id !== techId));
@@ -71,7 +79,11 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     };
 
     const handleTechUpdate = (techId: number, field: 'years_experience' | 'proficiency', value: string | number) => {
-        setData('techs', data.techs.map((t) => (t.id === techId ? { ...t, [field]: value } : t)));
+        // Convert proficiency number to string
+        const finalValue = field === 'proficiency' && typeof value === 'number'
+            ? proficiencyMap[value]
+            : value;
+        setData('techs', data.techs.map((t) => (t.id === techId ? { ...t, [field]: finalValue } : t)));
     };
 
     const submit = (e: React.FormEvent) => {

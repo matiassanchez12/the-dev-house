@@ -263,13 +263,13 @@ export default function OnboardingIndex() {
                                 <Textarea
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
-                                    maxLength={500}
+                                    maxLength={1000}
                                     placeholder="Cuéntanos sobre vos, tu experiencia y qué te apasiona..."
                                     rows={5}
                                     className="w-full"
                                 />
                                 <div className="text-right text-sm text-muted-foreground">
-                                    {bio.length}/500
+                                    {bio.length}/1000
                                 </div>
                             </div>
                         )}
