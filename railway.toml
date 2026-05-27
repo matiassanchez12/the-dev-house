@@ -1,0 +1,18 @@
+[build]
+builder = "nixpacks"
+builder_version = "latest"
+
+[build.env]
+APP_ENV = "production"
+PHP_VERSION = "8.2"
+NODE_VERSION = "20"
+
+[nixpacks]
+variables = { APP_KEY = "" }
+
+[deploy]
+healthCheckPath = "/"
+startCommand = "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 8080"
+
+[[ports]]
+containerPort = 8080
