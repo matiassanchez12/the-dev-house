@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\StorageUrlHelper;
+use App\Helpers\ApiResourceTransformer;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,22 +11,6 @@ use Inertia\Inertia;
 
 class LandingController extends Controller
 {
-    /**
-     * Transform project images and creator avatars to full URLs.
-     */
-    private function transformProject(Project $project): array
-    {
-        $project = $project->toArray();
-        $images = $project['images'] ?? [];
-        $project['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
-
-        if (isset($project['creator']['avatar'])) {
-            $project['creator']['avatar'] = StorageUrlHelper::url($project['creator']['avatar']);
-        }
-
-        return $project;
-    }
-
     /**
      * Landing page principal
      */
@@ -39,14 +23,12 @@ class LandingController extends Controller
             ->limit(6)
             ->get();
 
-        $transformedProjects = $projects->map(fn($p) => $this->transformProject($p));
-
         return Inertia::render('landing', [
             'user_count' => User::count(),
             'project_count' => Project::count(),
             'collaboration_count' => DB::table('project_participants')->count(),
             'projects' => [
-                'data' => $transformedProjects->toArray(),
+                'data' => ApiResourceTransformer::projects($projects),
                 'total' => Project::where('status', 'open')->count(),
             ],
         ]);
