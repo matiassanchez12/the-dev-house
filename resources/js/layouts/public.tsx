@@ -2,6 +2,7 @@ import ApplicationLogo from '@/components/application-logo';
 import ThemeToggle from '@/components/theme-toggle';
 import NavLink from '@/components/nav-link';
 import { Dropdown } from '@/components/ui/dropdown';
+import { Dialog } from '@/components/ui/dialog';
 import ResponsiveNavLink from '@/components/responsive-nav-link';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
@@ -20,7 +21,7 @@ interface Props {
 
 export default function PublicLayout({ children, header }: Props) {
     const user = usePage().props.auth.user as User | null;
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-background">
@@ -111,11 +112,7 @@ export default function PublicLayout({ children, header }: Props) {
                         <div className="-me-2 flex items-center sm:hidden">
                             <ThemeToggle />
                             <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
+                                onClick={() => setMobileMenuOpen(true)}
                                 className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition duration-150 ease-in-out hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none"
                             >
                                 <svg
@@ -125,26 +122,10 @@ export default function PublicLayout({ children, header }: Props) {
                                     viewBox="0 0 24 24"
                                 >
                                     <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
                                         d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
                                     />
                                 </svg>
                             </button>
@@ -152,51 +133,89 @@ export default function PublicLayout({ children, header }: Props) {
                     </div>
                 </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('projects.index')}
-                            active={route().current('projects.*')}
+                {/* Mobile full-screen menu */}
+                <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                    <Dialog.Content className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm sm:hidden">
+                        <button
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="absolute right-4 top-4 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none"
                         >
-                            Proyectos
-                        </ResponsiveNavLink>
-                        {user ? (
-                            <>
-                                <ResponsiveNavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route('profile.edit')}
-                                    active={route().current('profile.edit')}
-                                >
-                                    Profile
-                                </ResponsiveNavLink>
-                            </>
-                        ) : (
-                            <>
-                                <ResponsiveNavLink href={route('login')}>
-                                    Log in
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('register')}>
-                                    Register
-                                </ResponsiveNavLink>
-                            </>
-                        )}
-                    </div>
-                </div>
+                            <svg
+                                className="h-6 w-6"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+
+                        <div className="flex flex-col items-center gap-6">
+                            <Link
+                                href={route('projects.index')}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="text-2xl font-medium text-foreground hover:text-primary"
+                            >
+                                Proyectos
+                            </Link>
+                            {user ? (
+                                <>
+                                    <Link
+                                        href={route('dashboard')}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-2xl font-medium text-foreground hover:text-primary"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route('profile.edit')}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-2xl font-medium text-foreground hover:text-primary"
+                                    >
+                                        Mi Perfil
+                                    </Link>
+                                    <Link
+                                        href={route('logout')}
+                                        method="post"
+                                        as="button"
+                                        type="button"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-2xl font-medium text-destructive hover:text-destructive/80"
+                                    >
+                                        Log Out
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        href={route('login')}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-2xl font-medium text-foreground hover:text-primary"
+                                    >
+                                        Log in
+                                    </Link>
+                                    <Link
+                                        href={route('register')}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-2xl font-medium text-foreground hover:text-primary"
+                                    >
+                                        Register
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </Dialog.Content>
+                </Dialog>
             </nav>
 
             {header && (
                 <header className="bg-card shadow">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>
                 </header>
