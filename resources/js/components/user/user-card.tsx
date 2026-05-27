@@ -31,14 +31,14 @@ export function UserCard({ user }: UserCardProps) {
         <Card className="h-full transition-colors hover:bg-muted/30">
             <CardHeader className="pb-2">
                 <div className="flex items-start gap-3">
-                    <Link href={`/users/${user.id}`} className="shrink-0">
+                    <Link href={route('users.show', user.slug)} className="shrink-0">
                         <Avatar size="lg">
                             <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                     </Link>
                     <div className="min-w-0 flex-1">
-                        <Link href={`/users/${user.id}`} className="hover:underline">
+                        <Link href={route('users.show', user.slug)} className="hover:underline">
                             <CardTitle className="truncate">{user.name}</CardTitle>
                         </Link>
                         {user.bio && (

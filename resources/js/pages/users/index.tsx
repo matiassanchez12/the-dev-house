@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useEffect, useCallback } from 'react';
+import AppLayout from '@/layouts/app-layout';
 import { UserCard } from '@/components/user/user-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +66,7 @@ export default function Index({ users, techs, filters }: Props) {
     return (
         <>
             <Head title="Discover Users" />
-            <div className="min-h-screen bg-background">
+            <AppLayout>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -172,7 +173,7 @@ export default function Index({ users, techs, filters }: Props) {
                         </>
                     )}
                 </div>
-            </div>
+            </AppLayout>
         </>
     );
 }

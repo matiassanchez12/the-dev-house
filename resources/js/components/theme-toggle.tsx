@@ -2,19 +2,15 @@ import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 
 export default function ThemeToggle() {
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    // Read from localStorage synchronously to avoid flash
+    const getInitialTheme = (): 'light' | 'dark' => {
+        if (typeof window === 'undefined') return 'light';
+        const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
 
-    useEffect(() => {
-        // Check localStorage or system preference on mount
-        const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (storedTheme) {
-            setTheme(storedTheme);
-        } else if (systemPrefersDark) {
-            setTheme('dark');
-        }
-    }, []);
+    const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 
     useEffect(() => {
         // Apply theme class to html element
