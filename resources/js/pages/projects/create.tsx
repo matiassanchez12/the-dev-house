@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/authenticated';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tech } from '@/types';
 import { ProjectForm } from '@/components/projects/project-form';
@@ -40,7 +40,7 @@ export default function Create({ auth, techs }: Props) {
     return (
         <>
             <Head title="Crear Proyecto" />
-            <AuthenticatedLayout
+            <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">
                         Crear Nuevo Proyecto
@@ -69,7 +69,7 @@ export default function Create({ auth, techs }: Props) {
                         </Card>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </AppLayout>
         </>
     );
 }

@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Check, X, Clock } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/authenticated';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,7 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
     return (
         <>
             <Head title="Solicitudes de Unión" />
-            <AuthenticatedLayout
+            <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">
                         Solicitudes de Unión
@@ -184,7 +184,7 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                         </Card>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </AppLayout>
         </>
     );
 }

@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import PublicLayout from '@/layouts/public';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProjectCard } from '@/components/projects/project-card';
@@ -153,7 +153,7 @@ export default function Index({ auth, projects, techs, filters }: Props) {
     return (
         <>
             <Head title="Proyectos" />
-            <PublicLayout
+            <AppLayout
                 header={
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-semibold leading-tight text-foreground">
@@ -314,7 +314,7 @@ export default function Index({ auth, projects, techs, filters }: Props) {
                         )}
                     </div>
                 </div>
-            </PublicLayout>
+            </AppLayout>
         </>
     );
 }

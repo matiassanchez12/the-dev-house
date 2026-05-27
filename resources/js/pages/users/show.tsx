@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { FolderOpen, Users, Wrench } from 'lucide-react';
-import PublicLayout from '@/layouts/public';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
@@ -48,7 +48,7 @@ export default function Show({ auth, user }: Props) {
     return (
         <>
             <Head title={user.name} />
-            <PublicLayout>
+            <AppLayout>
                 {/* Hero Section */}
                 <div className="bg-gradient-to-b from-muted/50 to-background">
                     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
@@ -114,7 +114,7 @@ export default function Show({ auth, user }: Props) {
                         </Empty>
                     )}
                 </div>
-            </PublicLayout>
+            </AppLayout>
         </>
     );
 }

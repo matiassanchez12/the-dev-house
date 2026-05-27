@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CircleDot, CheckCircle, CircleX, GitBranch, ExternalLink, Send, User as UserIcon } from 'lucide-react';
-import PublicLayout from '@/layouts/public';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -76,7 +76,7 @@ export default function Show({ auth, project }: Props) {
     return (
         <>
             <Head title={project.title} />
-            <PublicLayout
+            <AppLayout
                 header={
                     <div className="flex justify-between items-center">
                         <h2 className="font-semibold text-xl text-foreground leading-tight">
@@ -355,7 +355,7 @@ export default function Show({ auth, project }: Props) {
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-            </PublicLayout>
+            </AppLayout>
         </>
     );
 }

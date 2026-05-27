@@ -11,7 +11,7 @@ import {
     Plus,
     ArrowRight,
 } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/authenticated';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -81,7 +81,7 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <AuthenticatedLayout
+            <AppLayout
                 header={
                     <div className="flex justify-between items-center">
                         <h2 className="font-semibold text-xl text-foreground leading-tight">
@@ -511,7 +511,7 @@ export default function Dashboard({
                         </div>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </AppLayout>
         </>
     );
 }

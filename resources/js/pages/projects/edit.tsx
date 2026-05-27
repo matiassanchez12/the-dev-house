@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/authenticated';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tech, Project as ProjectType } from '@/types';
 import { ProjectForm } from '@/components/projects/project-form';
@@ -45,7 +45,7 @@ export default function Edit({ auth, project, techs }: Props) {
     return (
         <>
             <Head title={`Editar ${project.title}`} />
-            <AuthenticatedLayout
+            <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">
                         Editar Proyecto
@@ -75,7 +75,7 @@ export default function Edit({ auth, project, techs }: Props) {
                         </Card>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </AppLayout>
         </>
     );
 }
