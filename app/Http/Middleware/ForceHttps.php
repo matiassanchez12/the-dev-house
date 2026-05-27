@@ -10,8 +10,8 @@ class ForceHttps
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->secure() && app()->environment('production')) {
-            return redirect()->secure($request->getRequestUri());
+        if ($request->header('X-Forwarded-Proto') === 'https' || $request->secure()) {
+            $request->server->set('HTTPS', 'on');
         }
 
         return $next($request);

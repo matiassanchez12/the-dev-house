@@ -34,11 +34,6 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'ziggy' => fn () => [
-                'url' => $request->secure() ? config('app.url') : 'https://' . parse_url(config('app.url'), PHP_URL_HOST),
-                'port' => parse_url(config('app.url'), PHP_URL_PORT),
-                'defaults' => [],
-            ],
         ];
     }
 }
