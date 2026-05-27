@@ -35,12 +35,18 @@ class OnboardingService
     {
         if (!$file) return null;
 
+        $disk = config('filesystems.default', 'public');
+
         // Delete old avatar if exists
         if ($user->avatar) {
-            Storage::disk('public')->delete($user->avatar);
+            try {
+                Storage::disk($disk)->delete($user->avatar);
+            } catch (\Exception $e) {
+                // Ignore if file doesn't exist
+            }
         }
 
-        $path = $file->store('avatars', 'public');
+        $path = $file->store('avatars', $disk);
         $user->update(['avatar' => $path]);
         return $path;
     }

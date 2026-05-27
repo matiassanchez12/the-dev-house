@@ -120,9 +120,10 @@ class ProjectService
      */
     public function uploadImages(array $files): array
     {
+        $disk = config('filesystems.default', 'public');
         $paths = [];
         foreach ($files as $file) {
-            $paths[] = $file->store('projects', 'public');
+            $paths[] = $file->store('projects', $disk);
         }
         return $paths;
     }
@@ -134,9 +135,10 @@ class ProjectService
      */
     public function deleteImages(array $paths): void
     {
+        $disk = config('filesystems.default', 'public');
         foreach ($paths as $path) {
             try {
-                Storage::disk('public')->delete($path);
+                Storage::disk($disk)->delete($path);
             } catch (\Exception $e) {
                 // Ignore if file doesn't exist
             }

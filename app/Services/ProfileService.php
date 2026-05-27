@@ -28,11 +28,12 @@ class ProfileService
     {
         // Delete existing avatar if present
         if ($user->avatar) {
-            $this->deleteAvatar($user);
+            $this->deleteAvatarFile($user->avatar);
         }
 
-        // Store new avatar
-        $path = $file->store('avatars', 'public');
+        // Store new avatar - use S3 in production, local in dev
+        $disk = config('filesystems.default', 'public');
+        $path = $file->store('avatars', $disk);
 
         // Update user record
         $user->avatar = $path;
@@ -47,14 +48,22 @@ class ProfileService
     public function deleteAvatar(User $user): void
     {
         if ($user->avatar) {
-            try {
-                Storage::disk('public')->delete($user->avatar);
-            } catch (\Exception $e) {
-                // Ignore if file doesn't exist
-            }
-
+            $this->deleteAvatarFile($user->avatar);
             $user->avatar = null;
             $user->save();
+        }
+    }
+
+    /**
+     * Delete avatar file from storage.
+     */
+    private function deleteAvatarFile(string $path): void
+    {
+        try {
+            $disk = config('filesystems.default', 'public');
+            Storage::disk($disk)->delete($path);
+        } catch (\Exception $e) {
+            // Ignore if file doesn't exist
         }
     }
 
@@ -99,13 +108,8 @@ class ProfileService
      */
     public function deleteAccount(User $user): void
     {
-        // Delete avatar file if exists
         if ($user->avatar) {
-            try {
-                Storage::disk('public')->delete($user->avatar);
-            } catch (\Exception $e) {
-                // Ignore if file doesn't exist
-            }
+            $this->deleteAvatarFile($user->avatar);
         }
 
         $user->delete();

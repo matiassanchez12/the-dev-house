@@ -35,5 +35,5 @@ RUN mkdir -p storage/logs storage/framework/cache storage/framework/views storag
 # Expose port
 EXPOSE 10000
 
-# Start server with migrations
-CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
+# Start server with migrations and seeds
+CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=10000"]
