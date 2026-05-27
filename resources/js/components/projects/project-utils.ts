@@ -44,3 +44,22 @@ export function storageUrl(path: string | null | undefined): string | null {
     if (!path) return null;
     return `/storage/${path}`;
 }
+
+export function relativeDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+    const diffMonth = Math.floor(diffDay / 30);
+    const diffYear = Math.floor(diffDay / 365);
+
+    if (diffSec < 60) return 'hace un momento';
+    if (diffMin < 60) return `hace ${diffMin} min`;
+    if (diffHr < 24) return `hace ${diffHr} ${diffHr === 1 ? 'hora' : 'horas'}`;
+    if (diffDay < 30) return `hace ${diffDay} ${diffDay === 1 ? 'día' : 'días'}`;
+    if (diffMonth < 12) return `hace ${diffMonth} ${diffMonth === 1 ? 'mes' : 'meses'}`;
+    return `hace ${diffYear} ${diffYear === 1 ? 'año' : 'años'}`;
+}

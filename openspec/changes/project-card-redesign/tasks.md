@@ -52,10 +52,10 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: ProjectCard Redesign (PR #3 — Visual Changes)
 
-- [ ] 3.1 Add image thumbnail to `ProjectCard` — `default` and `featured` variants show `project.images[0]` as 16:9 banner at card top (use `storageUrl()`); gradient placeholder when no images; `compact` variant shows NO image
-- [ ] 3.2 Add meta row footer to `ProjectCard` — replace current footer with row containing: `ProjectStatusBadge`, participants count (hidden if `=== 0`), relative date (e.g., "hace 3 días"); use `gap-*` spacing
-- [ ] 3.3 Enhance `featured` variant — add `ring-2 ring-primary/20` and `shadow-xl` for visual prominence; keep star icon
-- [ ] 3.4 Update `ProjectCardProps` — add optional `createdAt?: string` for relative date; `UserProject` cards skip relative date (no `created_at` in type)
-- [ ] 3.5 Run `npm run build` — verify zero TypeScript errors
-- [ ] 3.6 Run `php artisan test` — verify no regressions
-- [ ] 3.7 Visual verification — manually check: thumbnail renders with/without images, meta row shows correct elements, featured variant has gradient ring, compact variant unchanged
+- [x] 3.1 Add image thumbnail to `ProjectCard` — `default` and `featured` variants show `project.images[0]` as 16:9 banner at card top (use `storageUrl()`); gradient placeholder when no images; `compact` variant shows NO image
+- [x] 3.2 Add meta row footer to `ProjectCard` — replace current footer with row containing: `ProjectStatusBadge`, participants count (hidden if `=== 0`), relative date (e.g., "hace 3 días"); use `gap-*` spacing
+- [x] 3.3 Enhance `featured` variant — add `ring-2 ring-primary/20` and `shadow-xl` for visual prominence; keep star icon
+- [x] 3.4 Update `ProjectCardProps` — add optional `createdAt?: string` for relative date; `UserProject` cards skip relative date (no `created_at` in type)
+- [x] 3.5 Run `npm run build` — verify zero TypeScript errors
+- [x] 3.6 Run `php artisan test` — verify no regressions
+- [x] 3.7 Visual verification — manually check: thumbnail renders with/without images, meta row shows correct elements, featured variant has gradient ring, compact variant unchanged
