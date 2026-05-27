@@ -1,42 +1,17 @@
 import { Link } from '@inertiajs/react';
-import { Star, CircleDot, CheckCircle, CircleX } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Project, UserProject } from '@/types';
 import { cn } from '@/lib/utils';
-
-const statusConfig = {
-    open: {
-        label: 'Abierto',
-        icon: CircleDot,
-        className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    },
-    completed: {
-        label: 'Completado',
-        icon: CheckCircle,
-        className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    },
-    closed: {
-        label: 'Cerrado',
-        icon: CircleX,
-        className: '',
-    },
-};
+import { getInitials } from './project-utils';
+import { ProjectStatusBadge } from './project-status-badge';
 
 interface ProjectCardProps {
     project: Project | UserProject;
     variant?: 'default' | 'featured' | 'compact';
     showParticipatingCount?: boolean;
-}
-
-function getInitials(name: string): string {
-    return name
-        .split(' ')
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
 }
 
 export function ProjectCard({
@@ -48,8 +23,6 @@ export function ProjectCard({
     const isCompact = variant === 'compact';
 
     const status = project.status;
-    const config = statusConfig[status];
-    const StatusIcon = config.icon;
 
     // Handle both Project and UserProject types
     const creator = 'creator' in project ? project.creator : null;
@@ -134,16 +107,7 @@ export function ProjectCard({
             </CardContent>
 
             <CardFooter>
-                <Badge
-                    variant="secondary"
-                    className={cn(
-                        'gap-1.5',
-                        config.className
-                    )}
-                >
-                    <StatusIcon className="size-3" />
-                    {config.label}
-                </Badge>
+                <ProjectStatusBadge status={status} />
             </CardFooter>
         </Card>
     );
