@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { CircleDot, CheckCircle, CircleX, GitBranch, ExternalLink, Send, User as UserIcon } from 'lucide-react';
+import { GitBranch, ExternalLink, Send } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { Project as ProjectType, Tech, User } from '@/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { getInitials, storageUrl } from '@/components/projects/project-utils';
+import { ProjectStatusBadge } from '@/components/projects/project-status-badge';
 
 interface Props {
     auth: {
@@ -27,12 +28,6 @@ interface Props {
         participants: User[];
     };
 }
-
-const statusConfig = {
-    open: { label: 'Abierto', icon: CircleDot, className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    completed: { label: 'Completado', icon: CheckCircle, className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-    closed: { label: 'Cerrado', icon: CircleX, className: 'bg-muted text-foreground' },
-};
 
 export default function Show({ auth, project }: Props) {
     const { delete: destroy } = useForm({});
@@ -63,15 +58,8 @@ export default function Show({ auth, project }: Props) {
     };
 
     const isCreator = auth.user?.id === project.user_id;
-    const status = statusConfig[project.status] ?? statusConfig.closed;
-    const StatusIcon = status.icon;
 
-    const creatorInitials = project.creator.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+    const creatorInitials = getInitials(project.creator.name);
 
     return (
         <>
@@ -101,17 +89,14 @@ export default function Show({ auth, project }: Props) {
                         {project.images && project.images.length > 0 ? (
                             <div className="relative mb-8 overflow-hidden rounded-xl">
                                 <img
-                                    src={`/storage/${project.images[0]}`}
+                                    src={storageUrl(project.images[0]) ?? ''}
                                     alt={project.title}
                                     className="w-full h-64 sm:h-80 object-cover"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                                 <div className="absolute bottom-0 left-0 right-0 p-6">
                                     <div className="flex items-center gap-3">
-                                        <Badge className={status.className}>
-                                            <StatusIcon className="size-3" />
-                                            {status.label}
-                                        </Badge>
+                                        <ProjectStatusBadge status={project.status} />
                                         <h1 className="text-2xl sm:text-3xl font-bold text-white">{project.title}</h1>
                                     </div>
                                 </div>
@@ -119,10 +104,7 @@ export default function Show({ auth, project }: Props) {
                         ) : (
                             <div className="relative mb-8 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-muted p-8">
                                 <div className="flex items-center gap-4">
-                                    <Badge className={status.className}>
-                                        <StatusIcon className="size-3" />
-                                        {status.label}
-                                    </Badge>
+                                    <ProjectStatusBadge status={project.status} />
                                     <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{project.title}</h1>
                                 </div>
                             </div>
@@ -168,7 +150,7 @@ export default function Show({ auth, project }: Props) {
                                                 {project.images.slice(1).map((image, index) => (
                                                     <img
                                                         key={index}
-                                                        src={`/storage/${image}`}
+                                                        src={storageUrl(image) ?? ''}
                                                         alt={`${project.title} - ${index + 2}`}
                                                         className="w-full h-32 object-cover rounded-lg"
                                                     />
