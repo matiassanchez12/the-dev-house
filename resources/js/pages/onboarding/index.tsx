@@ -173,7 +173,7 @@ export default function OnboardingIndex() {
 
     return (
         <>
-            <Head title="Welcome to DevCollab" />
+            <Head title="Welcome to The Dev House" />
             <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps}>
                 <Card>
                     <CardHeader>

@@ -14,7 +14,7 @@ export default function OnboardingLayout({ children, currentStep, totalSteps }: 
 
     return (
         <div className="min-h-screen bg-background">
-            <Head title="Welcome to DevCollab" />
+            <Head title="Welcome to The Dev House" />
 
             <div className="max-w-2xl mx-auto px-4 py-12">
                 {/* Progress indicator */}
