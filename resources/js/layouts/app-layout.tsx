@@ -22,10 +22,11 @@ export default function AppLayout({ children, header }: Props) {
 
     const authenticatedNavLinks = user
         ? [
-              { href: route('dashboard'), label: 'Dashboard', active: route().current('dashboard') },
               { href: route('join-requests.index'), label: 'Solicitudes', active: route().current('join-requests.*') },
           ]
         : [];
+
+    const logoHref = user ? route('dashboard') : '/';
 
     return (
         <div className="min-h-screen bg-background">
@@ -34,7 +35,7 @@ export default function AppLayout({ children, header }: Props) {
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
+                                <Link href={logoHref}>
                                     <ApplicationLogo variant="icon" className="h-9" />
                                 </Link>
                             </div>
