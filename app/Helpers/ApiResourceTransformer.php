@@ -83,6 +83,22 @@ class ApiResourceTransformer
      */
     public static function users(Collection|\Illuminate\Pagination\LengthAwarePaginator $users): array
     {
+        // If it's a paginator, preserve structure with transformed data
+        if ($users instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            return [
+                'data' => $users->map(fn($u) => self::user($u))->toArray(),
+                'links' => $users->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
+                    'from' => $users->firstItem(),
+                    'to' => $users->lastItem(),
+                ],
+            ];
+        }
+
         return $users->map(fn($u) => self::user($u))->toArray();
     }
 

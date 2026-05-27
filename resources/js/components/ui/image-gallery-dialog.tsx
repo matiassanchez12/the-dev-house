@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
+import { DialogClose } from '@/components/ui/dialog';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { ImageGalleryDialogProps } from '@/types';
 
@@ -45,17 +46,12 @@ export function ImageGalleryDialog({
             <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/90" />
             <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center">
                 {/* Close button */}
-                <Dialog.Close
-                    render={
-                        <button
-                            type="button"
-                            className="absolute top-4 right-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
-                        />
-                    }
+                <DialogClose
+                    className="absolute top-4 right-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                    aria-label="Cerrar"
                 >
                     <X className="size-5" />
-                    <span className="sr-only">Cerrar</span>
-                </Dialog.Close>
+                </DialogClose>
 
                 {/* Main image container */}
                 <div className="relative flex items-center justify-center px-16 py-8">
