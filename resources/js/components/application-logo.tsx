@@ -27,7 +27,7 @@ export default function ApplicationLogo({
                 <>
                     {/* "The Dev House" text */}
                     <text
-                        x="62"
+                        x="54"
                         y="28"
                         fontFamily="Bricolage Grotesque, sans-serif"
                         fontSize="18"
@@ -38,7 +38,7 @@ export default function ApplicationLogo({
                     </text>
                     {/* Tagline */}
                     <text
-                        x="62"
+                        x="54"
                         y="44"
                         fontFamily="Inter, sans-serif"
                         fontSize="9"
