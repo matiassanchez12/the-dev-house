@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\StorageUrlHelper;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,10 +30,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        // Transform user avatar path to full URL (handles S3 and local)
+        if ($user?->avatar) {
+            $user = $user->toArray();
+            $user['avatar_url'] = StorageUrlHelper::url($user['avatar']);
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
         ];
     }
