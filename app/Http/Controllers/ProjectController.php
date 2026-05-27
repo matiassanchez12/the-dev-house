@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StorageUrlHelper;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
@@ -17,6 +18,17 @@ class ProjectController extends Controller
     public function __construct(
         private ProjectService $projectService
     ) {}
+
+    /**
+     * Transform project images to full URLs.
+     */
+    private function transformProjectImages(Project $project): array
+    {
+        $images = $project->images ?? [];
+        $project = $project->toArray();
+        $project['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
+        return $project;
+    }
 
     /**
      * Display a listing of the resource.
@@ -42,9 +54,12 @@ class ProjectController extends Controller
 
         $techs = Tech::orderBy('name')->get();
 
+        // Transform images to URLs
+        $projects = collect($paginator->items())->map(fn($p) => $this->transformProjectImages($p));
+
         return Inertia::render('projects/index', [
             'projects' => [
-                'data' => $paginator->items(),
+                'data' => $projects->toArray(),
                 'links' => $paginator->linkCollection()->toArray(),
                 'meta' => [
                     'current_page' => $paginator->currentPage(),
@@ -98,7 +113,7 @@ class ProjectController extends Controller
         $project->load(['creator.techs', 'techs', 'participants']);
 
         return Inertia::render('projects/show', [
-            'project' => $project,
+            'project' => $this->transformProjectImages($project),
         ]);
     }
 
@@ -114,7 +129,7 @@ class ProjectController extends Controller
         $project->load(['creator.techs', 'techs']);
 
         return Inertia::render('projects/edit', [
-            'project' => $project,
+            'project' => $this->transformProjectImages($project),
             'techs' => $techs,
         ]);
     }

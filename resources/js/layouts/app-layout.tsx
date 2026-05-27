@@ -12,7 +12,13 @@ interface Props {
 }
 
 export default function AppLayout({ children, header }: Props) {
-    const user = usePage().props.auth.user as { id: number; name: string; slug: string } | null;
+    const user = usePage().props.auth.user as {
+        id: number;
+        name: string;
+        slug: string;
+        avatar_url?: string;
+        avatar?: string;
+    } | null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navLinks = [

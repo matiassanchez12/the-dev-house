@@ -22,7 +22,9 @@ interface Props {
 
 export default function UpdateProfileCompleteForm({ className = '', userTechs, allTechs }: Props) {
     const user = usePage().props.auth.user;
-    const [previewAvatar, setPreviewAvatar] = useState<string | null>(user.avatar ? `/storage/${user.avatar}` : null);
+    const [previewAvatar, setPreviewAvatar] = useState<string | null>(
+        user.avatar_url || (user.avatar ? `/storage/${user.avatar}` : null)
+    );
     const avatarInput = useRef<HTMLInputElement>(null);
 
     // Convert proficiency number to string for the form
