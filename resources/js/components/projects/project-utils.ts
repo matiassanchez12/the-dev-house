@@ -44,12 +44,16 @@ export function storageUrl(path: string | null | undefined): string | null {
     if (!path) return null;
 
     // Already a full URL (S3, external, etc.)
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (path.includes('://')) {
         return path;
     }
 
     // Local storage path
     return `/storage/${path}`;
+}
+
+export function avatarUrl(path: string | null | undefined): string | null {
+    return storageUrl(path);
 }
 
 export function relativeDate(dateString: string): string {

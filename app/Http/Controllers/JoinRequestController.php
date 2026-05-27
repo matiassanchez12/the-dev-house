@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StorageUrlHelper;
 use App\Http\Requests\JoinRequest\StoreJoinRequestRequest;
 use App\Models\JoinRequest;
 use App\Models\Project;
@@ -20,11 +21,30 @@ class JoinRequestController extends Controller
     ) {}
 
     /**
+     * Transform request applicant/project avatars.
+     */
+    private function transformRequest($request): array
+    {
+        $request = $request->toArray();
+        if (isset($request['applicant']['avatar'])) {
+            $request['applicant']['avatar'] = StorageUrlHelper::url($request['applicant']['avatar']);
+        }
+        if (isset($request['project']['images'])) {
+            $images = $request['project']['images'] ?? [];
+            $request['project']['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
+        }
+        return $request;
+    }
+
+    /**
      * Display a listing of join requests for the current user's projects
      */
     public function index(Request $request)
     {
         $data = $this->joinRequestService->getIndexData(Auth::user());
+
+        $data['receivedRequests'] = $data['receivedRequests']->map(fn($r) => $this->transformRequest($r));
+        $data['sentRequests'] = $data['sentRequests']->map(fn($r) => $this->transformRequest($r));
 
         return Inertia::render('join_requests/index', $data);
     }

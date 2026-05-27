@@ -27,6 +27,12 @@ class ProjectController extends Controller
         $images = $project->images ?? [];
         $project = $project->toArray();
         $project['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
+
+        // Also transform creator avatar
+        if (isset($project['creator']['avatar'])) {
+            $project['creator']['avatar'] = StorageUrlHelper::url($project['creator']['avatar']);
+        }
+
         return $project;
     }
 
