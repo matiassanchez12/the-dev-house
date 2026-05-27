@@ -41,6 +41,12 @@ export default function PublicLayout({ children, header }: Props) {
                                 >
                                     Proyectos
                                 </NavLink>
+                                <NavLink
+                                    href={route('users.index')}
+                                    active={route().current('users.*')}
+                                >
+                                    Developers
+                                </NavLink>
                             </div>
                         </div>
 
@@ -161,6 +167,13 @@ export default function PublicLayout({ children, header }: Props) {
                                 className="text-2xl font-medium text-foreground hover:text-primary"
                             >
                                 Proyectos
+                            </Link>
+                            <Link
+                                href={route('users.index')}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="text-2xl font-medium text-foreground hover:text-primary"
+                            >
+                                Developers
                             </Link>
                             {user ? (
                                 <>
