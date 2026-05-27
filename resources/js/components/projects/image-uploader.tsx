@@ -4,6 +4,7 @@ import { FormError } from '@/components/ui/form-error';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { storageUrl } from './project-utils';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MAX_FILES = 5;
@@ -142,7 +143,7 @@ export function ImageUploader({
                         {existingImages.map((image, index) => (
                             <div key={index} className="relative group">
                                 <img
-                                    src={`${image}`}
+                                    src={storageUrl(image) ?? ''}
                                     alt={`Imagen ${index + 1}`}
                                     className="size-full aspect-square object-cover rounded-lg border"
                                 />

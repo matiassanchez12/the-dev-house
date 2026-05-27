@@ -65,34 +65,34 @@ class ApiResourceTransformer
     }
 
     /**
-     * Transform a collection of projects.
+     * Transform a collection/paginator of projects.
      *
-     * @param Collection $projects
+     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $projects
      * @return array
      */
-    public static function projects(Collection $projects): array
+    public static function projects(Collection|\Illuminate\Pagination\LengthAwarePaginator $projects): array
     {
         return $projects->map(fn($p) => self::project($p))->toArray();
     }
 
     /**
-     * Transform a collection of users.
+     * Transform a collection/paginator of users.
      *
-     * @param Collection $users
+     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $users
      * @return array
      */
-    public static function users(Collection $users): array
+    public static function users(Collection|\Illuminate\Pagination\LengthAwarePaginator $users): array
     {
         return $users->map(fn($u) => self::user($u))->toArray();
     }
 
     /**
-     * Transform a collection of join requests.
+     * Transform a collection/paginator of join requests.
      *
-     * @param Collection $requests
+     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $requests
      * @return array
      */
-    public static function joinRequests(Collection $requests): array
+    public static function joinRequests(Collection|\Illuminate\Pagination\LengthAwarePaginator $requests): array
     {
         return $requests->map(fn($r) => self::joinRequest($r))->toArray();
     }
