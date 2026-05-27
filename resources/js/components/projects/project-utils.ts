@@ -42,6 +42,13 @@ export function getInitials(name: string): string {
 
 export function storageUrl(path: string | null | undefined): string | null {
     if (!path) return null;
+
+    // Already a full URL (S3, external, etc.)
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+
+    // Local storage path
     return `/storage/${path}`;
 }
 
