@@ -142,7 +142,7 @@ export function ImageUploader({
                         {existingImages.map((image, index) => (
                             <div key={index} className="relative group">
                                 <img
-                                    src={`/storage/${image}`}
+                                    src={`${image}`}
                                     alt={`Imagen ${index + 1}`}
                                     className="size-full aspect-square object-cover rounded-lg border"
                                 />
