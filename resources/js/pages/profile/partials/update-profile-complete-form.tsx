@@ -315,7 +315,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
 
                 {/* Submit Button */}
                 <div className="flex items-center gap-4">
-                    <Button disabled={processing}>Guardar Cambios</Button>
+                    <Button type="submit" disabled={processing}>Guardar Cambios</Button>
 
                     <Transition
                         show={recentlySuccessful}
