@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserProfile } from '@/types';
 
@@ -14,23 +14,27 @@ export function UserProfileHeader({ user }: UserProfileHeaderProps) {
         .toUpperCase()
         .slice(0, 2);
 
+    const memberDate = user.created_at
+        ? new Date(user.created_at).toLocaleDateString('es-ES', {
+            month: 'long',
+            year: 'numeric',
+        })
+        : null;
+
     return (
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <Avatar size="lg">
+            <Avatar className="size-20 ring-2 ring-border">
                 <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                <AvatarFallback>{initials}</AvatarFallback>
+                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
+                <h1 className="text-3xl font-display font-bold text-foreground">{user.name}</h1>
                 {user.bio && (
-                    <p className="mt-2 text-muted-foreground max-w-xl">{user.bio}</p>
+                    <p className="mt-2 text-muted-foreground max-w-xl line-clamp-3">{user.bio}</p>
                 )}
-                {user.created_at && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Miembro desde {new Date(user.created_at).toLocaleDateString('es-ES', {
-                            month: 'long',
-                            year: 'numeric',
-                        })}
+                {memberDate && (
+                    <p className="mt-2 text-xs text-muted-foreground/70">
+                        Miembro desde {memberDate}
                     </p>
                 )}
             </div>

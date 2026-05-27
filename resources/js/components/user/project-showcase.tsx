@@ -1,60 +1,68 @@
-import { useState } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import { ProjectCard } from '@/components/projects/project-card';
 import { UserProject } from '@/types';
+import { FolderOpen, Users } from 'lucide-react';
 
 interface ProjectShowcaseProps {
     createdProjects: UserProject[];
     participatingProjects: UserProject[];
 }
 
-function EmptyState({ message }: { message: string }) {
+function EmptyProjects({ message }: { message: string }) {
     return (
-        <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-                {message}
-            </CardContent>
-        </Card>
+        <Empty className="py-12">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <FolderOpen className="size-5 text-muted-foreground" />
+                </EmptyMedia>
+                <EmptyTitle>{message}</EmptyTitle>
+                <EmptyDescription>
+                    Los proyectos aparecerán aquí cuando estén disponibles.
+                </EmptyDescription>
+            </EmptyHeader>
+        </Empty>
     );
 }
 
 export function ProjectShowcase({ createdProjects, participatingProjects }: ProjectShowcaseProps) {
-    const [activeTab, setActiveTab] = useState<'created' | 'participating'>('created');
-
     const hasCreated = createdProjects.length > 0;
     const hasParticipating = participatingProjects.length > 0;
-
     const showTabs = hasCreated && hasParticipating;
 
-    return (
-        <div className="space-y-4">
-            {showTabs && (
-                <div className="flex gap-4 border-b border-border">
-                    <button
-                        onClick={() => setActiveTab('created')}
-                        className={`pb-2 px-1 text-sm font-medium transition-colors border-b-2 ${
-                            activeTab === 'created'
-                                ? 'border-primary text-foreground'
-                                : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Creados ({createdProjects.length})
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('participating')}
-                        className={`pb-2 px-1 text-sm font-medium transition-colors border-b-2 ${
-                            activeTab === 'participating'
-                                ? 'border-primary text-foreground'
-                                : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Participando ({participatingProjects.length})
-                    </button>
-                </div>
-            )}
+    if (!hasCreated && !hasParticipating) {
+        return <EmptyProjects message="No hay proyectos para mostrar" />;
+    }
 
-            {activeTab === 'created' && (
-                <div className="space-y-4">
+    if (!showTabs) {
+        const projects = hasCreated ? createdProjects : participatingProjects;
+        return (
+            <div className="flex flex-col gap-4">
+                {projects.map((project) => (
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        variant="compact"
+                    />
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <Tabs defaultValue="created">
+            <TabsList variant="line" className="mb-4">
+                <TabsTrigger value="created">
+                    Creados ({createdProjects.length})
+                </TabsTrigger>
+                <TabsTrigger value="participating">
+                    Participando ({participatingProjects.length})
+                </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="created">
+                <div className="flex flex-col gap-4">
                     {hasCreated ? (
                         createdProjects.map((project) => (
                             <ProjectCard
@@ -64,13 +72,13 @@ export function ProjectShowcase({ createdProjects, participatingProjects }: Proj
                             />
                         ))
                     ) : (
-                        <EmptyState message="No ha creado proyectos todavía" />
+                        <EmptyProjects message="No ha creado proyectos todavía" />
                     )}
                 </div>
-            )}
+            </TabsContent>
 
-            {activeTab === 'participating' && (
-                <div className="space-y-4">
+            <TabsContent value="participating">
+                <div className="flex flex-col gap-4">
                     {hasParticipating ? (
                         participatingProjects.map((project) => (
                             <ProjectCard
@@ -80,10 +88,10 @@ export function ProjectShowcase({ createdProjects, participatingProjects }: Proj
                             />
                         ))
                     ) : (
-                        <EmptyState message="No participa en proyectos todavía" />
+                        <EmptyProjects message="No participa en proyectos todavía" />
                     )}
                 </div>
-            )}
-        </div>
+            </TabsContent>
+        </Tabs>
     );
 }
