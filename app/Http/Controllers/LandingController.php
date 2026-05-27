@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class LandingController extends Controller
@@ -21,6 +23,9 @@ class LandingController extends Controller
             ->get();
 
         return Inertia::render('landing', [
+            'user_count' => User::count(),
+            'project_count' => Project::count(),
+            'collaboration_count' => DB::table('project_participants')->count(),
             'projects' => [
                 'data' => $projects,
                 'total' => Project::where('status', 'open')->count(),
