@@ -26,8 +26,8 @@ export default function GuestLayout({ children }: Props) {
                     </Link>
                 </div>
 
-                {/* Card */}
-                <div className="w-full overflow-hidden bg-card shadow-md sm:rounded-lg">
+                {/* Auth form */}
+                <div className="w-full">
                     {children}
                 </div>
             </div>

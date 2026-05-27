@@ -18,7 +18,7 @@ export default function ApplicationLogo({
             <svg
                 viewBox="0 0 40 40"
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-full w-auto fill-current text-foreground"
+                className="h-full w-auto fill-current text-foreground shrink-0"
             >
                 {/* House shape */}
                 <path d="M5 24 L20 9 L35 24 V38 H5 Z" />
@@ -30,7 +30,7 @@ export default function ApplicationLogo({
 
             {/* Texto — solo en variant full */}
             {variant === 'full' && (
-                <div className="flex flex-col leading-tight">
+                <div className="flex flex-col text-center leading-tight">
                     <span className="font-display text-lg font-bold text-foreground">
                         The Dev House
                     </span>
