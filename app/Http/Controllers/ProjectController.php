@@ -38,16 +38,28 @@ class ProjectController extends Controller
             $query->where('status', $request->status);
         }
 
-        $projects = $query->paginate(12)->withQueryString();
+        $paginator = $query->paginate(12)->withQueryString();
 
         $techs = Tech::orderBy('name')->get();
 
         return Inertia::render('projects/index', [
-            'projects' => $projects,
+            'projects' => [
+                'data' => $paginator->items(),
+                'links' => $paginator->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'from' => $paginator->firstItem(),
+                    'to' => $paginator->lastItem(),
+                ],
+            ],
             'techs' => $techs,
             'filters' => [
                 'tech' => $request->tech,
                 'status' => $request->status,
+                'search' => $request->search,
             ],
         ]);
     }
