@@ -182,7 +182,7 @@ export default function Landing({ auth, projects, user_count, project_count, col
                         <div className="flex flex-col items-center gap-6">
                             {/* Brand */}
                             <Link href="/" className="flex items-center gap-3">
-                                <ApplicationLogo variant="icon" className="h-12 w-auto" />
+                                <ApplicationLogo variant="icon" className="h-12" />
                                 <div>
                                     <span className="font-display font-bold text-lg text-foreground">The Dev House</span>
                                     <p className="text-xs text-muted-foreground">Where developers build together</p>

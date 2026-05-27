@@ -22,11 +22,8 @@ export default function GuestLayout({ children }: Props) {
                 {/* Logo + tagline */}
                 <div className="mb-8 text-center">
                     <Link href="/">
-                        <ApplicationLogo variant="full" className="h-16 w-auto fill-current text-foreground mx-auto" />
+                        <ApplicationLogo variant="full" className="h-16 mx-auto" />
                     </Link>
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        Where developers build together
-                    </p>
                 </div>
 
                 {/* Card */}
