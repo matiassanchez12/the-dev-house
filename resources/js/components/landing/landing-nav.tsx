@@ -48,7 +48,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <ApplicationLogo variant="icon" className="h-8 w-8" />
+                        <ApplicationLogo variant="icon" className="h-10 w-auto" />
                         <span className="font-display font-bold text-lg hidden sm:inline">The Dev House</span>
                     </Link>
 
