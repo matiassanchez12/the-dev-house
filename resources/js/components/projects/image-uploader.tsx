@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
 import { FormError } from '@/components/ui/form-error';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,6 +26,8 @@ export function ImageUploader({
     error,
 }: ImageUploaderProps) {
     const [isDragOver, setIsDragOver] = useState(false);
+    const [galleryOpen, setGalleryOpen] = useState(false);
+    const [galleryIndex, setGalleryIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const validateAndAddFiles = useCallback(
@@ -99,118 +102,138 @@ export function ImageUploader({
         [files, onFilesChange]
     );
 
+    const handleOpenExistingGallery = (index: number) => {
+        setGalleryIndex(index);
+        setGalleryOpen(true);
+    };
+
     const totalImages = files.length + existingImages.length;
 
-    return (
-        <div className="flex flex-col gap-4">
-            {/* Drop zone */}
-            <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
-                className={cn(
-                    'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 cursor-pointer transition-colors',
-                    isDragOver
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                )}
-            >
-                <Upload className="size-8 text-muted-foreground" />
-                <div className="text-center">
-                    <p className="text-sm font-medium text-foreground">
-                        Arrastrá imágenes aquí
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        o hacé clic para seleccionar (máx. {MAX_FILES} imágenes, 2MB cada una)
-                    </p>
-                </div>
-                <input
-                    ref={inputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleBrowse}
-                    className="hidden"
-                />
-            </div>
+    const existingImageUrls = existingImages.map((img) => storageUrl(img) ?? '');
 
-            {/* Existing images (edit mode) */}
-            {existingImages.length > 0 && (
-                <div>
-                    <p className="mb-2 text-sm font-medium">Imágenes actuales</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {existingImages.map((image, index) => (
-                            <div key={index} className="relative group">
-                                <img
-                                    src={storageUrl(image) ?? ''}
-                                    alt={`Imagen ${index + 1}`}
-                                    className="size-full aspect-square object-cover rounded-lg border"
-                                />
-                                {onRemoveExisting && (
+    return (
+        <>
+            <div className="flex flex-col gap-4">
+                {/* Drop zone */}
+                <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => inputRef.current?.click()}
+                    className={cn(
+                        'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 cursor-pointer transition-colors',
+                        isDragOver
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    )}
+                >
+                    <Upload className="size-8 text-muted-foreground" />
+                    <div className="text-center">
+                        <p className="text-sm font-medium text-foreground">
+                            Arrastrá imágenes aquí
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                            o hacé clic para seleccionar (máx. {MAX_FILES} imágenes, 2MB cada una)
+                        </p>
+                    </div>
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleBrowse}
+                        className="hidden"
+                    />
+                </div>
+
+                {/* Existing images (edit mode) */}
+                {existingImages.length > 0 && (
+                    <div>
+                        <p className="mb-2 text-sm font-medium">Imágenes actuales</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {existingImages.map((image, index) => (
+                                <div key={index} className="relative group">
+                                    <img
+                                        src={storageUrl(image) ?? ''}
+                                        alt={`Imagen ${index + 1}`}
+                                        className="size-full aspect-square object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                                        onClick={() => handleOpenExistingGallery(index)}
+                                    />
+                                    {onRemoveExisting && (
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="icon"
+                                            className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onRemoveExisting(image);
+                                            }}
+                                        >
+                                            <X className="size-3" />
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* New file previews */}
+                {files.length > 0 && (
+                    <div>
+                        <p className="mb-2 text-sm font-medium">
+                            Imágenes seleccionadas ({files.length})
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {files.map((file, index) => (
+                                <div key={index} className="relative group">
+                                    <div className="aspect-square rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={file.name}
+                                            className="size-full object-cover"
+                                            onLoad={(e) => {
+                                                URL.revokeObjectURL(
+                                                    (e.target as HTMLImageElement).src
+                                                );
+                                            }}
+                                        />
+                                    </div>
                                     <Button
                                         type="button"
                                         variant="destructive"
                                         size="icon"
                                         className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => onRemoveExisting(image)}
+                                        onClick={() => handleRemoveFile(index)}
                                     >
                                         <X className="size-3" />
                                     </Button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* New file previews */}
-            {files.length > 0 && (
-                <div>
-                    <p className="mb-2 text-sm font-medium">
-                        Imágenes seleccionadas ({files.length})
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {files.map((file, index) => (
-                            <div key={index} className="relative group">
-                                <div className="aspect-square rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
-                                    <img
-                                        src={URL.createObjectURL(file)}
-                                        alt={file.name}
-                                        className="size-full object-cover"
-                                        onLoad={(e) => {
-                                            URL.revokeObjectURL(
-                                                (e.target as HTMLImageElement).src
-                                            );
-                                        }}
-                                    />
+                                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                                        {file.name}
+                                    </p>
                                 </div>
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => handleRemoveFile(index)}
-                                >
-                                    <X className="size-3" />
-                                </Button>
-                                <p className="mt-1 truncate text-xs text-muted-foreground">
-                                    {file.name}
-                                </p>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {totalImages === 0 && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <ImageIcon className="size-4" />
-                    <p className="text-sm">Sin imágenes</p>
-                </div>
-            )}
+                {totalImages === 0 && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <ImageIcon className="size-4" />
+                        <p className="text-sm">Sin imágenes</p>
+                    </div>
+                )}
 
-            <FormError message={error} />
-        </div>
+                <FormError message={error} />
+            </div>
+
+            <ImageGalleryDialog
+                images={existingImageUrls}
+                open={galleryOpen}
+                initialIndex={galleryIndex}
+                onOpenChange={setGalleryOpen}
+            />
+        </>
     );
 }

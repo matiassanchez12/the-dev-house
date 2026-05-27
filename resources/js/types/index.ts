@@ -126,6 +126,17 @@ export interface DiscoverableUser {
     joined_projects_count: number;
 }
 
+export interface ImageGalleryDialogProps {
+    /** Array of image URLs to display */
+    images: string[];
+    /** Whether the dialog is open */
+    open: boolean;
+    /** Index of the image to show initially (resets on each open) */
+    initialIndex: number;
+    /** Called when open state changes (close) */
+    onOpenChange: (open: boolean) => void;
+}
+
 // Landing page props
 export interface LandingPageProps {
     user_count: number;
