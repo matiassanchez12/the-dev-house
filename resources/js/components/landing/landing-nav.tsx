@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import ApplicationLogo from '@/components/application-logo';
 import { Button } from '@/components/ui/button';
+import ThemeToggle from '@/components/theme-toggle';
 import { Menu, X } from 'lucide-react';
 
 interface LandingNavProps {
@@ -67,6 +68,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
 
                     {/* CTA buttons */}
                     <div className="hidden md:flex items-center gap-3">
+                        <ThemeToggle />
                         {auth.user ? (
                             <Link href={route('dashboard')}>
                                 <Button variant="default" size="sm">Dashboard</Button>
@@ -108,6 +110,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                                 </a>
                             ))}
                             <div className="flex gap-2 pt-2">
+                                <ThemeToggle />
                                 {auth.user ? (
                                     <Link href={route('dashboard')}>
                                         <Button variant="default" size="sm" className="w-full">Dashboard</Button>
