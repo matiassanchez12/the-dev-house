@@ -54,7 +54,7 @@ export function ProjectCard({
     return (
         <Card
             className={cn(
-                'group/card flex flex-col transition-all duration-200',
+                'p-0 group/card flex flex-col transition-all duration-200',
                 'hover:shadow-lg hover:scale-[1.02]',
                 isFeatured && 'ring-2 ring-primary/20 shadow-xl hover:shadow-xl'
             )}

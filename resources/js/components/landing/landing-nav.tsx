@@ -19,8 +19,8 @@ interface LandingNavProps {
 
 const navLinks = [
     { label: 'Features', href: '#features' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Developers', href: '#developers' },
+    { label: 'Projects', href: '/projects' },
+    { label: 'Developers', href: '/users' },
 ];
 
 export default function LandingNav({ auth, className }: LandingNavProps) {
