@@ -2,7 +2,7 @@ import ApplicationLogo from '@/components/application-logo';
 import ThemeToggle from '@/components/theme-toggle';
 import NavLink from '@/components/nav-link';
 import { Dropdown } from '@/components/ui/dropdown';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ResponsiveNavLink from '@/components/responsive-nav-link';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
@@ -135,7 +135,7 @@ export default function PublicLayout({ children, header }: Props) {
 
                 {/* Mobile full-screen menu */}
                 <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                    <Dialog.Content className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm sm:hidden">
+                    <DialogContent className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm sm:hidden">
                         <button
                             onClick={() => setMobileMenuOpen(false)}
                             className="absolute right-4 top-4 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none"
@@ -209,7 +209,7 @@ export default function PublicLayout({ children, header }: Props) {
                                 </>
                             )}
                         </div>
-                    </Dialog.Content>
+                    </DialogContent>
                 </Dialog>
             </nav>
 
