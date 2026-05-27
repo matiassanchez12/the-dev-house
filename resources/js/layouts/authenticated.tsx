@@ -2,7 +2,6 @@ import ApplicationLogo from '@/components/application-logo';
 import ThemeToggle from '@/components/theme-toggle';
 import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
-import { Dialog } from '@/components/ui/dialog';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -120,7 +119,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 </div>
 
                 {/* Mobile full-screen menu */}
-                <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                {mobileMenuOpen && (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm sm:hidden">
                         <button
                             onClick={() => setMobileMenuOpen(false)}
@@ -190,7 +189,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </Link>
                         </div>
                     </div>
-                </Dialog>
+                )}
             </nav>
 
             {header && (
