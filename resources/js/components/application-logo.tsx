@@ -35,7 +35,7 @@ export default function ApplicationLogo({
                         The Dev House
                     </span>
                     <span className="text-xs text-muted-foreground">
-                        Where developers build together
+                        Donde los desarrolladores construyen juntos
                     </span>
                 </div>
             )}

@@ -59,14 +59,14 @@ export function UserCard({ user }: UserCardProps) {
                         ))}
                         {remainingTechs > 0 && (
                             <Badge variant="outline" className="text-xs">
-                                +{remainingTechs} more
+                                +{remainingTechs}
                             </Badge>
                         )}
                     </div>
                 )}
                 <div className="flex gap-4 text-xs text-muted-foreground">
-                    <span>{user.created_projects_count} projects created</span>
-                    <span>{user.joined_projects_count} joined</span>
+                    <span>{user.created_projects_count} proyecto{user.created_projects_count !== 1 ? 's' : ''} creado{user.created_projects_count !== 1 ? 's' : ''}</span>
+                    <span>{user.joined_projects_count} unido{user.joined_projects_count !== 1 ? 's' : ''}</span>
                 </div>
             </CardContent>
         </Card>
