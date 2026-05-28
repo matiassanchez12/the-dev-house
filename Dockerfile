@@ -8,7 +8,6 @@ RUN apk add --no-cache \
     libxml2-dev \
     zip \
     unzip \
-    postgresql-dev \
     nodejs \
     npm \
     && docker-php-ext-install pdo pdo_pgsql curl mbstring fileinfo
