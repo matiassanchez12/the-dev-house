@@ -10,7 +10,7 @@ RUN apk add --no-cache \
     unzip \
     nodejs \
     npm \
-    && docker-php-ext-install pdo pdo_pgsql curl mbstring fileinfo
+    && docker-php-ext-install pdo pdo_pgsql mbstring fileinfo
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
