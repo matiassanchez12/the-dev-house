@@ -14,6 +14,19 @@ interface UserTech extends Tech {
     };
 }
 
+interface TechFormEntry {
+    id: number;
+    years_experience: number;
+    proficiency: string;
+}
+
+interface ProfileFormData {
+    bio: string;
+    avatar: File | null;
+    techs: TechFormEntry[];
+    _method: 'post';
+}
+
 interface Props {
     className?: string;
     userTechs: UserTech[];
@@ -53,12 +66,12 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         'master': 'Experto',
     };
 
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
+    const { data, setData, post, processing, errors, recentlySuccessful } = useForm<ProfileFormData>({
         bio: user.bio ?? '',
         avatar: null as File | null,
         techs: userTechs.map((ut) => ({
             id: ut.id,
-            years_experience: ut.pivot?.years_experience ?? '',
+            years_experience: ut.pivot?.years_experience ?? 0,
             proficiency: typeof ut.pivot?.proficiency === 'string'
                 ? ut.pivot.proficiency
                 : (ut.pivot?.proficiency ? proficiencyMap[ut.pivot.proficiency] : 'intermediate'),
@@ -84,7 +97,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         if (checked) {
             setData('techs', [
                 ...data.techs,
-                { id: techId, years_experience: '', proficiency: 'intermediate' },
+                { id: techId, years_experience: 0, proficiency: 'intermediate' },
             ]);
         } else {
             setData('techs', data.techs.filter((t) => t.id !== techId));
@@ -92,10 +105,9 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     };
 
     const handleTechUpdate = (techId: number, field: 'years_experience' | 'proficiency', value: string | number) => {
-        // Convert proficiency number to string
         const finalValue = field === 'proficiency' && typeof value === 'number'
             ? proficiencyMap[value]
-            : value;
+            : (field === 'years_experience' ? Number(value) : value);
         setData('techs', data.techs.map((t) => (t.id === techId ? { ...t, [field]: finalValue } : t)));
     };
 

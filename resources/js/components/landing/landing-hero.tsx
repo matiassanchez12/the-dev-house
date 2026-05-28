@@ -1,7 +1,15 @@
 import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Rocket, Code2, Users, GitBranch, Sparkles } from 'lucide-react';
+import { Rocket, Sparkles } from 'lucide-react';
+import { SanityLight } from '@/components/ui/svgs/sanityLight';
+import { SanityDark } from '@/components/ui/svgs/sanityDark';
+import { ReactIcon } from '@/components/ui/svgs/react-icon';
+import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
+import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
+import { PythonIcon } from '@/components/ui/svgs/python-icon';
+import { VueIcon } from '@/components/ui/svgs/vue-icon';
+import { NodeJsIcon } from '@/components/ui/svgs/nodejs-icon';
 
 interface LandingHeroProps {
     auth: {
@@ -14,13 +22,22 @@ interface LandingHeroProps {
     className?: string;
 }
 
-const floatingTechs = [
-    { icon: Code2, label: 'React', delay: '0s' },
-    { icon: GitBranch, label: 'Laravel', delay: '1s' },
-    { icon: Users, label: 'TypeScript', delay: '2s' },
-    { icon: Sparkles, label: 'Python', delay: '0.5s' },
-    { icon: Code2, label: 'Vue', delay: '1.5s' },
-    { icon: GitBranch, label: 'Node.js', delay: '2.5s' },
+interface FloatingTech {
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    label: string;
+    delay: string;
+    className?: string;
+}
+
+const floatingTechs: FloatingTech[] = [
+    { icon: ReactIcon, label: 'React', delay: '0s', className: 'size-4' },
+    { icon: LaravelIcon, label: 'Laravel', delay: '1s', className: 'size-4' },
+    { icon: TypeScriptIcon, label: 'TypeScript', delay: '2s', className: 'size-4' },
+    { icon: PythonIcon, label: 'Python', delay: '0.5s', className: 'size-4' },
+    { icon: VueIcon, label: 'Vue', delay: '1.5s', className: 'size-4' },
+    { icon: NodeJsIcon, label: 'Node.js', delay: '2.5s', className: 'size-4' },
+    { icon: SanityLight, label: 'Sanity', delay: '3s', className: 'size-4' },
+    { icon: SanityDark, label: 'Sanity Dark', delay: '3.5s', className: 'size-4' },
 ];
 
 export default function LandingHero({ auth, className }: LandingHeroProps) {
@@ -57,8 +74,8 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                         className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight animate-fade-in-up"
                         style={{ '--stagger-delay': '100ms' } as React.CSSProperties}
                     >
-                        Construí junto a otros,<br />
-                        <span className="text-primary">crecé como desarrollador</span>
+                        Encontrá devs con tu mismo tech stack<br />
+                        <span className="text-primary">y llevá tu proyecto al siguiente nivel</span>
                     </h1>
 
                     {/* Subtitle */}
@@ -110,7 +127,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                                 className="text-sm px-4 py-1.5 gap-2 animate-bob"
                                 style={{ animationDelay: tech.delay } as React.CSSProperties}
                             >
-                                <tech.icon className="size-3.5 text-muted-foreground" />
+                                <tech.icon className={tech.className ?? 'size-3.5 text-muted-foreground'} />
                                 {tech.label}
                             </Badge>
                         ))}
