@@ -15,6 +15,7 @@ import {
     CarouselNext,
     useCarousel,
 } from '@/components/ui/carousel';
+import { Card, CardContent } from '@/components/ui/card';
 import type { ImageGalleryDialogProps } from '@/types';
 
 function GalleryCarousel({ images, currentIndex, onSlideChange }: {
@@ -46,21 +47,25 @@ function GalleryCarousel({ images, currentIndex, onSlideChange }: {
         >
             <CarouselContent>
                 {images.map((src, index) => (
-                    <CarouselItem key={index} className="flex items-center justify-center p-0">
-                        <img
-                            src={src}
-                            alt=""
-                            className="object-cover w-full h-full max-h-[80vh]"
-                        />
+                    <CarouselItem key={index} className="p-0">
+                        <Card className="m-0 border-0 bg-transparent shadow-none">
+                            <CardContent className="flex aspect-square sm:aspect-auto sm:h-[70vh] md:h-[75vh] lg:h-[80vh] items-center justify-center p-0">
+                                <img
+                                    src={src}
+                                    alt=""
+                                    className="h-full w-full object-contain"
+                                />
+                            </CardContent>
+                        </Card>
                     </CarouselItem>
                 ))}
             </CarouselContent>
-            <CarouselPrevious
-                className="-left-4 sm:-left-8 bg-black/50 text-white hover:bg-black/70 border-0"
+            <CarouselPrevious 
+                className="-left-4 sm:-left-8 bg-black/50 text-white hover:bg-black/70 border-0 z-20"
                 size="icon"
             />
-            <CarouselNext
-                className="-right-4 sm:-right-8 bg-black/50 text-white hover:bg-black/70 border-0"
+            <CarouselNext 
+                className="-right-4 sm:-right-8 bg-black/50 text-white hover:bg-black/70 border-0 z-20"
                 size="icon"
             />
         </Carousel>
@@ -98,7 +103,7 @@ export function ImageGalleryDialog({
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
+                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-20"
                         aria-label="Cerrar"
                     >
                         <svg
