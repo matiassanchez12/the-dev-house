@@ -1,7 +1,7 @@
 import InputError from '@/components/input-error';
 import InputLabel from '@/components/input-label';
 import { Button } from '@/components/ui/button';
-import TextInput from '@/components/text-input';
+import { Input } from '@/components/ui/input';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -44,7 +44,7 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
-                    <TextInput
+                    <Input
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
@@ -60,7 +60,7 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
+                    <Input
                         id="email"
                         type="email"
                         className="mt-1 block w-full"

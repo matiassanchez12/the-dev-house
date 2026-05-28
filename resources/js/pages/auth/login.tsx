@@ -1,7 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import InputLabel from '@/components/input-label';
 import { Button } from '@/components/ui/button';
-import TextInput from '@/components/text-input';
+import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -35,14 +35,14 @@ export default function Login({ status, canResetPassword }) {
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
+                    <Input
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        isFocused={true}
+                        isFocused
                         placeholder="email@example.com"
                         onChange={(e) => setData('email', e.target.value)}
                     />
@@ -53,7 +53,7 @@ export default function Login({ status, canResetPassword }) {
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
+                    <Input
                         id="password"
                         type="password"
                         name="password"

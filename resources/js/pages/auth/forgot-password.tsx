@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import TextInput from '@/components/text-input';
+import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, useForm } from '@inertiajs/react';
@@ -32,13 +32,13 @@ export default function ForgotPassword({ status }) {
             )}
 
             <form onSubmit={submit}>
-                <TextInput
+                <Input
                     id="email"
                     type="email"
                     name="email"
                     value={data.email}
                     className="mt-1 block w-full"
-                    isFocused={true}
+                    isFocused
                     placeholder="email@example.com"
                     onChange={(e) => setData('email', e.target.value)}
                 />

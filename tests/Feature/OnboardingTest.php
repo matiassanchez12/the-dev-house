@@ -261,6 +261,6 @@ class OnboardingTest extends TestCase
 
         $response = $this->actingAs($user)->get('/onboarding');
 
-        $response->assertInertia(fn ($page) => $page->has('totalSteps', 5));
+        $response->assertInertia(fn ($page) => $page->where('totalSteps', 5));
     }
 }

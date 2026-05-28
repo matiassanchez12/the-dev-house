@@ -35,6 +35,7 @@ class OnboardingController extends Controller
             'user' => ['bio' => $user->bio, 'avatar' => $user->avatar],
             'allTechs' => $allTechs,
             'userTechs' => $userTechs,
+            'totalSteps' => 5,
         ]);
     }
 

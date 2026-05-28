@@ -19,6 +19,7 @@ Source: .agents/skills/ (project-level), AGENTS.md conventions
 | Committing | `prowler-commit` | skills/prowler-commit/SKILL.md | Conventional commits |
 | Creating new skills | `skill-creator` | skills/skill-creator/SKILL.md | LLM-first skills with frontmatter |
 | Installing shadcn components | `shadcn` | .agents/skills/shadcn/SKILL.md | ALWAYS use `npx shadcn@latest add` — never write by hand |
+| Adding Input component | `shadcn` | .agents/skills/shadcn/SKILL.md | `npx shadcn@latest add input` — replace custom TextInput components |
 
 ## Project-Level Skills (.agents/skills/)
 

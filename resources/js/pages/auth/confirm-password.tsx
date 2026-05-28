@@ -1,6 +1,6 @@
 import InputLabel from '@/components/input-label';
 import { Button } from '@/components/ui/button';
-import TextInput from '@/components/text-input';
+import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import { Head, useForm } from '@inertiajs/react';
@@ -31,13 +31,13 @@ export default function ConfirmPassword() {
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
+                    <Input
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
-                        isFocused={true}
+                        isFocused
                         placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />

@@ -18,6 +18,7 @@ interface OnboardingProps {
     };
     allTechs: Tech[];
     userTechs: (Tech & { pivot?: { proficiency?: string } })[];
+    totalSteps: number;
 }
 
 const PROFICIENCY_MAP: Record<number, string> = {
@@ -53,10 +54,9 @@ interface Recommendation {
 }
 
 export default function OnboardingIndex() {
-    const { auth, user, allTechs, userTechs } = usePage<OnboardingProps>().props;
+    const { auth, user, allTechs, userTechs, totalSteps } = usePage<OnboardingProps>().props;
 
     const [currentStep, setCurrentStep] = useState(1);
-    const totalSteps = 5;
 
     // Step 1: Tech selection
     const [selectedTechs, setSelectedTechs] = useState<SelectedTech[]>(() => {
