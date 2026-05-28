@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserProfile } from '@/types';
+import { SocialLinksDisplay } from './social-links-display';
 
 interface UserProfileHeaderProps {
     user: UserProfile;
@@ -37,6 +38,9 @@ export function UserProfileHeader({ user }: UserProfileHeaderProps) {
                         Miembro desde {memberDate}
                     </p>
                 )}
+                <div className="mt-3">
+                    <SocialLinksDisplay links={user.socialLinks ?? []} />
+                </div>
             </div>
         </div>
     );

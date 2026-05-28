@@ -4,8 +4,18 @@ import DeleteUserForm from './partials/delete-user-form';
 import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
 import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
+import SocialLinksEditForm from './partials/social-links-edit-form';
+import { SocialLink } from '@/types';
 
-export default function Edit({ mustVerifyEmail, status, userTechs, allTechs }) {
+interface Props {
+    mustVerifyEmail: boolean;
+    status?: string;
+    userTechs: unknown[];
+    allTechs: unknown[];
+    socialLinks?: SocialLink[];
+}
+
+export default function Edit({ mustVerifyEmail, status, userTechs, allTechs, socialLinks }: Props) {
     return (
         <AppLayout
             header={
@@ -35,6 +45,16 @@ export default function Edit({ mustVerifyEmail, status, userTechs, allTechs }) {
                             className="max-w-3xl"
                         />
                     </div>
+
+                    {/* Redes sociales */}
+                    {socialLinks !== undefined && (
+                        <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
+                            <SocialLinksEditForm
+                                socialLinks={socialLinks}
+                                className="max-w-xl"
+                            />
+                        </div>
+                    )}
 
                     {/* Password */}
                     <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">

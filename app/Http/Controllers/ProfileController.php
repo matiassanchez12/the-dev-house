@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Profile\UpdateCompleteProfileRequest;
+use App\Http\Requests\Profile\UpdateSocialLinksRequest;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\SocialLink;
 use App\Models\Tech;
 use App\Services\ProfileService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -28,12 +30,14 @@ class ProfileController extends Controller
         $user = $request->user();
         $userTechs = $user->techs()->withPivot('years_experience', 'proficiency')->get();
         $allTechs = Tech::orderBy('name')->get();
+        $socialLinks = $user->socialLinks;
 
         return Inertia::render('profile/edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
             'userTechs' => $userTechs,
             'allTechs' => $allTechs,
+            'socialLinks' => $socialLinks,
         ]);
     }
 
@@ -78,6 +82,75 @@ class ProfileController extends Controller
         }
 
         return Redirect::route('profile.edit')->with('success', 'Perfil actualizado exitosamente!');
+    }
+
+    /**
+     * Update the user's social links (replace all).
+     */
+    public function updateSocialLinks(UpdateSocialLinksRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $links = $request->validated()['links'];
+
+        // Separate existing (with id) and new links
+        $existingLinks = array_filter($links, fn ($link) => isset($link['id']));
+        $newLinks = array_filter($links, fn ($link) => ! isset($link['id']));
+
+        // Update existing links
+        foreach ($existingLinks as $link) {
+            $socialLink = SocialLink::where('id', $link['id'])
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($socialLink) {
+                $socialLink->update([
+                    'platform' => $link['platform'],
+                    'url' => $link['url'],
+                ]);
+            }
+        }
+
+        // Get IDs of links to keep
+        $keepIds = array_map(fn ($link) => $link['id'], array_filter($links, fn ($link) => isset($link['id'])));
+
+        // Delete links not in the submitted set
+        if (! empty($keepIds)) {
+            $user->socialLinks()->whereNotIn('id', $keepIds)->delete();
+        } else {
+            $user->socialLinks()->delete();
+        }
+
+        // Insert new links
+        $records = array_map(function ($link) use ($user) {
+            return [
+                'user_id' => $user->id,
+                'platform' => $link['platform'],
+                'url' => $link['url'],
+            ];
+        }, $newLinks);
+
+        if (! empty($records)) {
+            SocialLink::upsert($records, ['user_id', 'platform'], ['url']);
+        }
+
+        return Redirect::route('profile.edit')->with('success', 'Links sociales actualizados!');
+    }
+
+    /**
+     * Delete a single social link.
+     */
+    public function destroySocialLink(Request $request, SocialLink $socialLink): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Ensure the user owns this link
+        if ($socialLink->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $socialLink->delete();
+
+        return Redirect::route('profile.edit')->with('success', 'Link social eliminado!');
     }
 
     /**

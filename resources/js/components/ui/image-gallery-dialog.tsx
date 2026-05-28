@@ -4,8 +4,65 @@ import {
     DialogContent,
     DialogOverlay,
 } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselPrevious,
+    CarouselNext,
+    useCarousel,
+} from '@/components/ui/carousel';
 import type { ImageGalleryDialogProps } from '@/types';
+
+function GalleryCarousel({ images, currentIndex, onSlideChange }: { 
+    images: string[]; 
+    currentIndex: number;
+    onSlideChange: (index: number) => void;
+}) {
+    const [api, setApi] = useState<ReturnType<typeof useCarousel>['api']>(undefined);
+
+    useEffect(() => {
+        if (!api) return;
+
+        // Sync external currentIndex with carousel
+        if (api.selectedScrollSnap() !== currentIndex) {
+            api.scrollTo(currentIndex);
+        }
+
+        // Listen to slide changes
+        api.on('select', () => {
+            onSlideChange(api.selectedScrollSnap());
+        });
+    }, [api, currentIndex, onSlideChange]);
+
+    return (
+        <Carousel
+            setApi={setApi}
+            opts={{ loop: true, align: 'center' }}
+            className="w-full"
+        >
+            <CarouselContent>
+                {images.map((src, index) => (
+                    <CarouselItem key={index} className="flex items-center justify-center p-0">
+                        <img
+                            src={src}
+                            alt=""
+                            className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[700px] lg:max-h-[85vh] lg:max-w-[800px] xl:max-w-[800px] object-contain"
+                        />
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious 
+                className="-left-4 sm:-left-8 bg-black/50 text-white hover:bg-black/70 border-0"
+                size="icon"
+            />
+            <CarouselNext 
+                className="-right-4 sm:-right-8 bg-black/50 text-white hover:bg-black/70 border-0"
+                size="icon"
+            />
+        </Carousel>
+    );
+}
 
 export function ImageGalleryDialog({
     images,
@@ -22,27 +79,7 @@ export function ImageGalleryDialog({
         }
     }, [open, initialIndex]);
 
-    // Keyboard navigation
-    useEffect(() => {
-        if (!open || images.length <= 1) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                setCurrentIndex((i) => (i - 1 + images.length) % images.length);
-            } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                setCurrentIndex((i) => (i + 1) % images.length);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [open, images.length]);
-
     if (images.length === 0) return null;
-
-    const showNav = images.length > 1;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,48 +91,19 @@ export function ImageGalleryDialog({
                 showCloseButton={false}
                 className="border-0 bg-transparent shadow-none p-0 max-w-none !left-0 !right-0 !mx-auto"
             >
-                {/* Image container */}
                 <div className="relative flex items-center justify-center">
-                    {/* Main image - responsive max sizing, 800px max on desktop */}
-                    <img
-                        src={images[currentIndex]}
-                        alt=""
-                        className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[700px] lg:max-h-[85vh] lg:max-w-[800px] xl:max-w-[800px] object-contain"
+                    {/* Carousel */}
+                    <GalleryCarousel 
+                        images={images}
+                        currentIndex={currentIndex}
+                        onSlideChange={setCurrentIndex}
                     />
-
-                    {/* Navigation buttons */}
-                    {showNav && (
-                        <>
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setCurrentIndex(
-                                        (i) => (i - 1 + images.length) % images.length
-                                    )
-                                }
-                                className="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
-                                aria-label="Imagen anterior"
-                            >
-                                <ChevronLeft className="size-6 sm:size-8" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setCurrentIndex((i) => (i + 1) % images.length)
-                                }
-                                className="absolute -right-4 sm:-right-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
-                                aria-label="Imagen siguiente"
-                            >
-                                <ChevronRight className="size-6 sm:size-8" />
-                            </button>
-                        </>
-                    )}
 
                     {/* Close button */}
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
+                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-20"
                         aria-label="Cerrar"
                     >
                         <svg
