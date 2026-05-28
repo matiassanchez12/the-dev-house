@@ -9,7 +9,7 @@ const steps = [
     {
         icon: Search,
         title: 'Descubre',
-        description: 'Explora proyectos que coinciden con tus habilidades e intereses. Encuentra equipos buscando desarrolladores como tú.',
+        description: 'Explora proyectos que coinciden con tus habilidades e intereses. Encuentra equipos buscando desarrolladores como vos.',
     },
     {
         icon: Users,

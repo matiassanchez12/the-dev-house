@@ -67,7 +67,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                         style={{ '--stagger-delay': '200ms' } as React.CSSProperties}
                     >
                         The Dev House es donde los desarrolladores descubren proyectos, encuentran colaboradores
-                        y escriben código que importa. No más codificando solos en la oscuridad.
+                        y escriben código que importa.
                     </p>
 
                     {/* CTA buttons */}
