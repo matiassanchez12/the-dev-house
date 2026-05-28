@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
@@ -12,8 +12,8 @@
         <link rel="apple-touch-icon" href="/favicon.svg">
 
         <!-- SEO Meta Tags -->
-        <meta name="description" content="The Dev House — Una plataforma colaborativa para desarrolladores. Crea proyectos, únete a equipos y construye software juntos.">
-        <meta name="keywords" content="desarrolladores, programación, proyectos, colaboración, open source, comunidad, tech, software">
+        <meta name="description" content="The Dev House - Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
+        <meta name="keywords" content="desarrolladores, programacion, proyectos, colaboracion, open source, comunidad, tech, software">
         <meta name="author" content="Matias Sanchez">
         <meta name="robots" content="index, follow">
         
@@ -21,7 +21,7 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
         <meta property="og:title" content="{{ config('app.name', 'The Dev House') }}">
-        <meta property="og:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, únete a equipos y construye software juntos.">
+        <meta property="og:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
         <meta property="og:image" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/og.jpg">
         <meta property="og:site_name" content="The Dev House">
 
@@ -29,7 +29,7 @@
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:url" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
         <meta name="twitter:title" content="{{ config('app.name', 'The Dev House') }}">
-        <meta name="twitter:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, únete a equipos y construye software juntos.">
+        <meta name="twitter:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
         <meta name="twitter:image" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/og.jpg">
         <meta name="twitter:creator" content="@matiassanchez_">
 
