@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 import type { User } from '@/types';
 
 interface ProjectJoinFormProps {
@@ -63,6 +64,10 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
         post(route('join-requests.store', projectId), {
             onSuccess: () => {
                 reset('message');
+                toast.success('Solicitud enviada exitosamente');
+            },
+            onError: () => {
+                toast.error('Error al enviar la solicitud');
             },
         });
     };
