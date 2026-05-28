@@ -54,6 +54,7 @@ class UserService
             'participatingProjects.techs',
             'participatingProjects.participants',
             'techs',
+            'socialLinks',
         ]);
 
         $createdProjects = $user->createdProjects->map(function ($project) {
@@ -111,6 +112,11 @@ class UserService
             'bio' => $user->bio,
             'avatar' => $user->avatar,
             'created_at' => $user->created_at?->toISOString(),
+            'socialLinks' => $user->socialLinks->map(fn ($link) => [
+                'id' => $link->id,
+                'platform' => $link->platform,
+                'url' => $link->url,
+            ])->toArray(),
             'createdProjects' => $createdProjects,
             'participatingProjects' => $participatingProjects,
             'techs' => $techs,
