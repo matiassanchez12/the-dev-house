@@ -50,6 +50,7 @@
         <script defer src="https://cloud.umami.is/script.js" data-website-id="6c403120-fd9d-4d63-b365-33605619023a"></script>
 
         <!-- Structured Data - Organization -->
+        @verbatim
         <script type="application/ld+json">
         {
           "@context": "https://schema.org",
@@ -67,6 +68,7 @@
           }
         }
         </script>
+        @endverbatim
     </head>
     <body class="font-sans antialiased">
         @inertia
