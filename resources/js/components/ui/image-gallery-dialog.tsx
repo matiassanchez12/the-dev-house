@@ -12,6 +12,7 @@ import {
     CarouselNext,
     useCarousel,
 } from '@/components/ui/carousel';
+import { Card, CardContent } from '@/components/ui/card';
 import type { ImageGalleryDialogProps } from '@/types';
 
 function GalleryCarousel({ images, currentIndex, onSlideChange }: { 
@@ -43,21 +44,25 @@ function GalleryCarousel({ images, currentIndex, onSlideChange }: {
         >
             <CarouselContent>
                 {images.map((src, index) => (
-                    <CarouselItem key={index} className="flex items-center justify-center p-0">
-                        <img
-                            src={src}
-                            alt=""
-                            className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[700px] lg:max-h-[85vh] lg:max-w-[800px] xl:max-w-[800px] object-contain"
-                        />
+                    <CarouselItem key={index} className="p-0">
+                        <Card className="m-0 border-0 bg-transparent shadow-none">
+                            <CardContent className="flex aspect-square sm:aspect-auto sm:h-[70vh] md:h-[75vh] lg:h-[80vh] items-center justify-center p-0">
+                                <img
+                                    src={src}
+                                    alt=""
+                                    className="h-full w-full object-contain"
+                                />
+                            </CardContent>
+                        </Card>
                     </CarouselItem>
                 ))}
             </CarouselContent>
             <CarouselPrevious 
-                className="-left-4 sm:-left-8 bg-black/50 text-white hover:bg-black/70 border-0"
+                className="-left-4 sm:-left-8 bg-black/50 text-white hover:bg-black/70 border-0 z-20"
                 size="icon"
             />
             <CarouselNext 
-                className="-right-4 sm:-right-8 bg-black/50 text-white hover:bg-black/70 border-0"
+                className="-right-4 sm:-right-8 bg-black/50 text-white hover:bg-black/70 border-0 z-20"
                 size="icon"
             />
         </Carousel>
@@ -104,65 +109,6 @@ export function ImageGalleryDialog({
                         type="button"
                         onClick={() => onOpenChange(false)}
                         className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-20"
-                        aria-label="Cerrar"
-                    >
-<<<<<<< HEAD
-                {/* Image container */}
-                <div className="relative flex items-center justify-center">
-                    {/* Main image - responsive max sizing, 800px max on desktop */}
-                    <img
-                        src={images[currentIndex]}
-                        alt=""
-                        className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[700px] lg:max-h-[85vh] lg:max-w-[800px] xl:max-w-[800px] object-contain"
-                    />
-
-                    {/* Navigation buttons */}
-                    {showNav && (
-                        <>
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setCurrentIndex(
-                                        (i) => (i - 1 + images.length) % images.length
-                                    )
-                                }
-                                className="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
-                                aria-label="Imagen anterior"
-                            >
-                                <ChevronLeft className="size-6 sm:size-8" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setCurrentIndex((i) => (i + 1) % images.length)
-                                }
-                                className="absolute -right-4 sm:-right-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
-                                aria-label="Imagen siguiente"
-                            >
-                                <ChevronRight className="size-6 sm:size-8" />
-                            </button>
-                        </>
-                    )}
-
-=======
-                <div className="relative flex items-center justify-center">
-                    {/* Carousel */}
-                    <GalleryCarousel 
-                        images={images}
-                        currentIndex={currentIndex}
-                        onSlideChange={setCurrentIndex}
-                    />
-
->>>>>>> master
-                    {/* Close button */}
-                    <button
-                        type="button"
-                        onClick={() => onOpenChange(false)}
-<<<<<<< HEAD
-                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
-=======
-                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-20"
->>>>>>> master
                         aria-label="Cerrar"
                     >
                         <svg
