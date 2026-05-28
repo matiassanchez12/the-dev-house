@@ -20,29 +20,29 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
 
                     {/* Statement */}
                     <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-foreground leading-tight">
-                        We believe the best code is written together.
+                        Creemos que el mejor código se escribe juntos.
                     </h2>
 
                     <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
                         <p>
-                            Every great product started with someone brave enough to share an idea.
-                            The Dev House exists to make that moment easier — connecting developers
-                            who have something to build with developers who have something to contribute.
+                            Cada gran producto comenzó con alguien lo suficientemente valiente como para compartir una idea.
+                            The Dev House existe para hacer ese momento más fácil — conectando desarrolladores
+                            que tienen algo que construir con desarrolladores que tienen algo que contribuir.
                         </p>
                         <p>
-                            We&apos;re not just another job board or social network. We&apos;re a place
-                            where real collaboration happens. Where junior devs learn from seniors,
-                            where side projects become startups, and where the code you write together
-                            is better than anything you could build alone.
+                            No somos solo otra bolsa de trabajo o red social. Somos un lugar
+                            donde ocurre la colaboración real. Donde los desarrolladores junior aprenden de los seniors,
+                            donde los proyectos secundarios se convierten en startups, y donde el código que escribes juntos
+                            es mejor que cualquier cosa que pudieras construir solo.
                         </p>
                     </div>
 
                     {/* Values */}
                     <div className="flex flex-wrap justify-center gap-6 mt-12">
                         {[
-                            { icon: Code2, label: 'Open Source First' },
-                            { icon: Heart, label: 'Community Driven' },
-                            { icon: Globe, label: 'Built by Developers' },
+                            { icon: Code2, label: 'Open Source Primero' },
+                            { icon: Heart, label: 'Impulsado por la Comunidad' },
+                            { icon: Globe, label: 'Construido por Desarrolladores' },
                         ].map((value) => {
                             const Icon = value.icon;
                             return (

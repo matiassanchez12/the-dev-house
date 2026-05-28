@@ -20,13 +20,13 @@ const stats = [
     {
         key: 'projects',
         icon: FolderGit2,
-        label: 'Projects',
+        label: 'Proyectos',
         getValue: (p: LandingStatsProps) => p.project_count,
     },
     {
         key: 'collaborations',
         icon: Handshake,
-        label: 'Collaborations',
+        label: 'Colaboraciones',
         getValue: (p: LandingStatsProps) => p.collaboration_count,
     },
 ];

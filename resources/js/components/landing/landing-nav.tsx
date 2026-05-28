@@ -18,8 +18,8 @@ interface LandingNavProps {
 }
 
 const navLinks = [
-    { label: 'Features', href: '#features' },
-    { label: 'Projects', href: '/projects' },
+    { label: 'Características', href: '#features' },
+    { label: 'Proyectos', href: '/projects' },
     { label: 'Developers', href: '/users' },
 ];
 
@@ -76,10 +76,10 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                         ) : (
                             <>
                                 <Link href={route('login')}>
-                                    <Button variant="ghost" size="sm">Log in</Button>
+                                    <Button variant="ghost" size="sm">Iniciar sesión</Button>
                                 </Link>
                                 <Link href={route('register')}>
-                                    <Button size="sm" variant='secondary' className="bg-accent text-accent-foreground hover:bg-accent/90">Get Started</Button>
+                                    <Button size="sm" variant='secondary' className="bg-accent text-accent-foreground hover:bg-accent/90">Comenzar</Button>
                                 </Link>
                             </>
                         )}
@@ -118,10 +118,10 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                                 ) : (
                                     <>
                                         <Link href={route('login')} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full">Log in</Button>
+                                            <Button variant="outline" size="sm" className="w-full">Iniciar sesión</Button>
                                         </Link>
                                         <Link href={route('register')} className="flex-1">
-                                            <Button size="sm" className="w-full">Get Started</Button>
+                                            <Button size="sm" className="w-full">Comenzar</Button>
                                         </Link>
                                     </>
                                 )}

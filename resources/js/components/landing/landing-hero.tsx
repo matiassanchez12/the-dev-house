@@ -48,7 +48,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                     >
                         <Badge variant="secondary" className="gap-1.5 text-sm">
                             <Sparkles className="size-3.5" />
-                            Where developers build together
+                            Donde los desarrolladores construyen juntos
                         </Badge>
                     </div>
 
@@ -57,8 +57,8 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                         className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight animate-fade-in-up"
                         style={{ '--stagger-delay': '100ms' } as React.CSSProperties}
                     >
-                        Build Better Software,<br />
-                        <span className="text-primary">Together</span>
+                        Construí junto a otros,<br />
+                        <span className="text-primary">crecé como desarrollador</span>
                     </h1>
 
                     {/* Subtitle */}
@@ -66,8 +66,8 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                         className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in-up"
                         style={{ '--stagger-delay': '200ms' } as React.CSSProperties}
                     >
-                        The Dev House is where developers discover projects, find collaborators,
-                        and ship code that matters. No more solo coding in the dark.
+                        The Dev House es donde los desarrolladores descubren proyectos, encuentran colaboradores
+                        y escriben código que importa. No más codificando solos en la oscuridad.
                     </p>
 
                     {/* CTA buttons */}
@@ -79,19 +79,19 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                             <Link href={route('projects.create')}>
                                 <Button size="lg" className="text-lg px-8">
                                     <Rocket className="size-5 mr-2" />
-                                    Create Project
+                                    Crear Proyecto
                                 </Button>
                             </Link>
                         ) : (
                             <>
                                 <Link href={route('register')}>
                                     <Button size="lg" className="text-lg px-8">
-                                        Start Building — It&apos;s Free
+                                        Comienza a Construir — Es Gratis
                                     </Button>
                                 </Link>
                                 <Link href={route('login')}>
                                     <Button variant="outline" size="lg" className="text-lg px-8">
-                                        Log In
+                                        Iniciar sesión
                                     </Button>
                                 </Link>
                             </>

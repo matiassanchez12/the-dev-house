@@ -8,18 +8,18 @@ interface LandingHowItWorksProps {
 const steps = [
     {
         icon: Search,
-        title: 'Discover',
-        description: 'Browse projects that match your skills and interests. Find teams looking for developers like you.',
+        title: 'Descubre',
+        description: 'Explora proyectos que coinciden con tus habilidades e intereses. Encuentra equipos buscando desarrolladores como tú.',
     },
     {
         icon: Users,
-        title: 'Collaborate',
-        description: 'Join a project, connect with your team through built-in chat, and start building together.',
+        title: 'Colabora',
+        description: 'Únete a un proyecto, conéctate con tu equipo a través del chat integrado y comienza a construir juntos.',
     },
     {
         icon: Rocket,
-        title: 'Ship',
-        description: 'Ship real products, grow your portfolio, and build your reputation in the community.',
+        title: 'Lanza',
+        description: 'Lanza productos reales, haz crecer tu portafolio y construye tu reputación en la comunidad.',
     },
 ];
 
@@ -30,10 +30,10 @@ export default function LandingHowItWorks({ className }: LandingHowItWorksProps)
                 {/* Section header */}
                 <div className="text-center mb-16">
                     <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                        How It Works
+                        Cómo Funciona
                     </h2>
                     <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-                        Three simple steps to go from solo developer to shipping with a team.
+                        Tres pasos simples para pasar de desarrollador solitario a lanzar con un equipo.
                     </p>
                 </div>
 
