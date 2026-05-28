@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Dialog } from '@/components/ui/dialog';
+import {
+    Sheet,
+    SheetContent,
+} from '@/components/ui/sheet';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImageGalleryDialogProps } from '@/types';
 
@@ -41,12 +44,13 @@ export function ImageGalleryDialog({
     const showNav = images.length > 1;
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Popup
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-                    style={{ top: 0, left: 0, transform: 'none' }}
-                >
+        <Sheet open={open} onOpenChange={onOpenChange}>
+            <SheetContent
+                showCloseButton={false}
+                className="p-0 border-0 bg-black/90 max-w-none w-full h-full"
+                side="right"
+            >
+                    {/* Main image container */}
                     <div className="relative flex items-center justify-center w-full h-full">
                         <img
                             src={images[currentIndex]}
@@ -112,8 +116,7 @@ export function ImageGalleryDialog({
                             {currentIndex + 1} / {images.length}
                         </div>
                     </div>
-                </Dialog.Popup>
-            </Dialog.Portal>
-        </Dialog>
+                </SheetContent>
+        </Sheet>
     );
 }
