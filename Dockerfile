@@ -11,6 +11,7 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     postgresql-dev \
+    oniguruma-dev \
     && docker-php-ext-install pdo pdo_pgsql mbstring fileinfo
 
 # Install Composer
