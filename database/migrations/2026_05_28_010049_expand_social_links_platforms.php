@@ -10,10 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // PostgreSQL: Add new values to the existing enum type
-        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'youtube'");
-        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'discord'");
-        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'stackoverflow'");
+        // PostgreSQL uses VARCHAR with CHECK constraint, not ENUM
+        // Drop old constraint and create new one with expanded values
+        DB::statement("ALTER TABLE social_links DROP CONSTRAINT social_links_platform_check");
+        DB::statement("ALTER TABLE social_links ADD CONSTRAINT social_links_platform_check CHECK (platform IN ('github', 'linkedin', 'twitter', 'website', 'youtube', 'discord', 'stackoverflow'))");
     }
 
     /**
