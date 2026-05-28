@@ -10,6 +10,7 @@ RUN apk add --no-cache \
     unzip \
     nodejs \
     npm \
+    postgresql-dev \
     && docker-php-ext-install pdo pdo_pgsql mbstring fileinfo
 
 # Install Composer
