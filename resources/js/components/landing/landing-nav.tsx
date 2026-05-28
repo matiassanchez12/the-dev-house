@@ -79,7 +79,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                                     <Button variant="ghost" size="sm">Log in</Button>
                                 </Link>
                                 <Link href={route('register')}>
-                                    <Button size="sm">Get Started</Button>
+                                    <Button size="sm" variant='secondary' className="bg-accent text-accent-foreground hover:bg-accent/90">Get Started</Button>
                                 </Link>
                             </>
                         )}

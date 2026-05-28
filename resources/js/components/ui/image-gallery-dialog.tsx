@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
     DialogOverlay,
 } from '@/components/ui/dialog';
 import {
@@ -15,8 +18,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import type { ImageGalleryDialogProps } from '@/types';
 
-function GalleryCarousel({ images, currentIndex, onSlideChange }: { 
-    images: string[]; 
+function GalleryCarousel({ images, currentIndex, onSlideChange }: {
+    images: string[];
     currentIndex: number;
     onSlideChange: (index: number) => void;
 }) {
@@ -40,7 +43,7 @@ function GalleryCarousel({ images, currentIndex, onSlideChange }: {
         <Carousel
             setApi={setApi}
             opts={{ loop: true, align: 'center' }}
-            className="w-full"
+            className="w-[50vw] sm:w-[40vw] lg:w-[30vw] h-auto"
         >
             <CarouselContent>
                 {images.map((src, index) => (
@@ -90,21 +93,13 @@ export function ImageGalleryDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             {/* Fullscreen overlay */}
             <DialogOverlay className="fixed inset-0 bg-black/90" />
-            
+
             {/* Centered dialog with margin auto */}
             <DialogContent
                 showCloseButton={false}
-                className="border-0 bg-transparent shadow-none p-0 max-w-none !left-0 !right-0 !mx-auto"
+                className="border-0 shadow-none bg-transparent border-none ring-0 w-full p-0 !left-0 !right-0 !mx-auto"
             >
-                <div className="relative flex items-center justify-center">
-                    {/* Carousel */}
-                    <GalleryCarousel 
-                        images={images}
-                        currentIndex={currentIndex}
-                        onSlideChange={setCurrentIndex}
-                    />
-
-                    {/* Close button */}
+                <DialogHeader className="flex flex-row justify-end items-center py-2 px-4">
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
@@ -127,13 +122,21 @@ export function ImageGalleryDialog({
                             <path d="m6 6 12 12" />
                         </svg>
                     </button>
-
-                    {/* Index indicator */}
-                    <div className="absolute -bottom-8 sm:bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs sm:text-sm text-white">
+                </DialogHeader>
+                <DialogDescription>
+                    <GalleryCarousel
+                        images={images}
+                        currentIndex={currentIndex}
+                        onSlideChange={setCurrentIndex}
+                    />
+                </DialogDescription>
+                <DialogFooter className="bg-transparent shadow-none border-0">
+                    <div className="rounded-full px-3 py-1 text-xs sm:text-sm text-white">
                         {currentIndex + 1} / {images.length}
                     </div>
-                </div>
+                </DialogFooter>
             </DialogContent>
+
         </Dialog>
     );
 }
