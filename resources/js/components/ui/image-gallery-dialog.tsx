@@ -49,18 +49,18 @@ export function ImageGalleryDialog({
             {/* Fullscreen overlay */}
             <DialogOverlay className="fixed inset-0 bg-black/90" />
             
-            {/* Content auto-sized, centered */}
+            {/* Centered dialog with margin auto */}
             <DialogContent
                 showCloseButton={false}
-                className="border-0 bg-transparent shadow-none p-0 max-w-none"
+                className="border-0 bg-transparent shadow-none p-0 max-w-none !left-0 !right-0 !mx-auto"
             >
-                {/* Image container with responsive max constraints */}
+                {/* Image container */}
                 <div className="relative flex items-center justify-center">
-                    {/* Main image - responsive max sizing */}
+                    {/* Main image - responsive max sizing, 800px max on desktop */}
                     <img
                         src={images[currentIndex]}
                         alt=""
-                        className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[85vw] lg:max-h-[90vh] lg:max-w-[80vw] object-contain"
+                        className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[700px] lg:max-h-[85vh] lg:max-w-[800px] xl:max-w-[800px] object-contain"
                     />
 
                     {/* Navigation buttons */}
