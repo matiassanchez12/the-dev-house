@@ -18,6 +18,7 @@ Source: .agents/skills/ (project-level), AGENTS.md conventions
 | Zod schemas | `zod-4` | skills/zod-4/SKILL.md | New Zod API |
 | Committing | `prowler-commit` | skills/prowler-commit/SKILL.md | Conventional commits |
 | Creating new skills | `skill-creator` | skills/skill-creator/SKILL.md | LLM-first skills with frontmatter |
+| Installing shadcn components | `shadcn` | .agents/skills/shadcn/SKILL.md | ALWAYS use `npx shadcn@latest add` — never write by hand |
 
 ## Project-Level Skills (.agents/skills/)
 
@@ -25,7 +26,7 @@ Source: .agents/skills/ (project-level), AGENTS.md conventions
 |-------|-------------|---------------|
 | `laravel-patterns` | Laravel architecture patterns, routing/controllers, Eloquent ORM, service layers, queues, events, caching | - Controllers → Services → Actions<br>- Route-model binding + scoped bindings<br>- Typed models, casts, scopes<br>- Keep IO in queues, cache reads<br>- Eager load to avoid N+1 |
 | `laravel-specialist` | Laravel 10+ specialist: Eloquent, Sanctum, Horizon, Livewire, Inertia | - PHP 8.2+ features (readonly, enums)<br>- >85% test coverage target<br>- Service containers + DI<br>- PSR-12 coding standard |
-| `shadcn` | shadcn/ui components management | - Use existing components via CLI<br>- Compose, don't reinvent<br>- Semantic colors: `bg-primary`, `text-muted-foreground`<br>- No `space-x-*`, use `gap-*`<br>- Forms: `FieldGroup` + `Field` |
+| `shadcn` | shadcn/ui components management | - **ALWAYS use `npx shadcn@latest add` to install — never write by hand**<br>- For fullscreen lightbox: use `Sheet` + `side="right"` + `w-full h-full` class overrides<br>- Compose, don't reinvent<br>- Semantic colors: `bg-primary`, `text-muted-foreground`<br>- No `space-x-*`, use `gap-*`<br>- Forms: `FieldGroup` + `Field` |
 | `vite` | Vite build tool, plugin API, SSR, Vite 8 Rolldown migration | - Use TypeScript: prefer vite.config.ts<br>- Always ESM, avoid CommonJS<br>- Environment API for multi-env |
 | `tailwind-css-patterns` | Tailwind utility-first styling, responsive design, layout | - Mobile-first breakpoints<br>- Use design tokens<br>- Extract reusable component classes<br>- Configure content paths |
 | `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite integration, dark mode | - `@theme inline` pattern (v4)<br>- CSS variable architecture<br>- Dark mode with `ThemeProvider`<br>- Four-step architecture |
