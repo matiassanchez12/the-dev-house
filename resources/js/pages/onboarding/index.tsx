@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import InputError from '@/components/input-error';
 import { User, Tech, Platform, SocialLink } from '@/types';
 
 interface OnboardingProps {
@@ -54,7 +55,7 @@ interface Recommendation {
 }
 
 export default function OnboardingIndex() {
-    const { auth, user, allTechs, userTechs, totalSteps } = usePage<OnboardingProps>().props;
+    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps & { errors: Record<string, string> }>().props;
 
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -331,30 +332,42 @@ export default function OnboardingIndex() {
                         {/* Step 3: Social Links */}
                         {currentStep === 3 && (
                             <div className="space-y-4">
-                                {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => (
-                                    <div key={platform} className="flex items-center gap-3">
-                                        <div className="text-muted-foreground flex-shrink-0">
-                                            {PLATFORM_ICONS[platform]}
+                                {/* General social links errors */}
+                                {errors.links && (
+                                    <InputError message={errors.links} className="mb-2" />
+                                )}
+                                {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => {
+                                    // Find any error for this platform's URL (e.g. "links.0.url", "links.1.url")
+                                    const urlError = Object.entries(errors).find(
+                                        ([key]) => key.includes('.url') && key.startsWith('links.')
+                                    )?.[1];
+
+                                    return (
+                                        <div key={platform} className="flex items-center gap-3">
+                                            <div className="text-muted-foreground flex-shrink-0">
+                                                {PLATFORM_ICONS[platform]}
+                                            </div>
+                                            <div className="flex-1">
+                                                <input
+                                                    type="url"
+                                                    value={socialLinks[platform]}
+                                                    onChange={(e) =>
+                                                        setSocialLinks((prev) => ({
+                                                            ...prev,
+                                                            [platform]: e.target.value,
+                                                        }))
+                                                    }
+                                                    placeholder={`https://...`}
+                                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                />
+                                                {urlError && <InputError message={urlError} className="mt-1" />}
+                                            </div>
+                                            <span className="text-sm text-muted-foreground w-24 flex-shrink-0">
+                                                {PLATFORM_LABELS[platform]}
+                                            </span>
                                         </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="url"
-                                                value={socialLinks[platform]}
-                                                onChange={(e) =>
-                                                    setSocialLinks((prev) => ({
-                                                        ...prev,
-                                                        [platform]: e.target.value,
-                                                    }))
-                                                }
-                                                placeholder={`https://...`}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                            />
-                                        </div>
-                                        <span className="text-sm text-muted-foreground w-24 flex-shrink-0">
-                                            {PLATFORM_LABELS[platform]}
-                                        </span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
 
                                 {/* Preview */}
                                 {Object.values(socialLinks).some((url) => url.trim() !== '') && (

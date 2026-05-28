@@ -46,17 +46,21 @@ export function ImageGalleryDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogOverlay className="bg-black/90" />
+            {/* Fullscreen overlay */}
+            <DialogOverlay className="fixed inset-0 bg-black/90" />
+            
+            {/* Content auto-sized, centered */}
             <DialogContent
                 showCloseButton={false}
-                className="p-0 border-0 bg-transparent shadow-none max-w-none w-full h-full"
+                className="border-0 bg-transparent shadow-none p-0 max-w-none"
             >
-                <div className="relative flex items-center justify-center w-full h-full">
-                    {/* Main image - responsive sizing */}
+                {/* Image container with responsive max constraints */}
+                <div className="relative flex items-center justify-center">
+                    {/* Main image - responsive max sizing */}
                     <img
                         src={images[currentIndex]}
                         alt=""
-                        className="max-h-[80vh] max-w-[90vw] sm:max-h-[85vh] sm:max-w-[85vw] lg:max-h-[90vh] lg:max-w-[80vw] object-contain"
+                        className="max-h-[70vh] max-w-[85vw] sm:max-h-[80vh] sm:max-w-[90vw] md:max-h-[85vh] md:max-w-[85vw] lg:max-h-[90vh] lg:max-w-[80vw] object-contain"
                     />
 
                     {/* Navigation buttons */}
@@ -69,7 +73,7 @@ export function ImageGalleryDialog({
                                         (i) => (i - 1 + images.length) % images.length
                                     )
                                 }
-                                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
+                                className="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
                                 aria-label="Imagen anterior"
                             >
                                 <ChevronLeft className="size-6 sm:size-8" />
@@ -79,7 +83,7 @@ export function ImageGalleryDialog({
                                 onClick={() =>
                                     setCurrentIndex((i) => (i + 1) % images.length)
                                 }
-                                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
+                                className="absolute -right-4 sm:-right-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
                                 aria-label="Imagen siguiente"
                             >
                                 <ChevronRight className="size-6 sm:size-8" />
@@ -91,7 +95,7 @@ export function ImageGalleryDialog({
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
+                        className="absolute -top-3 -right-3 sm:top-2 sm:right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
                         aria-label="Cerrar"
                     >
                         <svg
@@ -112,7 +116,7 @@ export function ImageGalleryDialog({
                     </button>
 
                     {/* Index indicator */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs sm:text-sm text-white">
+                    <div className="absolute -bottom-8 sm:bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs sm:text-sm text-white">
                         {currentIndex + 1} / {images.length}
                     </div>
                 </div>

@@ -263,4 +263,79 @@ class OnboardingTest extends TestCase
 
         $response->assertInertia(fn ($page) => $page->where('totalSteps', 5));
     }
+
+    /**
+     * TEST 16: Social links URL max length (2048 chars) rejected
+     */
+    public function test_social_links_url_max_length_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $longUrl = 'https://example.com/' . str_repeat('a', 2048);
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => $longUrl],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('links.0.url');
+        $this->assertDatabaseCount('social_links', 0);
+    }
+
+    /**
+     * TEST 17: Social link user relationship returns correct user
+     */
+    public function test_social_link_user_relationship(): void
+    {
+        $user = User::factory()->create();
+        $socialLink = SocialLink::create([
+            'user_id' => $user->id,
+            'platform' => 'github',
+            'url' => 'https://github.com/testuser',
+        ]);
+
+        $this->assertTrue($socialLink->user->is($user));
+        $this->assertEquals($user->id, $socialLink->user->id);
+    }
+
+    /**
+     * TEST 18: Complete onboarding flow through all five steps
+     */
+    public function test_complete_onboarding_flow_all_five_steps(): void
+    {
+        $user = User::factory()->create();
+        $tech = \App\Models\Tech::factory()->create();
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+        $project->techs()->attach($tech->id);
+
+        // Step 1: Techs
+        $this->actingAs($user)->post('/onboarding/step-1', [
+            'techs' => [['id' => $tech->id, 'proficiency' => '3']],
+        ]);
+
+        // Step 2: Bio
+        $this->post('/onboarding/step-2', [
+            'bio' => 'I am a developer',
+        ]);
+
+        // Step 3: Social Links
+        $this->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => 'https://github.com/testuser'],
+            ],
+        ]);
+
+        // Step 4: Avatar (optional, skip by not sending file)
+        $this->post('/onboarding/step-3', []);
+
+        // Step 5: Join requests
+        $response = $this->post('/onboarding/step-4', [
+            'join_requests' => [$project->id],
+        ]);
+
+        $response->assertRedirect('/dashboard');
+        $this->assertNotNull($user->fresh()->onboarding_completed_at);
+    }
 }
