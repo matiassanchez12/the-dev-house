@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\JoinRequest;
 use App\Models\Project;
+use App\Models\SocialLink;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -134,5 +135,132 @@ class OnboardingTest extends TestCase
 
         $response = $this->actingAs($user)->get('/onboarding/recommendations');
         $response->assertJsonCount(1, 'projects');
+    }
+
+    /**
+     * TEST 9: User can complete step social links — saves links and redirects
+     */
+    public function test_user_can_complete_step_social_links(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => 'https://github.com/testuser'],
+                ['platform' => 'linkedin', 'url' => 'https://linkedin.com/in/testuser'],
+            ],
+        ]);
+
+        $response->assertRedirect('/onboarding');
+        $this->assertDatabaseCount('social_links', 2);
+        $this->assertDatabaseHas('social_links', [
+            'user_id' => $user->id,
+            'platform' => 'github',
+            'url' => 'https://github.com/testuser',
+        ]);
+    }
+
+    /**
+     * TEST 10: Social links invalid URL rejected
+     */
+    public function test_social_links_invalid_url_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => 'not-a-url'],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('links.0.url');
+        $this->assertDatabaseCount('social_links', 0);
+    }
+
+    /**
+     * TEST 11: Social links invalid platform rejected
+     */
+    public function test_social_links_invalid_platform_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'facebook', 'url' => 'https://facebook.com/user'],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('links.0.platform');
+    }
+
+    /**
+     * TEST 12: Social links empty array rejected
+     */
+    public function test_social_links_empty_array_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [],
+        ]);
+
+        $response->assertSessionHasErrors('links');
+    }
+
+    /**
+     * TEST 13: Social links upsert updates existing record
+     */
+    public function test_social_links_upsert_updates_existing(): void
+    {
+        $user = User::factory()->create();
+        SocialLink::create([
+            'user_id' => $user->id,
+            'platform' => 'github',
+            'url' => 'https://github.com/old',
+        ]);
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => 'https://github.com/new'],
+            ],
+        ]);
+
+        $response->assertRedirect('/onboarding');
+        $this->assertDatabaseCount('social_links', 1);
+        $this->assertDatabaseHas('social_links', [
+            'user_id' => $user->id,
+            'platform' => 'github',
+            'url' => 'https://github.com/new',
+        ]);
+    }
+
+    /**
+     * TEST 14: Social links cascade delete on user removal
+     */
+    public function test_social_links_cascade_delete(): void
+    {
+        $user = User::factory()->create();
+        SocialLink::create([
+            'user_id' => $user->id,
+            'platform' => 'github',
+            'url' => 'https://github.com/user',
+        ]);
+
+        $userId = $user->id;
+        $user->delete();
+
+        $this->assertDatabaseCount('social_links', 0);
+    }
+
+    /**
+     * TEST 15: Onboarding total steps is five
+     */
+    public function test_onboarding_total_steps_is_five(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/onboarding');
+
+        $response->assertInertia(fn ($page) => $page->has('totalSteps', 5));
     }
 }

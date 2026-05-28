@@ -113,6 +113,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Links sociales de este usuario
+     */
+    public function socialLinks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SocialLink::class);
+    }
+
+    /**
      * Verificar si el usuario completó el onboarding.
      */
     public function hasCompletedOnboarding(): bool

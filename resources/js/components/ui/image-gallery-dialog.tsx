@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
-    Sheet,
-    SheetContent,
-} from '@/components/ui/sheet';
+    Dialog,
+    DialogContent,
+    DialogOverlay,
+} from '@/components/ui/dialog';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImageGalleryDialogProps } from '@/types';
 
@@ -44,79 +45,78 @@ export function ImageGalleryDialog({
     const showNav = images.length > 1;
 
     return (
-        <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogOverlay className="bg-black/90" />
+            <DialogContent
                 showCloseButton={false}
-                className="p-0 border-0 bg-black/90 max-w-none w-full h-full"
-                side="right"
+                className="p-0 border-0 bg-transparent shadow-none max-w-none w-full h-full"
             >
-                    {/* Main image container */}
-                    <div className="relative flex items-center justify-center w-full h-full">
-                        <img
-                            src={images[currentIndex]}
-                            alt=""
-                            className="max-h-[90vh] max-w-[95vw] object-contain"
-                        />
+                <div className="relative flex items-center justify-center w-full h-full">
+                    {/* Main image - responsive sizing */}
+                    <img
+                        src={images[currentIndex]}
+                        alt=""
+                        className="max-h-[80vh] max-w-[90vw] sm:max-h-[85vh] sm:max-w-[85vw] lg:max-h-[90vh] lg:max-w-[80vw] object-contain"
+                    />
 
-                        {/* Navigation buttons */}
-                        {showNav && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setCurrentIndex(
-                                            (i) => (i - 1 + images.length) % images.length
-                                        )
-                                    }
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition-colors"
-                                    aria-label="Imagen anterior"
-                                >
-                                    <ChevronLeft className="size-8" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setCurrentIndex(
-                                            (i) => (i + 1) % images.length
-                                        )
-                                    }
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition-colors"
-                                    aria-label="Imagen siguiente"
-                                >
-                                    <ChevronRight className="size-8" />
-                                </button>
-                            </>
-                        )}
-
-                        {/* Close button */}
-                        <button
-                            type="button"
-                            onClick={() => onOpenChange(false)}
-                            className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
-                            aria-label="Cerrar"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                    {/* Navigation buttons */}
+                    {showNav && (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setCurrentIndex(
+                                        (i) => (i - 1 + images.length) % images.length
+                                    )
+                                }
+                                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
+                                aria-label="Imagen anterior"
                             >
-                                <path d="M18 6 6 18" />
-                                <path d="m6 6 12 12" />
-                            </svg>
-                        </button>
+                                <ChevronLeft className="size-6 sm:size-8" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setCurrentIndex((i) => (i + 1) % images.length)
+                                }
+                                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 sm:p-3 text-white hover:bg-black/70 transition-colors"
+                                aria-label="Imagen siguiente"
+                            >
+                                <ChevronRight className="size-6 sm:size-8" />
+                            </button>
+                        </>
+                    )}
 
-                        {/* Index indicator */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-1.5 text-sm text-white">
-                            {currentIndex + 1} / {images.length}
-                        </div>
+                    {/* Close button */}
+                    <button
+                        type="button"
+                        onClick={() => onOpenChange(false)}
+                        className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
+                        aria-label="Cerrar"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="sm:w-5 sm:h-5"
+                        >
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    </button>
+
+                    {/* Index indicator */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs sm:text-sm text-white">
+                        {currentIndex + 1} / {images.length}
                     </div>
-                </SheetContent>
-        </Sheet>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }

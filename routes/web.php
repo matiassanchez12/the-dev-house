@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
     Route::post('/onboarding/step-1', [OnboardingController::class, 'saveStep1'])->name('onboarding.step-1');
     Route::post('/onboarding/step-2', [OnboardingController::class, 'saveStep2'])->name('onboarding.step-2');
+    Route::post('/onboarding/step-social-links', [OnboardingController::class, 'saveStepSocialLinks'])->name('onboarding.step-social-links');
     Route::post('/onboarding/step-3', [OnboardingController::class, 'saveStep3'])->name('onboarding.step-3');
     Route::post('/onboarding/step-4', [OnboardingController::class, 'saveStep4'])->name('onboarding.step-4');
     Route::post('/onboarding/skip', [OnboardingController::class, 'skip'])->name('onboarding.skip');

@@ -68,6 +68,13 @@ export interface Message {
     sender?: User;
 }
 
+export type Platform = 'github' | 'linkedin' | 'twitter' | 'website';
+
+export interface SocialLink {
+    platform: Platform;
+    url: string;
+}
+
 export interface ProjectParticipant {
     id: number;
     project_id: number;

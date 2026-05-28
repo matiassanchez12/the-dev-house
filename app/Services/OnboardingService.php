@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Project;
+use App\Models\SocialLink;
 use Illuminate\Support\Facades\Storage;
 
 class OnboardingService
@@ -29,6 +30,23 @@ class OnboardingService
     public function saveBio(User $user, ?string $bio): void
     {
         $user->update(['bio' => $bio]);
+    }
+
+    public function saveSocialLinks(User $user, array $links): void
+    {
+        if (empty($links)) {
+            return;
+        }
+
+        $records = array_map(function ($link) use ($user) {
+            return [
+                'user_id' => $user->id,
+                'platform' => $link['platform'],
+                'url' => $link['url'],
+            ];
+        }, $links);
+
+        SocialLink::upsert($records, ['user_id', 'platform'], ['url']);
     }
 
     public function saveAvatar(User $user, $file): ?string

@@ -6,6 +6,7 @@ use App\Http\Requests\Onboarding\SaveStep1Request;
 use App\Http\Requests\Onboarding\SaveStep2Request;
 use App\Http\Requests\Onboarding\SaveStep3Request;
 use App\Http\Requests\Onboarding\SaveStep4Request;
+use App\Http\Requests\Onboarding\SaveStepSocialLinksRequest;
 use App\Services\OnboardingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,13 @@ class OnboardingController extends Controller
     public function saveStep2(SaveStep2Request $request)
     {
         $this->onboardingService->saveBio(Auth::user(), $request->validated()['bio'] ?? null);
+        return redirect()->route('onboarding.index');
+    }
+
+    public function saveStepSocialLinks(SaveStepSocialLinksRequest $request)
+    {
+        $this->onboardingService->saveSocialLinks(Auth::user(), $request->validated()['links']);
+
         return redirect()->route('onboarding.index');
     }
 
