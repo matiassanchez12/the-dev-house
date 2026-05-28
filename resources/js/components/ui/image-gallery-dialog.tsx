@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Dialog } from '@base-ui/react/dialog';
-import { DialogClose } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogOverlay,
+} from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImageGalleryDialogProps } from '@/types';
 
 export function ImageGalleryDialog({
@@ -43,18 +46,13 @@ export function ImageGalleryDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/90" />
-            <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center">
-                {/* Close button */}
-                <DialogClose
-                    className="absolute top-4 right-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
-                    aria-label="Cerrar"
-                >
-                    <X className="size-5" />
-                </DialogClose>
-
-                {/* Main image container */}
-                <div className="relative flex items-center justify-center px-16 py-8">
+            <DialogOverlay className="fixed inset-0 z-50 bg-black/90" />
+            <DialogContent
+                showCloseButton={false}
+                className="fixed inset-0 z-50 flex items-center justify-center p-0 border-0 bg-transparent max-w-none"
+            >
+                {/* Main image */}
+                <div className="relative flex items-center justify-center px-16 py-8 w-full h-full">
                     <img
                         src={images[currentIndex]}
                         alt=""
@@ -71,10 +69,10 @@ export function ImageGalleryDialog({
                                         (i) => (i - 1 + images.length) % images.length
                                     )
                                 }
-                                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition-colors"
                                 aria-label="Imagen anterior"
                             >
-                                <ChevronLeft className="size-6" />
+                                <ChevronLeft className="size-8" />
                             </button>
                             <button
                                 type="button"
@@ -83,20 +81,43 @@ export function ImageGalleryDialog({
                                         (i) => (i + 1) % images.length
                                     )
                                 }
-                                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition-colors"
                                 aria-label="Imagen siguiente"
                             >
-                                <ChevronRight className="size-6" />
+                                <ChevronRight className="size-8" />
                             </button>
                         </>
                     )}
-                </div>
 
-                {/* Index indicator */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-1.5 text-sm text-white">
-                    {currentIndex + 1} / {images.length}
+                    {/* Close button */}
+                    <button
+                        type="button"
+                        onClick={() => onOpenChange(false)}
+                        className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                        aria-label="Cerrar"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    </button>
+
+                    {/* Index indicator */}
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-1.5 text-sm text-white">
+                        {currentIndex + 1} / {images.length}
+                    </div>
                 </div>
-            </Dialog.Popup>
+            </DialogContent>
         </Dialog>
     );
 }
