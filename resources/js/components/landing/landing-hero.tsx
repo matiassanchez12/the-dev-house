@@ -2,14 +2,14 @@ import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Rocket, Sparkles } from 'lucide-react';
-import { SanityLight } from '@/components/ui/svgs/sanityLight';
-import { SanityDark } from '@/components/ui/svgs/sanityDark';
+import { Sanity } from '@/components/ui/svgs/sanityLight';
 import { ReactIcon } from '@/components/ui/svgs/react-icon';
 import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
 import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
 import { PythonIcon } from '@/components/ui/svgs/python-icon';
 import { VueIcon } from '@/components/ui/svgs/vue-icon';
 import { NodeJsIcon } from '@/components/ui/svgs/nodejs-icon';
+import { Unity } from '../ui/svgs/unity-icon';
 
 interface LandingHeroProps {
     auth: {
@@ -36,8 +36,8 @@ const floatingTechs: FloatingTech[] = [
     { icon: PythonIcon, label: 'Python', delay: '0.5s', className: 'size-4' },
     { icon: VueIcon, label: 'Vue', delay: '1.5s', className: 'size-4' },
     { icon: NodeJsIcon, label: 'Node.js', delay: '2.5s', className: 'size-4' },
-    { icon: SanityLight, label: 'Sanity', delay: '3s', className: 'size-4' },
-    { icon: SanityDark, label: 'Sanity Dark', delay: '3.5s', className: 'size-4' },
+    { icon: Sanity, label: 'Sanity', delay: '3s', className: 'size-4' },
+    { icon: Unity, label: 'Unity', delay: '3.5s', className: 'size-4' },
 ];
 
 export default function LandingHero({ auth, className }: LandingHeroProps) {
