@@ -10,7 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE social_links MODIFY COLUMN platform ENUM('github', 'linkedin', 'twitter', 'website', 'youtube', 'discord', 'stackoverflow') NOT NULL");
+        // PostgreSQL: Add new values to the existing enum type
+        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'youtube'");
+        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'discord'");
+        DB::statement("ALTER TYPE social_links_platform_enum ADD VALUE IF NOT EXISTS 'stackoverflow'");
     }
 
     /**
@@ -18,6 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE social_links MODIFY COLUMN platform ENUM('github', 'linkedin', 'twitter', 'website') NOT NULL");
+        // PostgreSQL: Not easily reversible - would require recreating the type
+        // This is a one-way migration for adding new platforms
     }
 };
