@@ -49,14 +49,14 @@ export function ImageGalleryDialog({
             <DialogOverlay className="fixed inset-0 z-50 bg-black/90" />
             <DialogContent
                 showCloseButton={false}
-                className="fixed inset-0 z-50 flex items-center justify-center p-0 border-0 bg-transparent max-w-none"
+                className="relative w-full h-full max-w-none border-0 bg-transparent shadow-none p-0"
             >
-                {/* Main image */}
-                <div className="relative flex items-center justify-center px-16 py-8 w-full h-full">
+                {/* Main image container */}
+                <div className="relative flex items-center justify-center w-full h-full">
                     <img
                         src={images[currentIndex]}
                         alt=""
-                        className="max-h-[80vh] max-w-[calc(100vw-8rem)] object-contain rounded-lg"
+                        className="max-h-[85vh] max-w-[90vw] object-contain"
                     />
 
                     {/* Navigation buttons */}
@@ -93,7 +93,7 @@ export function ImageGalleryDialog({
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                        className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors z-10"
                         aria-label="Cerrar"
                     >
                         <svg
