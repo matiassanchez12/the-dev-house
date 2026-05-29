@@ -89,7 +89,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
 
                     {/* CTA buttons */}
                     <div
-                        className="flex gap-4 justify-center animate-fade-in-up"
+                        className="flex gap-4 justify-center flex-col sm:flex-row animate-fade-in-up"
                         style={{ '--stagger-delay': '300ms' } as React.CSSProperties}
                     >
                         {auth.user ? (
@@ -102,7 +102,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
                         ) : (
                             <>
                                 <Link href={route('register')}>
-                                    <Button size="lg" className="text-lg px-8">
+                                    <Button size="lg" className="text-sm sm:text-lg px-8">
                                         Comienza a Construir — Es Gratis
                                     </Button>
                                 </Link>

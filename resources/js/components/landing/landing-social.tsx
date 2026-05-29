@@ -1,30 +1,15 @@
 import { cn } from '@/lib/utils';
-import { Quote } from 'lucide-react';
+import { User } from '@/types';
 
 interface LandingSocialProps {
     developerCount?: number;
     className?: string;
+    developers: User[]
 }
 
-const testimonials = [
-    {
-        quote: "I found my co-founder here. We shipped our SaaS in 3 months and now have 2,000 users. This platform changed my career.",
-        author: "Sarah Chen",
-        role: "Full-stack Developer",
-    },
-    {
-        quote: "As a junior dev, I was nervous to contribute to open source. The Dev House made it easy to find welcoming teams and learn by doing.",
-        author: "Marcus Rivera",
-        role: "Frontend Developer",
-    },
-    {
-        quote: "I've been coding alone for 10 years. Joining a team on here reminded me why I fell in love with programming in the first place.",
-        author: "Aisha Patel",
-        role: "Backend Engineer",
-    },
-];
+const bgAvatarColors = ['bg-primary/20', 'bg-accent/30', 'bg-primary/40', 'bg-accent/20', 'bg-primary/30'];
 
-export default function LandingSocial({ developerCount = 2000, className }: LandingSocialProps) {
+export default function LandingSocial({ developers, className }: LandingSocialProps) {
     return (
         <section className={cn('py-20 bg-muted/30', className)}>
             <div className="container mx-auto px-4">
@@ -33,27 +18,27 @@ export default function LandingSocial({ developerCount = 2000, className }: Land
                     {/* Avatar stack */}
                     <div className="flex justify-center mb-6">
                         <div className="flex -space-x-3">
-                            {['bg-primary/20', 'bg-accent/30', 'bg-primary/40', 'bg-accent/20', 'bg-primary/30'].map((bg, i) => (
+                            {developers.map((developer, i) => (
                                 <div
                                     key={i}
-                                    className={`size-10 rounded-full ${bg} border-2 border-background flex items-center justify-center text-xs font-bold text-foreground`}
+                                    className={`size-10 rounded-full ${bgAvatarColors[i]} border-2 border-background flex items-center justify-center text-xs font-bold text-foreground`}
                                 >
-                                    {String.fromCharCode(65 + i)}
+                                    {developer.name.charAt(0)}
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                        Join {developerCount.toLocaleString()}+ developers building together
+                        {developers.length.toLocaleString()}+ developers ya estan construyendo algo juntos!
                     </h2>
                     <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-                        Don&apos;t just take our word for it — hear from developers who found their team.
+                        Construir junto a otros nunca fue tan facil, publicá tu proyecto hoy y conecta con otros devs que están en la misma que vos.
                     </p>
                 </div>
 
                 {/* Testimonial cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                     {testimonials.map((testimonial, index) => (
                         <div
                             key={index}
@@ -74,7 +59,7 @@ export default function LandingSocial({ developerCount = 2000, className }: Land
                             </div>
                         </div>
                     ))}
-                </div>
+                </div> */}
             </div>
         </section>
     );
