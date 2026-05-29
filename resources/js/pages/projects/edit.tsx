@@ -35,10 +35,18 @@ export default function Edit({ auth, project, techs }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        form.put(`/projects/${project.slug}`, {
+        form.post(`/projects/${project.slug}`, {
+            _method: 'put',
             forceFormData: true,
             onSuccess: () => toast.success('Proyecto actualizado exitosamente'),
-            onError: () => toast.error('Error al actualizar el proyecto'),
+            onError: (errors) => {
+                const errorMessages = Object.values(errors);
+                if (errorMessages.length > 0) {
+                    toast.error(errorMessages[0]);
+                } else {
+                    toast.error('Error al actualizar el proyecto');
+                }
+            },
         });
     };
 
