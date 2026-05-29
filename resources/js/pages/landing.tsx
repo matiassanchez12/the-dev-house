@@ -186,17 +186,6 @@ export default function Landing({ auth, projects, user_count, project_count, col
                             {/* Copyright & Attribution */}
                             <div className="border-t border-border pt-6 text-center text-sm text-muted-foreground space-y-2">
                                 <p>
-                                    Developed with {'<3'} and
-                                    <a
-                                        href="https://opencode.ai"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline mx-1"
-                                    >
-                                        OpenCode
-                                    </a>
-                                </p>
-                                <p>
                                     <a
                                         href="https://github.com/matiassanchez12/the-dev-house"
                                         target="_blank"
