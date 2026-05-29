@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
-import { ProjectCard } from '@/components/projects/project-card';
+import { ProjectCard } from '@/components/projects/card/project-card';
 import { UserProject } from '@/types';
 import { FolderOpen, Users } from 'lucide-react';
 

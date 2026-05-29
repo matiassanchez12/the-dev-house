@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Rocket, Users, MessageSquare, Zap, GitBranch, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ProjectCard } from '@/components/projects/project-card';
+import { ProjectCard } from '@/components/projects/card/project-card';
 import ThemeToggle from '@/components/theme-toggle';
 import { Project as ProjectType, LandingPageProps } from '@/types';
 import LandingNav from '@/components/landing/landing-nav';

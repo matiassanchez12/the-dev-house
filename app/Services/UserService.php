@@ -63,6 +63,7 @@ class UserService
                 'title' => $project->title,
                 'slug' => $project->slug,
                 'status' => $project->status,
+                'description' => $project->description,
                 'creator' => [
                     'id' => $project->creator->id,
                     'name' => $project->creator->name,
@@ -74,6 +75,7 @@ class UserService
                     'slug' => $tech->slug,
                 ])->toArray(),
                 'participants_count' => $project->participants->count(),
+                'created_at' => $project->created_at?->toISOString(),
             ];
         })->toArray();
 
@@ -83,6 +85,7 @@ class UserService
                 'title' => $project->title,
                 'slug' => $project->slug,
                 'status' => $project->status,
+                'description' => $project->description,
                 'creator' => [
                     'id' => $project->creator->id,
                     'name' => $project->creator->name,
@@ -94,6 +97,7 @@ class UserService
                     'slug' => $tech->slug,
                 ])->toArray(),
                 'participants_count' => $project->participants->count(),
+                'created_at' => $project->created_at?->toISOString(),
             ];
         })->toArray();
 

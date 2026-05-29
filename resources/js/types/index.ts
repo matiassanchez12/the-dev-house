@@ -106,6 +106,7 @@ export interface UserProject {
     title: string;
     slug: string;
     status: 'open' | 'closed' | 'completed';
+    description: string;
     creator: {
         id: number;
         name: string;
@@ -117,6 +118,7 @@ export interface UserProject {
         slug: string;
     }>;
     participants_count: number;
+    created_at: string;
 }
 
 export interface UserTech {
