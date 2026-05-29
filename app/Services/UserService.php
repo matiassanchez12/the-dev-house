@@ -8,6 +8,16 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
 {
+    /** 
+     * Get all users with their associated techs.
+     * This method retrieves all users from the database and eager loads their related techs to minimize database queries when accessing user tech information.
+     * @return \Illuminate\Database\Eloquent\Collection Returns a collection of User models, each with their associated techs loaded.
+     */
+    public function getAllUsers(): \Illuminate\Database\Eloquent\Collection
+    {
+        return User::with('techs')->get();
+    }
+
     /**
      * Get discoverable users with optional search and tech filters.
      *

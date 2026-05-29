@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Helpers\ApiResourceTransformer;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class LandingController extends Controller
 {
+    public function __construct(
+        private UserService $userService
+    ) {}
     /**
      * Landing page principal
      */
@@ -22,9 +26,10 @@ class LandingController extends Controller
             ->latest()
             ->limit(6)
             ->get();
+        $allUsers = $this->userService->getAllUsers();
 
         return Inertia::render('landing', [
-            'user_count' => User::count(),
+            'users' => $allUsers->toArray(), 
             'project_count' => Project::count(),
             'collaboration_count' => DB::table('project_participants')->count(),
             'projects' => [
