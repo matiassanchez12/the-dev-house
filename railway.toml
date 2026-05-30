@@ -9,6 +9,4 @@ NODE_VERSION = "20"
 
 [deploy]
 healthCheckPath = "/"
-# 1. Cambiamos el puerto fijo por la variable dinámica $PORT que asigna Railway
-startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
-restartPolicyType = "ON_FAILURE"
+startCommand = "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port ${PORT}"
