@@ -159,7 +159,7 @@ export function ProjectImage({ src, alt }: { src: string; alt: string }) {
         <img
             src={src}
             alt={alt}
-            className="size-full object-cover transition-transform duration-200 group-hover/card:scale-105"
+            className="size-full object-cover transition-transform duration-200 group-hover:scale-105"
         />
     );
 }

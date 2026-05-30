@@ -4,7 +4,6 @@ import {
     Users,
     MessageSquare,
     CheckCircle,
-    CircleDot,
     Check,
     X,
     Clock,
@@ -23,6 +22,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Project, JoinRequest, User, Tech } from '@/types';
+import { ProjectStatusBadge } from '@/components/projects/project-status-badge';
 
 interface DashboardProps {
     auth: {
@@ -201,7 +201,7 @@ export default function Dashboard({
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {createdProjects.map((project) => (
-                                                <Card key={project.id} className="relative">
+                                                <Card key={project.id} className="relative pb-0">
                                                     {project.join_requests_count > 0 && (
                                                         <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                                                             {project.join_requests_count}
@@ -244,40 +244,7 @@ export default function Dashboard({
                                                         </div>
                                                     </CardContent>
                                                     <CardFooter>
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className={`text-xs gap-1.5 ${
-                                                                project.status ===
-                                                                'open'
-                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                                    : project.status ===
-                                                                      'completed'
-                                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                                                                    : ''
-                                                            }`}
-                                                        >
-                                                            {project.status ===
-                                                                'open' && (
-                                                                <>
-                                                                    <CircleDot className="size-3" />
-                                                                    Abierto
-                                                                </>
-                                                            )}
-                                                            {project.status ===
-                                                                'completed' && (
-                                                                <>
-                                                                    <CheckCircle className="size-3" />
-                                                                    Completado
-                                                                </>
-                                                            )}
-                                                            {project.status ===
-                                                                'closed' && (
-                                                                <>
-                                                                    <CircleDot className="size-3" />
-                                                                    Cerrado
-                                                                </>
-                                                            )}
-                                                        </Badge>
+                                                        <ProjectStatusBadge status={project.status} />
                                                     </CardFooter>
                                                 </Card>
                                             ))}

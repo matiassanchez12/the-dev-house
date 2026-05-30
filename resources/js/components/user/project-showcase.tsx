@@ -1,9 +1,8 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import { ProjectCard } from '@/components/projects/card/project-card';
 import { UserProject } from '@/types';
-import { FolderOpen, Users } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 
 interface ProjectShowcaseProps {
     createdProjects: UserProject[];
@@ -34,7 +33,7 @@ export function ProjectShowcase({ createdProjects, participatingProjects }: Proj
     if (!hasCreated && !hasParticipating) {
         return <EmptyProjects message="No hay proyectos para mostrar" />;
     }
-
+    
     if (!showTabs) {
         const projects = hasCreated ? createdProjects : participatingProjects;
         return (
@@ -51,7 +50,7 @@ export function ProjectShowcase({ createdProjects, participatingProjects }: Proj
     }
 
     return (
-        <Tabs defaultValue="created">
+        <Tabs defaultValue="created" className='flex flex-col'>
             <TabsList variant="line" className="mb-4">
                 <TabsTrigger value="created">
                     Creados ({createdProjects.length})

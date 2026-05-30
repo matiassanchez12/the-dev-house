@@ -49,7 +49,7 @@ export function UserCard({ user }: UserCardProps) {
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 flex flex-1 flex-col justify-end">
                 {displayedTechs.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {displayedTechs.map((tech) => (
@@ -66,7 +66,6 @@ export function UserCard({ user }: UserCardProps) {
                 )}
                 <div className="flex gap-4 text-xs text-muted-foreground">
                     <span>{user.created_projects_count} proyecto{user.created_projects_count !== 1 ? 's' : ''} creado{user.created_projects_count !== 1 ? 's' : ''}</span>
-                    <span>{user.joined_projects_count} unido{user.joined_projects_count !== 1 ? 's' : ''}</span>
                 </div>
             </CardContent>
         </Card>

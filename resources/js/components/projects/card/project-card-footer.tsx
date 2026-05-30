@@ -9,7 +9,7 @@ interface ProjectCardSectionProps {
 
 export function ProjectCardFooter({ card }: ProjectCardSectionProps) {
     return (
-        <CardFooter className={cn('flex justify-between items-center gap-2 pt-0', card.isCompact && 'pb-3')}>
+        <CardFooter className={cn('flex justify-between items-center gap-2', card.isCompact && 'pb-3')}>
             {card.isCompact ? <CompactProjectCardMeta card={card} /> : <DefaultProjectCardMeta card={card} />}
         </CardFooter>
     );

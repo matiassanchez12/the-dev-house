@@ -106,6 +106,7 @@ export interface UserProject {
     title: string;
     slug: string;
     status: 'open' | 'closed' | 'completed';
+    images: string[] | null;
     description: string;
     creator: {
         id: number;

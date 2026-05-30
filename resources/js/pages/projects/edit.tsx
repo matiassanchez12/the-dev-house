@@ -36,34 +36,7 @@ export default function Edit({ auth, project, techs }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Ensure techs is properly formatted for FormData
-        const formData = new FormData();
-        formData.append('title', form.data.title);
-        formData.append('description', form.data.description);
-        formData.append('vision', form.data.vision);
-        formData.append('repository_url', form.data.repository_url);
-        formData.append('demo_url', form.data.demo_url);
-        
-        // Append techs as array with bracket notation
-        form.data.techs.forEach((techId) => {
-            formData.append('techs[]', techId.toString());
-        });
-        
-        // Append images
-        form.data.images.forEach((file) => {
-            formData.append('images[]', file);
-        });
-        
-        // Append remove_images
-        if (form.data.remove_images && form.data.remove_images.length > 0) {
-            form.data.remove_images.forEach((img) => {
-                formData.append('remove_images[]', img);
-            });
-        }
-        
-        formData.append('_method', 'PUT');
-        
-        form.post(`/projects/${project.slug}`, formData, {
+        form.put(`/projects/${project.slug}`, {
             onSuccess: () => {
                 toast.success('Proyecto actualizado exitosamente');
                 form.reset('images', 'remove_images');

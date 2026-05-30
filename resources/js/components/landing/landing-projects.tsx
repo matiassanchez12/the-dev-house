@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { Project as ProjectType } from "@/types";
-import { ProjectCard } from "@/components/projects/project-card";
+import { ProjectCard } from "../projects/card";
 
 interface Props {
     projects: { data: ProjectType[]; total: number };

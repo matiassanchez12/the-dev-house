@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\StorageUrlHelper;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -68,11 +69,14 @@ class UserService
         ]);
 
         $createdProjects = $user->createdProjects->map(function ($project) {
+            $images = array_map(fn($img) => StorageUrlHelper::url($img), $project['images']);
+
             return [
                 'id' => $project->id,
                 'title' => $project->title,
                 'slug' => $project->slug,
                 'status' => $project->status,
+                'images' => $images,
                 'description' => $project->description,
                 'creator' => [
                     'id' => $project->creator->id,
@@ -90,11 +94,14 @@ class UserService
         })->toArray();
 
         $participatingProjects = $user->participatingProjects->map(function ($project) {
+            $images = array_map(fn($img) => StorageUrlHelper::url($img), $project['images']);
+
             return [
                 'id' => $project->id,
                 'title' => $project->title,
                 'slug' => $project->slug,
                 'status' => $project->status,
+                'images' => $images,
                 'description' => $project->description,
                 'creator' => [
                     'id' => $project->creator->id,
