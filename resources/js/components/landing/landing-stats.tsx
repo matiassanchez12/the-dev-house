@@ -57,8 +57,11 @@ export default function LandingStats({
                         return (
                             <div
                                 key={stat.key}
-                                className="animate-fade-in-up"
-                                style={{ '--stagger-delay': `${index * 150}ms` } as React.CSSProperties}
+                                className={cn(
+                                    'transition-all duration-700',
+                                    isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
+                                )}
+                                style={{ transitionDelay: `${index * 150}ms` }}
                             >
                                 <div className="inline-flex items-center justify-center size-12 rounded-full bg-primary-foreground/10 mb-4">
                                     <Icon className="size-6" />

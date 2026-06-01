@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useInView } from '@/hooks/use-in-view';
 import { Heart, Code2, Globe } from 'lucide-react';
 
 interface LandingManifestoProps {
@@ -6,13 +7,18 @@ interface LandingManifestoProps {
 }
 
 export default function LandingManifesto({ className }: LandingManifestoProps) {
+    const [ref, isInView] = useInView({ threshold: 0.2 });
+
     return (
-        <section className={cn('py-20 bg-accent/5 relative overflow-hidden', className)}>
+        <section ref={ref} className={cn('py-20 bg-accent/5 relative overflow-hidden', className)}>
             {/* Accent background treatment */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />
 
             <div className="container mx-auto px-4 relative z-10">
-                <div className="max-w-3xl mx-auto text-center">
+                <div className={cn(
+                    'max-w-3xl mx-auto text-center transition-all duration-700',
+                    isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
+                )}>
                     {/* Manifesto icon */}
                     <div className="inline-flex items-center justify-center size-16 rounded-full bg-accent/10 mb-8">
                         <Heart className="size-8 text-accent" />
@@ -32,7 +38,7 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
                         <p>
                             No somos solo otra bolsa de trabajo o red social. Somos un lugar
                             donde ocurre la colaboración real. Donde los desarrolladores junior aprenden de los seniors,
-                            donde los proyectos secundarios se convierten en startups, y donde el código que escribes juntos
+                            donde los proyectos secundarios se convierten en startups, y donde el código que escribís juntos
                             es mejor que cualquier cosa que pudieras construir solo.
                         </p>
                     </div>
@@ -43,12 +49,16 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
                             { icon: Code2, label: 'Open Source Primero' },
                             { icon: Heart, label: 'Impulsado por la Comunidad' },
                             { icon: Globe, label: 'Construido por Desarrolladores' },
-                        ].map((value) => {
+                        ].map((value, index) => {
                             const Icon = value.icon;
                             return (
                                 <div
                                     key={value.label}
-                                    className="flex items-center gap-2 text-sm font-medium text-foreground/70"
+                                    className={cn(
+                                        'flex items-center gap-2 text-sm font-medium text-foreground/70 transition-all duration-700',
+                                        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+                                    )}
+                                    style={{ transitionDelay: `${400 + index * 100}ms` }}
                                 >
                                     <Icon className="size-4 text-accent" />
                                     {value.label}
