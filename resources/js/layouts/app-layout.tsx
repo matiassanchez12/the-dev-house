@@ -1,10 +1,12 @@
 import ApplicationLogo from '@/components/application-logo';
+import MobileNavMenu from '@/components/mobile-nav-menu';
 import ThemeToggle from '@/components/theme-toggle';
 import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { User } from '@/types';
 
 interface Props {
     children: React.ReactNode;
@@ -12,7 +14,7 @@ interface Props {
 }
 
 export default function AppLayout({ children, header }: Props) {
-    const user = usePage().props.auth.user as { id: number; name: string; slug: string } | null;
+    const user = usePage().props.auth.user as User | null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navLinks = [
@@ -142,82 +144,40 @@ export default function AppLayout({ children, header }: Props) {
                 </div>
 
                 {/* Mobile full-screen menu */}
-                {mobileMenuOpen && (
-                    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm sm:hidden">
-                        <button
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="absolute right-4 top-4 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none"
-                        >
-                            <svg
-                                className="h-6 w-6"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 24 24"
+                <MobileNavMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+                    {[...navLinks, ...authenticatedNavLinks].map((link) => (
+                        <MobileNavMenu.Link key={link.href} href={link.href}>
+                            {link.label}
+                        </MobileNavMenu.Link>
+                    ))}
+
+                    <MobileNavMenu.Divider />
+
+                    {user ? (
+                        <>
+                            <MobileNavMenu.Link href={route('users.show', user.slug)}>
+                                Mi Perfil
+                            </MobileNavMenu.Link>
+                            <MobileNavMenu.Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                variant="destructive"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
-
-                        <div className="flex flex-col items-center gap-6">
-                            {[...navLinks, ...authenticatedNavLinks].map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="text-2xl font-medium text-foreground hover:text-primary"
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
-
-                            {user ? (
-                                <>
-                                    <div className="my-2 h-px w-32 bg-border" />
-                                    <Link
-                                        href={route('users.show', user.slug)}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="text-2xl font-medium text-foreground hover:text-primary"
-                                    >
-                                        Mi Perfil
-                                    </Link>
-                                    <Link
-                                        href={route('logout')}
-                                        method="post"
-                                        as="button"
-                                        type="button"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="text-2xl font-medium text-destructive hover:text-destructive/80"
-                                    >
-                                        Cerrar Sesión
-                                    </Link>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="my-2 h-px w-32 bg-border" />
-                                    <Link
-                                        href={route('login')}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="text-2xl font-medium text-foreground hover:text-primary"
-                                    >
-                                        Iniciar Sesión
-                                    </Link>
-                                    <Link
-                                        href={route('register')}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="text-2xl font-medium text-foreground hover:text-primary"
-                                    >
-                                        Registrarse
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                )}
+                                Cerrar Sesión
+                            </MobileNavMenu.Link>
+                        </>
+                    ) : (
+                        <>
+                            <MobileNavMenu.Link href={route('login')}>
+                                Iniciar Sesión
+                            </MobileNavMenu.Link>
+                            <MobileNavMenu.Link href={route('register')}>
+                                Registrarse
+                            </MobileNavMenu.Link>
+                        </>
+                    )}
+                </MobileNavMenu>
             </nav>
 
             {header && (
