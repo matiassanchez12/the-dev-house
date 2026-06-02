@@ -84,6 +84,7 @@ class User extends Authenticatable
     public function techs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Tech::class, 'user_tech')
+                    ->using(UserTech::class)
                     ->withPivot('years_experience', 'proficiency')
                     ->withTimestamps();
     }
