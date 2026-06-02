@@ -88,7 +88,7 @@ export default function Dashboard({
                             Hola, {auth.user?.name}
                         </h2>
                         <Link href={route('projects.create')}>
-                            <Button>
+                            <Button variant='default'>
                                 <Plus className="size-4 mr-2" />
                                 Crear Proyecto
                             </Button>
