@@ -7,13 +7,11 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Landing page
 Route::get('/', [LandingController::class, '__invoke'])->name('landing');
-
+Route::get('/test-landing');
 Route::get('/dashboard', [DashboardController::class, '__invoke'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

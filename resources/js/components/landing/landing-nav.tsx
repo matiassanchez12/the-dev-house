@@ -71,7 +71,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                         <ThemeToggle />
                         {auth.user ? (
                             <Link href={route('dashboard')}>
-                                <Button variant="default" size="sm">Dashboard</Button>
+                                <Button variant="secondary" size="sm">Dashboard</Button>
                             </Link>
                         ) : (
                             <>
@@ -97,34 +97,53 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
 
                 {/* Mobile menu */}
                 {mobileOpen && (
-                    <div className="md:hidden pb-4 border-t border-border/50 pt-4">
-                        <div className="flex flex-col gap-3">
-                            {navLinks.map((link) => (
-                                <a
-                                    key={link.label}
-                                    href={link.href}
-                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                                    onClick={() => setMobileOpen(false)}
-                                >
-                                    {link.label}
-                                </a>
-                            ))}
-                            <div className="flex gap-2 pt-2">
-                                <ThemeToggle />
+                    <div className="md:hidden -mx-4 border-t border-border bg-background/95 backdrop-blur-md shadow-lg">
+                        <div className="flex flex-col p-4">
+                            <nav aria-label="Navegación móvil" className="flex flex-col">
+                                {navLinks.map((link) => (
+                                    <a
+                                        key={link.label}
+                                        href={link.href}
+                                        onClick={() => setMobileOpen(false)}
+                                        className="px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    >
+                                        {link.label}
+                                    </a>
+                                ))}
+                            </nav>
+
+                            <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                                 {auth.user ? (
                                     <Link href={route('dashboard')}>
-                                        <Button variant="default" size="sm" className="w-full">Dashboard</Button>
+                                        <Button variant="cta" size="lg" className="w-full">
+                                            Ir al Dashboard
+                                        </Button>
                                     </Link>
                                 ) : (
                                     <>
-                                        <Link href={route('login')} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full">Iniciar sesión</Button>
+                                        <Link href={route('register')}>
+                                            <Button
+                                                size="lg"
+                                                variant="secondary"
+                                                className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                                            >
+                                                Comenzar
+                                            </Button>
                                         </Link>
-                                        <Link href={route('register')} className="flex-1">
-                                            <Button size="sm" className="w-full">Comenzar</Button>
+                                        <Link href={route('login')}>
+                                            <Button variant="ghost" size="lg" className="w-full">
+                                                Iniciar sesión
+                                            </Button>
                                         </Link>
                                     </>
                                 )}
+                            </div>
+
+                            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+                                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                    Apariencia
+                                </span>
+                                <ThemeToggle />
                             </div>
                         </div>
                     </div>
