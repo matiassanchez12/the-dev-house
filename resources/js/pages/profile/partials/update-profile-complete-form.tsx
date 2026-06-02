@@ -287,6 +287,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                                                                     type="number"
                                                                     min="0"
                                                                     max="50"
+                                                                    step="1"
                                                                     value={userTech.years_experience}
                                                                     onChange={(e) =>
                                                                         handleTechUpdate(tech.id, 'years_experience', e.target.value)
