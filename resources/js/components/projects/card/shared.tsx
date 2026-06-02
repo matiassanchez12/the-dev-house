@@ -141,12 +141,12 @@ export function ProjectCardLink({ slug, children }: { slug: string; children: Re
 
 export function CompactProjectCardImage({ card }: ProjectCardSectionProps) {
     if (!card.imageUrl) {
-        return <GradientFallback className="h-20 bg-gradient-to-r rounded-t-lg" gradient={card.gradientFallback} />;
+        return <GradientFallback className="h-20 bg-gradient-to-r" gradient={card.gradientFallback} />;
     }
 
     return (
         <ProjectCardLink slug={card.slug}>
-            <div className="relative h-32 overflow-hidden rounded-t-lg">
+            <div className="relative h-32 overflow-hidden">
                 <ProjectImage src={card.imageUrl} alt={card.title} />
                 <div className={cn('absolute inset-0 bg-gradient-to-t opacity-60', card.gradientFallback)} />
             </div>

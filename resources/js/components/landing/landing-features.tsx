@@ -1,7 +1,8 @@
-import { Link, ArrowRight, Rocket, Users, MessageSquare } from "lucide-react";
+import { ArrowRight, Rocket, Users, MessageSquare } from "lucide-react";
 import { useInView } from '@/hooks/use-in-view';
 import { cn } from '@/lib/utils';
 import { Button } from "../ui/button";
+import { Link } from "@inertiajs/react";
 
 const featureItems = [
     {
@@ -56,18 +57,6 @@ export default function LandingFeatures() {
                             </p>
                         </div>
                     ))}
-
-                    <div className={cn(
-                        'col-span-1 md:col-span-3 flex items-center justify-center w-full transition-all duration-700',
-                        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
-                    )} style={{ transitionDelay: '450ms' }}>
-                        <Link href={route('register')}>
-                            <Button size="lg" className="text-lg px-8 bg-accent text-accent-foreground hover:bg-accent/90">
-                                Crear Cuenta Gratis
-                                <ArrowRight className="size-4 ml-2" />
-                            </Button>
-                        </Link>
-                    </div>
                 </div>
             </div>
         </section>

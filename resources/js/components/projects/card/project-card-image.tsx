@@ -13,7 +13,7 @@ export function ProjectCardImage({ card }: ProjectCardSectionProps) {
 
     return (
         <ProjectCardLink slug={card.slug}>
-            <div className="relative aspect-video overflow-hidden rounded-t-lg">
+            <div className="relative aspect-video overflow-hidden">
                 {card.imageUrl ? (
                     <ProjectImage src={card.imageUrl} alt={card.title} />
                 ) : (

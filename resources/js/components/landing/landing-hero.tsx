@@ -47,7 +47,7 @@ export default function LandingHero({ auth, className }: LandingHeroProps) {
             <div
                 className="absolute inset-0 opacity-[0.4] dark:opacity-[0.2]"
                 style={{
-                    backgroundImage: 'radial-gradient(circle, hsl(var(--muted-foreground)) 1px, transparent 1px)',
+                    backgroundImage: 'radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)',
                     backgroundSize: '24px 24px',
                 }}
             />
