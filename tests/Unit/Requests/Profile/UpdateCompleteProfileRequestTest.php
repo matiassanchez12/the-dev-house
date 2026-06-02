@@ -223,4 +223,24 @@ class UpdateCompleteProfileRequestTest extends TestCase
 
         $this->assertFalse($validator->fails());
     }
+
+    /**
+     * Regression test for #30: years_experience must be an integer.
+     * Previously the column was decimal(3,1) and the form submitted
+     * decimals, leaving users stuck on a 422.
+     */
+    /** @test */
+    public function years_experience_must_be_an_integer(): void
+    {
+        $data = [
+            'techs' => [
+                ['id' => $this->validTechIds[0], 'years_experience' => 1.5, 'proficiency' => 'expert'],
+            ],
+        ];
+
+        $validator = $this->validateRequest($data);
+
+        $this->assertTrue($validator->fails());
+        $this->assertArrayHasKey('techs.0.years_experience', $validator->errors()->toArray());
+    }
 }
