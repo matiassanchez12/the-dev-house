@@ -58,6 +58,7 @@ export default function OnboardingIndex() {
     const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps & { errors: Record<string, string> }>().props;
 
     const [currentStep, setCurrentStep] = useState(1);
+    const [processing, setProcessing] = useState(false);
 
     // Step 1: Tech selection
     const [selectedTechs, setSelectedTechs] = useState<SelectedTech[]>(() => {
@@ -168,61 +169,98 @@ export default function OnboardingIndex() {
     };
 
     const handleNext = () => {
+        if (processing) return;
+
         if (currentStep === 1) {
+            setProcessing(true);
             router.post(
                 '/onboarding/step-1',
                 { techs: selectedTechs.map((t) => ({ id: t.id, proficiency: t.proficiency })) },
-                { preserveScroll: true }
+                {
+                    preserveScroll: true,
+                    onSuccess: () => setCurrentStep(2),
+                    onFinish: () => setProcessing(false),
+                }
             );
-            setCurrentStep(2);
         } else if (currentStep === 2) {
+            setProcessing(true);
             router.post(
                 '/onboarding/step-2',
                 { bio },
-                { preserveScroll: true }
+                {
+                    preserveScroll: true,
+                    onSuccess: () => setCurrentStep(3),
+                    onFinish: () => setProcessing(false),
+                }
             );
-            setCurrentStep(3);
         } else if (currentStep === 3) {
             const links: SocialLink[] = Object.entries(socialLinks)
                 .filter(([, url]) => url.trim() !== '')
                 .map(([platform, url]) => ({ platform: platform as Platform, url }));
 
-            if (links.length > 0) {
-                router.post(
-                    '/onboarding/step-social-links',
-                    { links },
-                    { preserveScroll: true }
-                );
+            if (links.length === 0) {
+                setCurrentStep(4);
+                return;
             }
-            setCurrentStep(4);
-        } else if (currentStep === 4) {
-            if (avatarFile) {
-                const formData = new FormData();
-                formData.append('avatar', avatarFile);
-                router.post('/onboarding/step-3', formData, {
-                    forceFormData: true,
+
+            setProcessing(true);
+            router.post(
+                '/onboarding/step-social-links',
+                { links },
+                {
                     preserveScroll: true,
-                });
+                    onSuccess: () => setCurrentStep(4),
+                    onFinish: () => setProcessing(false),
+                }
+            );
+        } else if (currentStep === 4) {
+            if (!avatarFile) {
+                setCurrentStep(5);
+                return;
             }
-            setCurrentStep(5);
+
+            const formData = new FormData();
+            formData.append('avatar', avatarFile);
+            setProcessing(true);
+            router.post('/onboarding/step-3', formData, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => setCurrentStep(5),
+                onFinish: () => setProcessing(false),
+            });
         } else if (currentStep === 5) {
+            setProcessing(true);
             router.post(
                 '/onboarding/step-4',
                 { join_requests: selectedProjects },
-                { preserveScroll: true }
+                {
+                    preserveScroll: true,
+                    onFinish: () => setProcessing(false),
+                }
             );
         }
     };
 
     const handleBack = () => {
+        if (processing) return;
         if (currentStep > 1) {
             setCurrentStep((prev) => prev - 1);
         }
     };
 
     const handleSkip = () => {
-        router.post('/onboarding/skip', {}, { preserveScroll: true });
+        if (processing) return;
+        setProcessing(true);
+        router.post('/onboarding/skip', {}, {
+            preserveScroll: true,
+            onFinish: () => setProcessing(false),
+        });
     };
+
+    const stepErrors = (prefix: string) =>
+        Object.entries(errors).filter(
+            ([key]) => key === prefix || key.startsWith(`${prefix}.`)
+        );
 
     return (
         <>
@@ -249,6 +287,10 @@ export default function OnboardingIndex() {
                         {/* Step 1: Tech Selection */}
                         {currentStep === 1 && (
                             <div className="space-y-6">
+                                {stepErrors('techs').map(([key, msg]) => (
+                                    <InputError key={key} message={msg} />
+                                ))}
+
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {allTechs.map((tech) => {
                                         const isSelected = selectedTechs.some((t) => t.id === tech.id);
@@ -326,6 +368,7 @@ export default function OnboardingIndex() {
                                 <div className="text-right text-sm text-muted-foreground">
                                     {bio.length}/1000
                                 </div>
+                                {errors.bio && <InputError message={errors.bio} />}
                             </div>
                         )}
 
@@ -434,6 +477,9 @@ export default function OnboardingIndex() {
                                         <p className="text-xs text-muted-foreground mt-1">
                                             Máximo 2MB
                                         </p>
+                                        {errors.avatar && (
+                                            <InputError message={errors.avatar} className="mt-2" />
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -442,6 +488,9 @@ export default function OnboardingIndex() {
                         {/* Step 5: Recommendations */}
                         {currentStep === 5 && (
                             <div className="space-y-4">
+                                {stepErrors('join_requests').map(([key, msg]) => (
+                                    <InputError key={key} message={msg} />
+                                ))}
                                 {loadingRecommendations ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         Cargando proyectos recomendados...
@@ -502,17 +551,21 @@ export default function OnboardingIndex() {
                             <Button
                                 variant="outline"
                                 onClick={handleBack}
-                                disabled={currentStep === 1}
+                                disabled={currentStep === 1 || processing}
                             >
                                 Atrás
                             </Button>
 
                             <div className="flex items-center gap-2">
-                                <Button variant="ghost" onClick={handleSkip}>
+                                <Button variant="ghost" onClick={handleSkip} disabled={processing}>
                                     Saltar
                                 </Button>
-                                <Button onClick={handleNext}>
-                                    {currentStep === 5 ? 'Finalizar' : 'Siguiente'}
+                                <Button onClick={handleNext} disabled={processing}>
+                                    {processing
+                                        ? 'Guardando...'
+                                        : currentStep === 5
+                                          ? 'Finalizar'
+                                          : 'Siguiente'}
                                 </Button>
                             </div>
                         </div>
