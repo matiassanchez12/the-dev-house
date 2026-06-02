@@ -98,6 +98,48 @@ class ProjectTest extends TestCase
         );
     }
 
+    /**
+     * TEST 3b: Filtrar proyectos por search (title)
+     */
+    public function test_can_filter_projects_by_search(): void
+    {
+        // Arrange
+        Project::factory()->create(['title' => 'React Dashboard']);
+        Project::factory()->create(['title' => 'Vue Admin Panel']);
+        Project::factory()->create(['title' => 'Laravel API']);
+
+        // Act
+        $response = $this->get('/projects?search=react');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('projects.data', 1)
+                ->where('projects.data.0.title', 'React Dashboard')
+                ->where('filters.search', 'react')
+        );
+    }
+
+    /**
+     * TEST 3c: Search es case-insensitive y matchea substring
+     */
+    public function test_search_is_case_insensitive_and_matches_substring(): void
+    {
+        // Arrange
+        Project::factory()->create(['title' => 'My Awesome Project']);
+        Project::factory()->create(['title' => 'Another Thing']);
+
+        // Act
+        $response = $this->get('/projects?search=AWESOME');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page->has('projects.data', 1)
+        );
+    }
+
     public function test_can_view_create_project_form_when_authenticated(): void
     {
         $user = User::factory()->create();
