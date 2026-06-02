@@ -2,7 +2,7 @@ name: PR Discord Notify
 
 on:
   pull_request:
-    types: [opened, closed, reopened]
+    types: [opened, closed, reopened, ready_for_review, convert_to_draft]
 
 jobs:
   notify:
@@ -12,7 +12,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_DEV_HOUSE }}
           ACTION: ${{ github.event.action }}
-          AUTHOR: ${{ github.actor }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -20,6 +20,11 @@ jobs:
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
           PR_STATE: ${{ github.event.pull_request.state }}
           IS_MERGED: ${{ github.event.pull_request.merged }}
+          ADDITIONS: ${{ github.event.pull_request.additions }}
+          DELETIONS: ${{ github.event.pull_request.deletions }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          COMMIT_COUNT: ${{ github.event.pull_request.commits }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ', ') }}
         run: |
           WEBHOOK=$(echo "$DISCORD_WEBHOOK" | xargs)
           if [ -z "$WEBHOOK" ]; then
@@ -27,30 +32,51 @@ jobs:
             exit 1
           fi
 
+          DIFF_STATS="\`+${ADDITIONS} -${DELETIONS}\` en \`${CHANGED_FILES}\` archivos (\`${COMMIT_COUNT}\` commits)"
+
           if [ "$ACTION" = "opened" ]; then
             COLOR=5814783
             TITLE="📋 Nuevo PR #${PR_NUMBER}"
-            DESC="**${AUTHOR}** abrió PR: **${PR_TITLE}**\n\nDe **${SOURCE_BRANCH}** → **${TARGET_BRANCH}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+            DESC="**${AUTHOR}** abrió PR: **${PR_TITLE}**\n\nDe **${SOURCE_BRANCH}** → **${TARGET_BRANCH}**\n\n${DIFF_STATS}"
+          elif [ "$ACTION" = "ready_for_review" ]; then
+            COLOR=5763719
+            TITLE="✅ PR #${PR_NUMBER} Listo para Review"
+            DESC="**${AUTHOR}** marcó como listo: **${PR_TITLE}**\n\n${DIFF_STATS}"
+          elif [ "$ACTION" = "convert_to_draft" ]; then
+            COLOR=15158332
+            TITLE="📝 PR #${PR_NUMBER} → Draft"
+            DESC="**${AUTHOR}** convirtió a draft: **${PR_TITLE}**\n\n${DIFF_STATS}"
           elif [ "$ACTION" = "closed" ]; then
             if [ "$IS_MERGED" = "true" ]; then
               COLOR=3066993
               TITLE="✅ PR #${PR_NUMBER} Merged"
-              DESC="**${PR_TITLE}** fue merged a **${TARGET_BRANCH}**\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+              DESC="**${PR_TITLE}** fue merged a **${TARGET_BRANCH}**\n\nPor **${AUTHOR}**\n\n${DIFF_STATS}"
             else
               COLOR=1003876
               TITLE="❌ PR #${PR_NUMBER} Cerrado"
-              DESC="**${PR_TITLE}** fue cerrado sin merge\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+              DESC="**${PR_TITLE}** fue cerrado sin merge\n\nPor **${AUTHOR}**\n\n${DIFF_STATS}"
             fi
           elif [ "$ACTION" = "reopened" ]; then
             COLOR=16772412
             TITLE="🔄 PR #${PR_NUMBER} Reabierto"
-            DESC="**${PR_TITLE}** fue reabierto\n\nPor **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+            DESC="**${AUTHOR}** reabrió: **${PR_TITLE}**\n\nDe **${SOURCE_BRANCH}** → **${TARGET_BRANCH}**\n\n${DIFF_STATS}"
           else
             COLOR=5814783
             TITLE="📋 PR #${PR_NUMBER} - ${ACTION}"
             DESC="**${PR_TITLE}** - ${ACTION} por **${AUTHOR}**\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
           fi
 
+          # Build fields array for labels (if any)
+          FIELDS=""
+          if [ -n "$LABELS" ]; then
+            FIELDS=",\"fields\":[{\"name\":\"🏷️ Labels\",\"value\":\"${LABELS}\",\"inline\":true}]"
+          fi
+
+          # Append URL footer to DESC
+          if ! echo "$DESC" | grep -q "Ver PR"; then
+            DESC="${DESC}\n\n🔗 [Ver PR #${PR_NUMBER}](${PR_URL})"
+          fi
+
           curl -X POST "$WEBHOOK" \
             -H "Content-Type: application/json" \
-            -d "{\"embeds\":[{\"title\":\"${TITLE}\",\"description\":\"${DESC}\",\"color\":${COLOR},\"footer\":{\"text\":\"devhouse\"}}]}"
+            -d "{\"embeds\":[{\"title\":\"${TITLE}\",\"description\":\"${DESC}\",\"color\":${COLOR},\"footer\":{\"text\":\"devhouse\"}${FIELDS}}]}"
