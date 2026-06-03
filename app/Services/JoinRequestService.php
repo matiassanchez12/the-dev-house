@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\JoinRequest;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\JoinRequestApproved;
+use App\Notifications\JoinRequestReceived;
+use App\Notifications\JoinRequestRejected;
 use App\Services\Exceptions\DuplicateJoinRequestException;
 use App\Services\Exceptions\SelfJoinException;
 use Illuminate\Database\QueryException;
@@ -45,12 +48,17 @@ class JoinRequestService
     public function create(Project $project, User $user, string $message): JoinRequest
     {
         try {
-            return JoinRequest::create([
+            $joinRequest = JoinRequest::create([
                 'project_id' => $project->id,
                 'user_id' => $user->id,
                 'message' => $message,
                 'status' => 'pending',
             ]);
+
+            $joinRequest->load('project', 'applicant');
+            $project->creator->notify(new JoinRequestReceived($joinRequest));
+
+            return $joinRequest;
         } catch (QueryException $e) {
             if ($this->isUniqueConstraintError($e)) {
                 throw new DuplicateJoinRequestException();
@@ -82,6 +90,9 @@ class JoinRequestService
                 $project->participants()->attach($joinRequest->user_id);
             }
         });
+
+        $joinRequest->load('project', 'applicant');
+        $joinRequest->applicant->notify(new JoinRequestApproved($joinRequest));
     }
 
     /**
@@ -95,6 +106,9 @@ class JoinRequestService
                 'reviewed_at' => now(),
             ]);
         });
+
+        $joinRequest->load('project', 'applicant');
+        $joinRequest->applicant->notify(new JoinRequestRejected($joinRequest));
     }
 
     /**
