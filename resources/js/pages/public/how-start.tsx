@@ -75,27 +75,44 @@ export default function HowStart({ auth }: Props) {
                                 heroInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
                             )}
                         >
+                            {/* Author */}
+                            <div className="inline-flex items-center gap-5 mb-10 px-5 py-3 rounded-full border border-border/40 bg-background/50 backdrop-blur-sm">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md" />
+                                    <img
+                                        src="https://avatars.githubusercontent.com/u/52495199?v=4"
+                                        alt="Matias Sanchez"
+                                        className="relative size-14 rounded-full ring-2 ring-accent/30"
+                                    />
+                                </div>
+                                <div className="text-left">
+                                    <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground/60">
+                                        Publicado por
+                                    </span>
+                                    <a
+                                        href="https://the-dev-house-1.onrender.com/users/matias-sanchez"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block font-display font-semibold text-foreground hover:text-accent-foreground transition-colors leading-tight"
+                                    >
+                                        Matias Sanchez
+                                    </a>
+                                    <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
+                                        Full Stack Developer +5 YOE<br />
+                                        Founder de The Dev House
+                                    </p>
+                                </div>
+                            </div>
+
                             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
                                 Cómo empezar tu primer{' '}
                                 <span className="text-accent-foreground bg-accent px-2">SaaS</span>{' '}
                                 o proyecto colaborativo
                             </h1>
-                            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
                                 Una idea increíble no alcanza sin las herramientas, la estructura y un camino detallado.
                                 Acá tenés una guía paso a paso.
                             </p>
-                            <div className="flex flex-wrap gap-4 justify-center">
-                                <Link href={route('projects.index')}>
-                                    <Button variant="secondary" size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                                        Explorar proyectos
-                                    </Button>
-                                </Link>
-                                <Link href={route('register')}>
-                                    <Button variant="outline" size="lg">
-                                        Crear cuenta
-                                    </Button>
-                                </Link>
-                            </div>
                         </div>
                     </div>
                 </section>
@@ -215,6 +232,7 @@ export default function HowStart({ auth }: Props) {
                                 </Button>
                             </Link>
                         </div>
+
                     </div>
                 </section>
 

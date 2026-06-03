@@ -16,7 +16,9 @@ return new class extends Migration
 
         // PostgreSQL uses VARCHAR with CHECK constraint, not ENUM
         // Drop old constraint and create new one with expanded values
-        
+
+        DB::statement('ALTER TABLE social_links DROP CONSTRAINT IF EXISTS social_links_platform_check');
+
         DB::statement("ALTER TABLE social_links ADD CONSTRAINT social_links_platform_check CHECK (platform IN ('github', 'linkedin', 'twitter', 'website', 'youtube', 'discord', 'stackoverflow'))");
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -166,6 +167,28 @@ class ProjectService
         }
 
         return str_starts_with($path, 'projects/');
+    }
+
+    /**
+     * Update the project status with transition validation.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function updateStatus(Project $project, ProjectStatus $newStatus): void
+    {
+        $currentStatus = $project->status;
+
+        if (! $currentStatus instanceof ProjectStatus) {
+            $currentStatus = ProjectStatus::tryFrom($currentStatus);
+        }
+
+        if (! $currentStatus->canTransitionTo($newStatus)) {
+            throw new \InvalidArgumentException(
+                "Cannot transition from {$currentStatus->value} to {$newStatus->value}."
+            );
+        }
+
+        $project->update(['status' => $newStatus->value]);
     }
 
     /**
