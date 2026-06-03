@@ -24,25 +24,27 @@ function InViewItem({ children, delayMs = 0, className }: InViewItemProps) {
 
 export default function LandingHero({ auth, techs, className }: LandingHeroProps) {
     return (
-        <section className={cn('relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32', className)}>
+        <section className={cn(
+            'relative overflow-hidden min-h-[calc(100vh-1px)] flex items-center',
+            'pt-20 pb-16 md:pt-32 md:pb-24',
+            className,
+        )}>
             <HeroBackground />
             <HeroTechBackground />
 
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="flex justify-center flex-col md:flex-row items-center gap-12">
-                    <div className="flex-1 text-center md:text-left max-w-2xl space-y-4">
-                        <InViewItem delayMs={0}>
-                            <HeroHeadline />
-                        </InViewItem>
+            <div className="container mx-auto px-4 relative z-10 w-full">
+                <div className="max-w-3xl mx-auto text-center space-y-6 md:space-y-8">
+                    <InViewItem delayMs={0}>
+                        <HeroHeadline />
+                    </InViewItem>
 
-                        <InViewItem delayMs={80}>
-                            <HeroWordmark />
-                        </InViewItem>
+                    <InViewItem delayMs={80}>
+                        <HeroWordmark />
+                    </InViewItem>
 
-                        <InViewItem delayMs={160}>
-                            <HeroCta auth={auth} />
-                        </InViewItem>
-                    </div>
+                    <InViewItem delayMs={160}>
+                        <HeroCta auth={auth} />
+                    </InViewItem>
                 </div>
             </div>
         </section>

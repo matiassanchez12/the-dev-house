@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest';
-import { Head, Link, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, useForm } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }) {
     const { post, processing } = useForm({});
@@ -13,7 +14,7 @@ export default function VerifyEmail({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
+            <Seo title="Verificar email" description="Verificá tu dirección de email en The Dev House para empezar a colaborar en proyectos." />
 
             <div className="mb-4 text-sm text-muted-foreground">
                 Thanks for signing up! Before getting started, could you verify

@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
-import { Head, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { useForm } from '@inertiajs/react';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -20,7 +21,7 @@ export default function ConfirmPassword() {
 
     return (
         <GuestLayout>
-            <Head title="Confirm Password" />
+            <Seo title="Confirmar contraseña" description="Esta es un área segura de The Dev House. Confirmá tu contraseña antes de continuar." />
 
             <div className="mb-4 text-sm text-muted-foreground">
                 This is a secure area of the application. Please confirm your

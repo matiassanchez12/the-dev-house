@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tech, Project as ProjectType } from '@/types';
@@ -54,7 +54,7 @@ export default function Edit({ auth, project, techs }: Props) {
 
     return (
         <>
-            <Head title={`Editar ${project.title}`} />
+            <Seo title={`Editar ${project.title}`} description="Actualizá la información de tu proyecto en The Dev House." />
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">

@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link } from '@inertiajs/react';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingFooter from '@/components/landing/landing-footer';
 import { cn } from '@/lib/utils';
@@ -37,7 +38,7 @@ export default function About({ auth }: Props) {
 
     return (
         <>
-            <Head title="Acerca de | The Dev House" />
+            <Seo title="Acerca de" description="Conocé The Dev House: la plataforma colaborativa para desarrolladores de todos los niveles. Creá proyectos, unite a equipos y construí software en comunidad." />
             <div className="min-h-screen bg-background">
                 <LandingNav auth={auth} />
 

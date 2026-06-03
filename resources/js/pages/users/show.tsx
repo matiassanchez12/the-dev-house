@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import { FolderOpen, Users, Wrench } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -47,7 +47,7 @@ export default function Show({ auth, user }: Props) {
 
     return (
         <>
-            <Head title={user.name} />
+            <Seo title={user.name} description={user.bio ? user.bio.slice(0, 160) : `Perfil de ${user.name} en The Dev House`} />
             <AppLayout>
                 {/* Hero Section */}
                 <div className="bg-gradient-to-b from-muted/50 to-background">

@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingFooter from '@/components/landing/landing-footer';
@@ -58,7 +58,7 @@ export default function Terms({ auth }: Props) {
 
     return (
         <>
-            <Head title="Términos de uso | The Dev House" />
+            <Seo title="Términos de uso" description="Términos de uso de The Dev House. Reglas de la plataforma, responsabilidades de los usuarios y propiedad intelectual del contenido." />
             <div className="min-h-screen bg-background">
                 <LandingNav auth={auth} />
 

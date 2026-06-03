@@ -1,4 +1,5 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import OnboardingLayout from '@/layouts/onboarding';
 import { Button } from '@/components/ui/button';
@@ -226,7 +227,7 @@ export default function OnboardingIndex() {
 
     return (
         <>
-            <Head title="Welcome to The Dev House" />
+            <Seo title="Welcome to The Dev House" description="Completá tu perfil en The Dev House: seleccioná tus tecnologías, escribí tu bio, agregá redes sociales y descubrí proyectos recomendados." />
             <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps}>
                 <Card>
                     <CardHeader>

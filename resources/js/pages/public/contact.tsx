@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link } from '@inertiajs/react';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingFooter from '@/components/landing/landing-footer';
 import { cn } from '@/lib/utils';
@@ -53,7 +54,7 @@ export default function Contact({ auth }: Props) {
 
     return (
         <>
-            <Head title="Contacto | The Dev House" />
+            <Seo title="Contacto" description="Contactanos. Escribinos a hola@thedevhouse.app o completá el formulario para consultas, propuestas de colaboración o sugerencias." />
             <div className="min-h-screen bg-background">
                 <LandingNav auth={auth} />
 

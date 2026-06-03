@@ -1,5 +1,5 @@
+import Seo from '@/components/seo';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 import DeleteUserForm from './partials/delete-user-form';
 import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
@@ -24,7 +24,7 @@ export default function Edit({ mustVerifyEmail, status, userTechs, allTechs, soc
                 </h2>
             }
         >
-            <Head title="Mi Perfil" />
+            <Seo title="Mi Perfil" description="Configurá tu perfil en The Dev House: actualizá tu información personal, tecnologías, redes sociales y contraseña." />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">

@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
-import { Head, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { useForm } from '@inertiajs/react';
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,7 +24,7 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Seo title="Restablecer contraseña" description="Establecé una nueva contraseña para tu cuenta de The Dev House." />
 
             <form onSubmit={submit}>
                 <div>

@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tech } from '@/types';
@@ -39,7 +39,7 @@ export default function Create({ auth, techs }: Props) {
 
     return (
         <>
-            <Head title="Crear Proyecto" />
+            <Seo title="Crear Proyecto" description="Publicá tu proyecto en The Dev House. Definí tecnologías, objetivos y encontrá colaboradores para construir software juntos." />
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">

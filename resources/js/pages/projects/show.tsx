@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Project as ProjectType, Tech, User } from '@/types';
@@ -55,7 +56,7 @@ export default function Show({ auth, project }: Props) {
                 </div>
             }
         >
-            <Head title={project.title} />
+            <Seo title={project.title} description={project.description?.slice(0, 160)} />
             <div className="py-8">
                 <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                     <ProjectHero

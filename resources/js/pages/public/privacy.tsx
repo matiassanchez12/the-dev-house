@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingFooter from '@/components/landing/landing-footer';
@@ -73,7 +73,7 @@ export default function Privacy({ auth }: Props) {
 
     return (
         <>
-            <Head title="Privacidad | The Dev House" />
+            <Seo title="Privacidad" description="Política de privacidad de The Dev House. Conocé cómo manejamos tus datos personales, tu derecho a eliminarlos y nuestras medidas de seguridad." />
             <div className="min-h-screen bg-background">
                 <LandingNav auth={auth} />
 

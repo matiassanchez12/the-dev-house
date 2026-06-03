@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingFooter from '@/components/landing/landing-footer';
 import { cn } from '@/lib/utils';
@@ -58,7 +58,7 @@ export default function HowStart({ auth }: Props) {
 
     return (
         <>
-            <Head title="Cómo empezar | The Dev House" />
+            <Seo title="Cómo empezar" description="Guía paso a paso para crear tu primer SaaS o proyecto colaborativo. Definí el propósito, validá tu idea, armá el plan y desplegá con The Dev House." />
             <div className="min-h-screen bg-background">
                 <LandingNav auth={auth} />
 
