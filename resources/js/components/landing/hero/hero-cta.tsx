@@ -14,13 +14,13 @@ export function HeroCta({ auth, className }: HeroCtaProps) {
         <div className={cn('flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center', className)}>
             <Link
                 href={primaryHref}
-                className={cn(buttonVariants({ variant: 'cta', size: 'lg' }), baseClasses)}
+                className={cn(buttonVariants({ variant: 'cta', size: 'lg' }), baseClasses, 'sm:flex-1')}
             >
                 {primaryLabel}
             </Link>
             <Link
                 href={route('projects.index')}
-                className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), baseClasses)}
+                className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), baseClasses, 'sm:flex-1')}
             >
                 Explorar proyectos
             </Link>
