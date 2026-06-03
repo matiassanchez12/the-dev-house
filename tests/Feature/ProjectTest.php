@@ -98,6 +98,48 @@ class ProjectTest extends TestCase
         );
     }
 
+    /**
+     * TEST 3b: Filtrar proyectos por search (title)
+     */
+    public function test_can_filter_projects_by_search(): void
+    {
+        // Arrange
+        Project::factory()->create(['title' => 'React Dashboard']);
+        Project::factory()->create(['title' => 'Vue Admin Panel']);
+        Project::factory()->create(['title' => 'Laravel API']);
+
+        // Act
+        $response = $this->get('/projects?search=react');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('projects.data', 1)
+                ->where('projects.data.0.title', 'React Dashboard')
+                ->where('filters.search', 'react')
+        );
+    }
+
+    /**
+     * TEST 3c: Search es case-insensitive y matchea substring
+     */
+    public function test_search_is_case_insensitive_and_matches_substring(): void
+    {
+        // Arrange
+        Project::factory()->create(['title' => 'My Awesome Project']);
+        Project::factory()->create(['title' => 'Another Thing']);
+
+        // Act
+        $response = $this->get('/projects?search=AWESOME');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page->has('projects.data', 1)
+        );
+    }
+
     public function test_can_view_create_project_form_when_authenticated(): void
     {
         $user = User::factory()->create();
@@ -386,5 +428,147 @@ class ProjectTest extends TestCase
         $service = new \App\Services\ProjectService();
         $duplicateSlug = $service->generateUniqueSlug('Mi Proyecto');
         $this->assertEquals('mi-proyecto-1', $duplicateSlug);
+    }
+
+    /**
+     * TEST 17: Update only deletes images that belong to the project (happy path)
+     *
+     * Security: remove_images must be intersected with $project->images.
+     */
+    public function test_update_only_deletes_images_owned_by_project(): void
+    {
+        // Arrange
+        $disk = config('filesystems.default', 'public');
+        Storage::fake($disk);
+
+        $ownedPath = 'projects/owned-image.jpg';
+        Storage::disk($disk)->put($ownedPath, 'fake-bytes');
+
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => [$ownedPath],
+        ]);
+
+        // Act
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'remove_images' => [$ownedPath],
+            ]);
+
+        // Assert
+        $response->assertRedirect();
+        Storage::disk($disk)->assertMissing($ownedPath);
+        $this->assertEquals([], $project->fresh()->images);
+    }
+
+    /**
+     * TEST 18: Update ignores remove_image paths that do not belong to the project
+     *
+     * Security: a malicious user must not be able to delete another project's image.
+     */
+    public function test_update_ignores_remove_image_paths_not_in_project(): void
+    {
+        // Arrange
+        $disk = config('filesystems.default', 'public');
+        Storage::fake($disk);
+
+        $ownedPath = 'projects/owned.jpg';
+        $otherProjectPath = 'projects/other-project.jpg';
+        Storage::disk($disk)->put($ownedPath, 'fake-bytes');
+        Storage::disk($disk)->put($otherProjectPath, 'fake-bytes');
+
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => [$ownedPath],
+        ]);
+
+        // Act — send a path the project does NOT own
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'remove_images' => [$otherProjectPath],
+            ]);
+
+        // Assert
+        $response->assertRedirect();
+        Storage::disk($disk)->assertExists($otherProjectPath);
+        Storage::disk($disk)->assertExists($ownedPath);
+        $this->assertEquals([$ownedPath], $project->fresh()->images);
+    }
+
+    /**
+     * TEST 19: Update rejects remove_image paths with directory traversal
+     *
+     * Security: paths like ../users/avatars/admin.jpg must not be passed to Storage::delete.
+     */
+    public function test_update_rejects_remove_image_paths_with_traversal(): void
+    {
+        // Arrange
+        $disk = config('filesystems.default', 'public');
+        Storage::fake($disk);
+
+        $victimPath = 'users/avatars/admin.jpg';
+        Storage::disk($disk)->put($victimPath, 'fake-bytes');
+
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => ['projects/legit.jpg'],
+        ]);
+
+        // Act — try to escape the projects/ prefix
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'remove_images' => ['../users/avatars/admin.jpg', 'projects/../users/avatars/admin.jpg'],
+            ]);
+
+        // Assert — victim file untouched and project's own image list intact
+        $response->assertRedirect();
+        Storage::disk($disk)->assertExists($victimPath);
+        $this->assertEquals(['projects/legit.jpg'], $project->fresh()->images);
+    }
+
+    /**
+     * TEST 20: deleteImages guard rejects paths outside projects/ prefix
+     *
+     * Defense-in-depth: even if a caller forgets to scope the input, deleteImages
+     * itself must refuse anything outside projects/ or containing traversal.
+     */
+    public function test_delete_images_guard_rejects_unsafe_paths(): void
+    {
+        // Arrange
+        $disk = config('filesystems.default', 'public');
+        Storage::fake($disk);
+
+        $victimAvatar = 'users/avatars/admin.jpg';
+        $victimRoot = 'secrets.txt';
+        $projectImage = 'projects/legit.jpg';
+
+        Storage::disk($disk)->put($victimAvatar, 'a');
+        Storage::disk($disk)->put($victimRoot, 'b');
+        Storage::disk($disk)->put($projectImage, 'c');
+
+        $service = new \App\Services\ProjectService();
+
+        // Act — feed the service a mix of malicious + valid paths
+        $service->deleteImages([
+            '../users/avatars/admin.jpg',
+            'projects/../users/avatars/admin.jpg',
+            '/etc/passwd',
+            'secrets.txt',
+            $projectImage,
+        ]);
+
+        // Assert — only the legit projects/ path is deleted
+        Storage::disk($disk)->assertExists($victimAvatar);
+        Storage::disk($disk)->assertExists($victimRoot);
+        Storage::disk($disk)->assertMissing($projectImage);
     }
 }

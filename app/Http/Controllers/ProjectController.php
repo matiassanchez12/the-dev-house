@@ -39,6 +39,12 @@ class ProjectController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filtro por búsqueda (title, case-insensitive, substring)
+        $search = trim((string) $request->input('search', ''));
+        if ($search !== '') {
+            $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%' . $search . '%']);
+        }
+
         $paginator = $query->paginate(12)->withQueryString();
 
         $techs = Tech::orderBy('name')->get();
