@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ReactIcon } from '@/components/ui/svgs/react-icon';
 import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
 import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
@@ -98,7 +99,7 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     FastAPI: FastapiIcon,
     'Spring Boot': SpringbootIcon,
     Gin: GinIcon,
-    Fiber: undefined, // No disponible en simple-icons
+    Fiber: undefined,
     Actix: ActixIcon,
     Hono: HonoIcon,
     // Languages
@@ -115,9 +116,9 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Zig: ZigIcon,
     Elixir: ElixirIcon,
     // Mobile
-    'React Native': undefined, // No disponible como icono separado
+    'React Native': undefined,
     Flutter: FlutterIcon,
-    SwiftUI: undefined, // No disponible en simple-icons
+    SwiftUI: undefined,
     'Jetpack Compose': JetpackcomposeIcon,
     // Database & Infra
     PostgreSQL: PostgresqlIcon,
@@ -127,7 +128,7 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     SQLite: SQLiteIcon,
     Prisma: PrismaIcon,
     Supabase: SupabaseIcon,
-    DynamoDB: undefined, // No disponible en simple-icons
+    DynamoDB: undefined,
     // DevOps
     Docker: DockerIcon,
     Kubernetes: KubernetesIcon,
@@ -140,7 +141,7 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     TensorFlow: TensorflowIcon,
     LangChain: LangchainIcon,
     'Hugging Face': HuggingfaceIcon,
-    OpenAI: undefined, // No disponible en simple-icons
+    OpenAI: undefined,
     Ollama: OllamaIcon,
     // Tools
     Vite: ViteIcon,
@@ -162,54 +163,101 @@ function getInitials(name: string): string {
         .slice(0, 2);
 }
 
-function TechTile({ name }: { name: string }) {
+const BASE_CLASS = 'flex flex-col items-center justify-center rounded p-3 text-xs font-medium text-foreground opacity-[15%] transition-all duration-300';
+const HOVERED_CLASS = '!opacity-[0.85] !bg-foreground/15';
+
+function TechTile({ name, isHovered }: { name: string; isHovered: boolean }) {
     const Icon = ICON_MAP[name];
     const hasIcon = !!Icon;
     const initials = getInitials(name);
 
     return (
         <div
-            key={name}
-            className="pointer-events-auto flex items-center justify-center rounded px-3 py-2 text-sm font-medium text-foreground opacity-[15%] transition-all duration-300 hover:opacity-[0.85] hover:bg-foreground/15"
+            className={`${BASE_CLASS} ${isHovered ? HOVERED_CLASS : ''}`}
             style={{
                 fontFamily: 'var(--font-mono)',
             }}
         >
             {hasIcon ? (
-                <>
-                    <Icon className="size-5 mr-1.5" />
-                    <span className="whitespace-nowrap">{name}</span>
-                </>
+                <Icon className="size-5 mb-1" />
             ) : (
-                <div className="flex items-center justify-center w-10 h-10">
+                <div className="flex items-center justify-center w-8 h-8 mb-1">
                     <div className="relative w-full h-full flex items-center justify-center">
                         <div className="absolute inset-0 rounded bg-foreground/5" />
-                        <span className="relative text-xs font-medium text-foreground">
+                        <span className="relative text-[10px] font-medium text-foreground">
                             {initials}
                         </span>
                     </div>
                 </div>
             )}
+            <span className="whitespace-nowrap leading-tight text-center">{name}</span>
         </div>
     );
 }
 
 export function HeroTechBackground() {
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+        const grid = gridRef.current;
+        if (!grid) return;
+
+        const tiles = grid.children;
+        for (let i = 0; i < tiles.length; i++) {
+            const rect = tiles[i].getBoundingClientRect();
+            if (
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right &&
+                e.clientY >= rect.top &&
+                e.clientY <= rect.bottom
+            ) {
+                setHoveredIndex(i);
+                return;
+            }
+        }
+        setHoveredIndex(null);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        setHoveredIndex(null);
+    }, []);
+
+    useEffect(() => {
+        const grid = gridRef.current;
+        if (!grid) return;
+
+        // Buscamos el <section> ancestro que sí captura eventos
+        const section = grid.closest('section');
+        if (!section) return;
+
+        section.addEventListener('mousemove', handleMouseMove);
+        section.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+            section.removeEventListener('mousemove', handleMouseMove);
+            section.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [handleMouseMove, handleMouseLeave]);
+
     return (
         <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
         >
             <div
-                className="absolute inset-0 grid"
+                ref={gridRef}
+                className="absolute inset-0 grid select-none"
                 style={{
                     gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                    gridAutoRows: 'minmax(40px, auto)',
+                    gridAutoRows: 'minmax(90px, 1fr)',
                     gap: '8px',
                     padding: '16px',
                 }}
             >
-                {TECHS.map((tech) => <TechTile key={tech} name={tech} />)}
+                {TECHS.map((tech, i) => (
+                    <TechTile key={tech} name={tech} isHovered={i === hoveredIndex} />
+                ))}
             </div>
         </div>
     );
