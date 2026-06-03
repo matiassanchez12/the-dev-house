@@ -26,16 +26,15 @@ class DashboardService
      */
     public function getDashboardData(User $user): array
     {
-        // Statistics
+        $userId = $user->id;
+
         $stats = [
             'projects_created' => $user->createdProjects()->count(),
             'projects_joined' => $user->participatingProjects()->count(),
-            'pending_requests_received' => JoinRequest::whereHas('project', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-                ->where('status', 'pending')
+            'pending_requests_received' => JoinRequest::where('status', 'pending')
+                ->whereHas('project', fn($q) => $q->where('user_id', $userId))
                 ->count(),
-            'requests_approved' => JoinRequest::where('user_id', $user->id)
+            'requests_approved' => JoinRequest::where('user_id', $userId)
                 ->where('status', 'approved')
                 ->count(),
         ];

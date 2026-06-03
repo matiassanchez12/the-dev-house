@@ -6,7 +6,6 @@ use App\Http\Requests\Profile\UpdateCompleteProfileRequest;
 use App\Http\Requests\Profile\UpdateSocialLinksRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\SocialLink;
-use App\Models\Tech;
 use App\Services\ProfileService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -29,7 +28,6 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $userTechs = $user->techs()->withPivot('years_experience', 'proficiency')->get();
-        $allTechs = Tech::orderBy('name')->get();
         $socialLinks = $user->socialLinks;
 
         return Inertia::render('profile/edit', [
@@ -39,7 +37,6 @@ class ProfileController extends Controller
             'email' => $user->email,
             'emailVerifiedAt' => $user->email_verified_at,
             'userTechs' => $userTechs,
-            'allTechs' => $allTechs,
             'socialLinks' => $socialLinks,
         ]);
     }
