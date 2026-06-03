@@ -7,6 +7,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/{project:slug}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project:slug}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project:slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    // Project Status
+    Route::patch('/projects/{project:slug}/status', [ProjectStatusController::class, 'update'])->name('projects.status.update');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -31,4 +31,12 @@ class ProjectPolicy
     {
         return $this->update($user, $project);
     }
+
+    /**
+     * Determine whether the user can update the project status.
+     */
+    public function updateStatus(User $user, Project $project): bool
+    {
+        return $project->user_id === $user->id;
+    }
 }
