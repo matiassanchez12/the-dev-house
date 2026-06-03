@@ -87,11 +87,16 @@ class ProjectService
 
         // Handle image removal
         if (! empty($data['remove_images'])) {
-            $this->deleteImages($data['remove_images']);
-            $allImages = array_values(array_filter(
-                $allImages,
-                fn ($img) => ! in_array($img, $data['remove_images'])
-            ));
+            $ownedImages = $project->images ?? [];
+            $toRemove = array_values(array_intersect($data['remove_images'], $ownedImages));
+
+            if (! empty($toRemove)) {
+                $this->deleteImages($toRemove);
+                $allImages = array_values(array_filter(
+                    $allImages,
+                    fn ($img) => ! in_array($img, $toRemove)
+                ));
+            }
         }
 
         $project->update([
@@ -137,12 +142,25 @@ class ProjectService
     {
         $disk = config('filesystems.default', 'public');
         foreach ($paths as $path) {
+            if (! $this->isSafeImagePath($path)) {
+                continue;
+            }
+
             try {
                 Storage::disk($disk)->delete($path);
             } catch (\Exception $e) {
                 // Ignore if file doesn't exist
             }
         }
+    }
+
+    private function isSafeImagePath(string $path): bool
+    {
+        if ($path === '' || str_contains($path, '..') || str_contains($path, "\0")) {
+            return false;
+        }
+
+        return str_starts_with($path, 'projects/');
     }
 
     /**
