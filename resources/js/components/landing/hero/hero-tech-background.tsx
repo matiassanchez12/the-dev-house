@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ReactIcon } from '@/components/ui/svgs/react-icon';
 import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
 import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
@@ -80,7 +80,6 @@ const TECHS = [
 ] as const;
 
 const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>> | undefined> = {
-    // Frontend
     React: ReactIcon,
     Vue: VueIcon,
     Angular: AngularIcon,
@@ -91,7 +90,6 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Astro: AstroIcon,
     Remix: RemixIcon,
     Qwik: QwikIcon,
-    // Backend
     Laravel: LaravelIcon,
     Django: DjangoIcon,
     Rails: RubyonrailsIcon,
@@ -102,7 +100,6 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Fiber: undefined,
     Actix: ActixIcon,
     Hono: HonoIcon,
-    // Languages
     TypeScript: TypeScriptIcon,
     Python: PythonIcon,
     Rust: RustIcon,
@@ -115,12 +112,10 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Ruby: RubyIcon,
     Zig: ZigIcon,
     Elixir: ElixirIcon,
-    // Mobile
     'React Native': undefined,
     Flutter: FlutterIcon,
     SwiftUI: undefined,
     'Jetpack Compose': JetpackcomposeIcon,
-    // Database & Infra
     PostgreSQL: PostgresqlIcon,
     MySQL: MysqlIcon,
     MongoDB: MongodbIcon,
@@ -129,21 +124,18 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Prisma: PrismaIcon,
     Supabase: SupabaseIcon,
     DynamoDB: undefined,
-    // DevOps
     Docker: DockerIcon,
     Kubernetes: KubernetesIcon,
     Terraform: TerraformIcon,
     'GitHub Actions': GithubactionsIcon,
     CircleCI: CircleciIcon,
     Ansible: AnsibleIcon,
-    // AI/ML
     PyTorch: PytorchIcon,
     TensorFlow: TensorflowIcon,
     LangChain: LangchainIcon,
     'Hugging Face': HuggingfaceIcon,
     OpenAI: undefined,
     Ollama: OllamaIcon,
-    // Tools
     Vite: ViteIcon,
     Turborepo: TurborepoIcon,
     Playwright: PlaywrightIcon,
@@ -154,80 +146,100 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Bun: BunIcon,
 };
 
+const SPOTLIGHT_RADIUS = 280;
+const BASE_OPACITY = 0.15;
+const MAX_ADDITIONAL = 0.70;
+
 function getInitials(name: string): string {
-    return name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
 }
 
-const BASE_CLASS = 'flex flex-col items-center justify-center rounded p-3 text-xs font-medium text-foreground opacity-[15%] transition-all duration-300';
-const HOVERED_CLASS = '!opacity-[0.85] !bg-foreground/15';
-
-function TechTile({ name, isHovered }: { name: string; isHovered: boolean }) {
+const TechTile = memo(function TechTile({
+    name,
+    opacity,
+}: {
+    name: string;
+    opacity: number;
+}) {
     const Icon = ICON_MAP[name];
     const hasIcon = !!Icon;
     const initials = getInitials(name);
+    const bgAlpha = opacity > BASE_OPACITY ? ((opacity - BASE_OPACITY) / MAX_ADDITIONAL) * 0.15 : 0;
+    const bgColor = bgAlpha > 0.01 ? `oklch(var(--foreground) / ${bgAlpha})` : 'transparent';
 
     return (
         <div
-            className={`${BASE_CLASS} ${isHovered ? HOVERED_CLASS : ''}`}
+            className="flex aspect-square flex-col items-center justify-center rounded p-1.5 text-[11px] font-medium text-foreground transition-all duration-200"
             style={{
                 fontFamily: 'var(--font-mono)',
+                opacity,
+                backgroundColor: bgColor,
             }}
         >
             {hasIcon ? (
-                <Icon className="size-5 mb-1" />
+                <Icon className="size-5 mb-0.5 shrink-0" />
             ) : (
-                <div className="flex items-center justify-center w-8 h-8 mb-1">
+                <div className="flex items-center justify-center w-7 h-7 mb-0.5 shrink-0">
                     <div className="relative w-full h-full flex items-center justify-center">
                         <div className="absolute inset-0 rounded bg-foreground/5" />
-                        <span className="relative text-[10px] font-medium text-foreground">
+                        <span className="relative text-[9px] font-medium text-foreground">
                             {initials}
                         </span>
                     </div>
                 </div>
             )}
-            <span className="whitespace-nowrap leading-tight text-center">{name}</span>
+            <span className="whitespace-nowrap leading-[1.1] text-center overflow-hidden text-ellipsis max-w-full">
+                {name}
+            </span>
         </div>
     );
-}
+});
 
 export function HeroTechBackground() {
     const gridRef = useRef<HTMLDivElement>(null);
-    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [opacities, setOpacities] = useState<number[]>(() => TECHS.map(() => BASE_OPACITY));
+    const rafId = useRef(0);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
-        const grid = gridRef.current;
-        if (!grid) return;
+        if (rafId.current) return;
+        rafId.current = requestAnimationFrame(() => {
+            rafId.current = 0;
+            const grid = gridRef.current;
+            if (!grid) return;
 
-        const tiles = grid.children;
-        for (let i = 0; i < tiles.length; i++) {
-            const rect = tiles[i].getBoundingClientRect();
-            if (
-                e.clientX >= rect.left &&
-                e.clientX <= rect.right &&
-                e.clientY >= rect.top &&
-                e.clientY <= rect.bottom
-            ) {
-                setHoveredIndex(i);
-                return;
+            const tiles = grid.children;
+            const newOps: number[] = [];
+
+            for (let i = 0; i < tiles.length; i++) {
+                const rect = tiles[i].getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+                let intensity = 1 - dist / SPOTLIGHT_RADIUS;
+                if (intensity <= 0) {
+                    newOps.push(BASE_OPACITY);
+                    continue;
+                }
+                // Smoothstep easing: suave entrada y salida
+                intensity = intensity * intensity * (3 - 2 * intensity);
+                newOps.push(BASE_OPACITY + intensity * MAX_ADDITIONAL);
             }
-        }
-        setHoveredIndex(null);
+
+            setOpacities(newOps);
+        });
     }, []);
 
     const handleMouseLeave = useCallback(() => {
-        setHoveredIndex(null);
+        if (rafId.current) {
+            cancelAnimationFrame(rafId.current);
+            rafId.current = 0;
+        }
+        setOpacities(TECHS.map(() => BASE_OPACITY));
     }, []);
 
     useEffect(() => {
         const grid = gridRef.current;
         if (!grid) return;
-
-        // Buscamos el <section> ancestro que sí captura eventos
         const section = grid.closest('section');
         if (!section) return;
 
@@ -237,6 +249,7 @@ export function HeroTechBackground() {
         return () => {
             section.removeEventListener('mousemove', handleMouseMove);
             section.removeEventListener('mouseleave', handleMouseLeave);
+            cancelAnimationFrame(rafId.current);
         };
     }, [handleMouseMove, handleMouseLeave]);
 
@@ -249,14 +262,14 @@ export function HeroTechBackground() {
                 ref={gridRef}
                 className="absolute inset-0 grid select-none"
                 style={{
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                    gridAutoRows: 'minmax(90px, 1fr)',
-                    gap: '8px',
-                    padding: '16px',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                    gridAutoRows: 'auto',
+                    gap: '6px',
+                    padding: '12px',
                 }}
             >
                 {TECHS.map((tech, i) => (
-                    <TechTile key={tech} name={tech} isHovered={i === hoveredIndex} />
+                    <TechTile key={tech} name={tech} opacity={opacities[i]} />
                 ))}
             </div>
         </div>
