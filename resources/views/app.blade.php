@@ -36,9 +36,18 @@
         <!-- Canonical URL -->
         <link rel="canonical" href="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <!-- Prevent dark-mode FOUC — apply .dark class BEFORE CSS renders -->
+        <script>
+            (function() {
+                var theme = localStorage.getItem('theme');
+                if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+        </script>
 
         <!-- Scripts -->
         @routes
