@@ -170,7 +170,7 @@ function TechTile({ name }: { name: string }) {
     return (
         <div
             key={name}
-            className="flex items-center justify-center rounded px-3 py-2 text-sm font-medium text-foreground opacity-[15%] transition-all duration-300 hover:opacity-[0.85] hover:bg-foreground/15"
+            className="pointer-events-auto flex items-center justify-center rounded px-3 py-2 text-sm font-medium text-foreground opacity-[15%] transition-all duration-300 hover:opacity-[0.85] hover:bg-foreground/15"
             style={{
                 fontFamily: 'var(--font-mono)',
             }}
