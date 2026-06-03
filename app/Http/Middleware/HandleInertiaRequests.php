@@ -30,18 +30,21 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $userData = null;
         $user = $request->user();
 
-        // Transform user avatar path to full URL (handles S3 and local)
-        if ($user?->avatar) {
-            $user = $user->toArray();
-            $user['avatar_url'] = StorageUrlHelper::url($user['avatar']);
+        if ($user) {
+            $userData = $user->only(['id', 'name', 'slug', 'bio', 'avatar']);
+
+            if ($user->avatar) {
+                $userData['avatar_url'] = StorageUrlHelper::url($user->avatar);
+            }
         }
 
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $user,
+                'user' => $userData,
             ],
         ];
     }

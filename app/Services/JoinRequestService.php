@@ -7,6 +7,9 @@ use App\Models\Project;
 use App\Models\User;
 use App\Services\Exceptions\DuplicateJoinRequestException;
 use App\Services\Exceptions\SelfJoinException;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\DB;
 
 class JoinRequestService
 {
@@ -36,15 +39,30 @@ class JoinRequestService
 
     /**
      * Create a new join request.
+     *
+     * @throws DuplicateJoinRequestException
      */
     public function create(Project $project, User $user, string $message): JoinRequest
     {
-        return JoinRequest::create([
-            'project_id' => $project->id,
-            'user_id' => $user->id,
-            'message' => $message,
-            'status' => 'pending',
-        ]);
+        try {
+            return JoinRequest::create([
+                'project_id' => $project->id,
+                'user_id' => $user->id,
+                'message' => $message,
+                'status' => 'pending',
+            ]);
+        } catch (QueryException $e) {
+            if ($this->isUniqueConstraintError($e)) {
+                throw new DuplicateJoinRequestException();
+            }
+
+            throw $e;
+        }
+    }
+
+    private function isUniqueConstraintError(QueryException $e): bool
+    {
+        return $e instanceof UniqueConstraintViolationException;
     }
 
     /**
@@ -52,16 +70,18 @@ class JoinRequestService
      */
     public function approve(JoinRequest $joinRequest): void
     {
-        $joinRequest->update([
-            'status' => 'approved',
-            'reviewed_at' => now(),
-        ]);
+        DB::transaction(function () use ($joinRequest) {
+            $joinRequest->update([
+                'status' => 'approved',
+                'reviewed_at' => now(),
+            ]);
 
-        // Attach user as participant if not already attached
-        $project = $joinRequest->project;
-        if (! $project->participants()->where('user_id', $joinRequest->user_id)->exists()) {
-            $project->participants()->attach($joinRequest->user_id);
-        }
+            // Attach user as participant if not already attached
+            $project = $joinRequest->project;
+            if (! $project->participants()->where('user_id', $joinRequest->user_id)->exists()) {
+                $project->participants()->attach($joinRequest->user_id);
+            }
+        });
     }
 
     /**
@@ -69,10 +89,12 @@ class JoinRequestService
      */
     public function reject(JoinRequest $joinRequest): void
     {
-        $joinRequest->update([
-            'status' => 'rejected',
-            'reviewed_at' => now(),
-        ]);
+        DB::transaction(function () use ($joinRequest) {
+            $joinRequest->update([
+                'status' => 'rejected',
+                'reviewed_at' => now(),
+            ]);
+        });
     }
 
     /**

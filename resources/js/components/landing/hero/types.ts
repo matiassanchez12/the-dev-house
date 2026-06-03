@@ -1,7 +1,7 @@
 import type { Tech } from '@/types';
 
 export interface LandingHeroProps {
-    auth: { user: { id: number; name: string; email: string } | null };
+    auth: { user: { id: number; name: string } | null };
     techs: Tech[];
     className?: string;
 }

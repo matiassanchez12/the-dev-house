@@ -263,4 +263,71 @@ class JoinRequestTest extends TestCase
         // Assert: Debería cargar la página correctamente (200)
         $response->assertStatus(200);
     }
+
+    /**
+     * TEST 11: Usuario puede re-aplicar después de ser rechazado
+     *
+     * Atomicity: the unique constraint must only apply to pending requests,
+     * not across all statuses.
+     */
+    public function test_user_can_reapply_after_rejection(): void
+    {
+        // Arrange: Crear solicitud y rechazarla
+        $joinRequest = JoinRequest::create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+            'message' => 'Primera solicitud',
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+
+        $requestData = [
+            'message' => 'Segunda oportunidad, ahora con más experiencia.',
+        ];
+
+        // Act: Intentar enviar nueva solicitud
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), $requestData);
+
+        // Assert
+        $response->assertRedirect(route('projects.show', $this->project));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('join_requests', [
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+            'message' => 'Segunda oportunidad, ahora con más experiencia.',
+            'status' => 'pending',
+        ]);
+    }
+
+    /**
+     * TEST 12: Aprobar una solicitud ya aprobada no duplica participantes
+     *
+     * Atomicity: approve must handle the edge case where the user is already
+     * a participant (resilience, not race).
+     */
+    public function test_approve_already_approved_request_is_safe(): void
+    {
+        // Arrange: Crear solicitud aprobada
+        $joinRequest = JoinRequest::create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'approved',
+            'reviewed_at' => now(),
+        ]);
+
+        // Manually attach participant (simulating first approve)
+        $this->project->participants()->attach($this->applicant->id);
+
+        // Act: Intentar aprobar de nuevo (desde el controller da error, pero el service debe ser seguro)
+        $this->app->make(\App\Services\JoinRequestService::class)->approve($joinRequest);
+
+        // Assert: No se duplica el participante
+        $this->assertEquals(
+            1,
+            $this->project->participants()->where('user_id', $this->applicant->id)->count()
+        );
+    }
 }

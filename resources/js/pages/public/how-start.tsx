@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
 
 interface Props {
-    auth: { user: { id: number; name: string; email: string } | null };
+    auth: { user: { id: number; name: string } | null };
 }
 
 const steps = [

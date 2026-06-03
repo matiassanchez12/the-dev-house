@@ -7,7 +7,7 @@ import { useInView } from '@/hooks/use-in-view';
 import { Shield, Trash2 } from 'lucide-react';
 
 interface Props {
-    auth: { user: { id: number; name: string; email: string } | null };
+    auth: { user: { id: number; name: string } | null };
 }
 
 const sections = [

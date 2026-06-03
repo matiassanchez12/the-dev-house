@@ -144,6 +144,62 @@ class JoinRequestServiceTest extends TestCase
         );
     }
 
+    /** @test */
+    public function user_can_create_new_request_after_rejection(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+
+        $this->service->validateCanCreate($this->project, $this->user);
+
+        $newRequest = $this->service->create($this->project, $this->user, 'Reapplying after rejection');
+
+        $this->assertDatabaseHas('join_requests', [
+            'id' => $newRequest->id,
+            'status' => 'pending',
+        ]);
+        $this->assertNotEquals($joinRequest->id, $newRequest->id);
+    }
+
+    /** @test */
+    public function user_can_create_new_request_after_cancel(): void
+    {
+        $joinRequest = JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->service->cancel($joinRequest);
+
+        $this->service->validateCanCreate($this->project, $this->user);
+
+        $newRequest = $this->service->create($this->project, $this->user, 'New request after cancel');
+
+        $this->assertDatabaseHas('join_requests', [
+            'id' => $newRequest->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    /** @test */
+    public function create_throws_on_db_level_duplicate(): void
+    {
+        JoinRequest::factory()->create([
+            'project_id' => $this->project->id,
+            'user_id' => $this->user->id,
+            'status' => 'pending',
+        ]);
+
+        $this->expectException(\App\Services\Exceptions\DuplicateJoinRequestException::class);
+
+        $this->service->create($this->project, $this->user, 'This should fail');
+    }
+
     // === reject tests ===
 
     /** @test */

@@ -30,7 +30,6 @@ interface DashboardProps {
         user: {
             id: number;
             name: string;
-            email: string;
         } | null;
     };
     stats: {

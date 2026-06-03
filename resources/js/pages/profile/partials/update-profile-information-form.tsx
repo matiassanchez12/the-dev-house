@@ -3,20 +3,30 @@ import InputLabel from '@/components/input-label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
+
+interface Props {
+    mustVerifyEmail: boolean;
+    status?: string;
+    name: string;
+    email: string;
+    emailVerifiedAt: string | null;
+    className?: string;
+}
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
+    name,
+    email,
+    emailVerifiedAt,
     className = '',
-}) {
-    const user = usePage().props.auth.user;
-
+}: Props) {
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
+            name: name,
+            email: email,
         });
 
     const submit = (e) => {
@@ -73,7 +83,7 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.email} />
                 </div>
 
-                {mustVerifyEmail && user.email_verified_at === null && (
+                {mustVerifyEmail && emailVerifiedAt === null && (
                     <div>
                         <p className="mt-2 text-sm text-muted-foreground">
                             Tu correo electrónico no está verificado.

@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Mail, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface Props {
-    auth: { user: { id: number; name: string; email: string } | null };
+    auth: { user: { id: number; name: string } | null };
 }
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
