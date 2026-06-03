@@ -33,8 +33,12 @@ RUN composer install --no-dev --optimize-autoloader \
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/views storage/framework/sessions \
     && chmod -R 775 storage
 
-# Expose port
-EXPOSE 10000
+# Copy entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Start server with migrations and seeds
-CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=10000"]
+# Expose ports
+EXPOSE 10000 8080
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["web"]

@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: devcollab
+      POSTGRES_USER: devcollab
+      POSTGRES_PASSWORD: devcollab
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devcollab"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "10000:10000"
+    environment:
+      SERVICE: web
+      RUN_MIGRATIONS: "true"
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: devcollab
+      DB_USERNAME: devcollab
+      DB_PASSWORD: devcollab
+      BROADCAST_CONNECTION: reverb
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      REVERB_APP_KEY: devcollab-local-key
+      REVERB_APP_SECRET: devcollab-local-secret
+      REVERB_APP_ID: devcollab-app-id
+      QUEUE_CONNECTION: database
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build: .
+    environment:
+      SERVICE: worker
+      APP_ENV: local
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: devcollab
+      DB_USERNAME: devcollab
+      DB_PASSWORD: devcollab
+      BROADCAST_CONNECTION: reverb
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      REVERB_APP_KEY: devcollab-local-key
+      REVERB_APP_SECRET: devcollab-local-secret
+      REVERB_APP_ID: devcollab-app-id
+      QUEUE_CONNECTION: database
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  reverb:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SERVICE: reverb
+      APP_ENV: local
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: devcollab
+      DB_USERNAME: devcollab
+      DB_PASSWORD: devcollab
+      REVERB_SERVER_HOST: 0.0.0.0
+      REVERB_APP_KEY: devcollab-local-key
+      REVERB_APP_SECRET: devcollab-local-secret
+      REVERB_APP_ID: devcollab-app-id
+      QUEUE_CONNECTION: database
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
