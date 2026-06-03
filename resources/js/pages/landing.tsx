@@ -15,7 +15,6 @@ interface Props extends LandingPageProps {
         user: {
             id: number;
             name: string;
-            email: string;
         } | null;
     };
     projects: {

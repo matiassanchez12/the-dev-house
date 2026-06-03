@@ -8,7 +8,7 @@ import { Users, GraduationCap, Rocket, HeartHandshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Props {
-    auth: { user: { id: number; name: string; email: string } | null };
+    auth: { user: { id: number; name: string } | null };
 }
 
 const values = [

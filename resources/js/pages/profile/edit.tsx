@@ -10,12 +10,15 @@ import { SocialLink } from '@/types';
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
+    name: string;
+    email: string;
+    emailVerifiedAt: string | null;
     userTechs: unknown[];
     allTechs: unknown[];
     socialLinks?: SocialLink[];
 }
 
-export default function Edit({ mustVerifyEmail, status, userTechs, allTechs, socialLinks }: Props) {
+export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, allTechs, socialLinks }: Props) {
     return (
         <AppLayout
             header={
@@ -33,6 +36,9 @@ export default function Edit({ mustVerifyEmail, status, userTechs, allTechs, soc
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
+                            name={name}
+                            email={email}
+                            emailVerifiedAt={emailVerifiedAt}
                             className="max-w-xl"
                         />
                     </div>

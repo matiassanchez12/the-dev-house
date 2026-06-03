@@ -12,7 +12,6 @@ interface Props {
         user: {
             id: number;
             name: string;
-            email: string;
         } | null;
     };
 }

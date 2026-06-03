@@ -12,6 +12,7 @@ class ApiResourceTransformer
 {
     /**
      * Transform a project model to array with full image URLs.
+     * Creator and participants are scrubbed to safe fields only.
      */
     public static function project(Model|array $project): array
     {
@@ -21,9 +22,14 @@ class ApiResourceTransformer
         $images = $data['images'] ?? [];
         $data['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
 
-        // Transform creator avatar
-        if (isset($data['creator']['avatar'])) {
-            $data['creator']['avatar'] = StorageUrlHelper::url($data['creator']['avatar']);
+        // Scrub creator to safe fields only
+        if (isset($data['creator'])) {
+            $data['creator'] = self::user($data['creator']);
+        }
+
+        // Scrub each participant to safe fields only
+        if (isset($data['participants']) && is_array($data['participants'])) {
+            $data['participants'] = array_map(fn($p) => self::user($p), $data['participants']);
         }
 
         return $data;
@@ -31,34 +37,47 @@ class ApiResourceTransformer
 
     /**
      * Transform a user model to array with full avatar URL.
+     * Only exposes safe fields — never email, timestamps, or internal data.
      */
     public static function user(Model|array $user): array
     {
         $data = $user instanceof Model ? $user->toArray() : $user;
 
-        if (isset($data['avatar'])) {
-            $data['avatar'] = StorageUrlHelper::url($data['avatar']);
+        $safe = array_intersect_key($data, array_flip(['id', 'name', 'slug', 'bio', 'avatar']));
+
+        if (isset($data['pivot'])) {
+            $safe['pivot'] = $data['pivot'];
         }
 
-        return $data;
+        if (isset($data['avatar'])) {
+            $safe['avatar'] = StorageUrlHelper::url($data['avatar']);
+        }
+
+        return $safe;
     }
 
     /**
      * Transform a join request to array with full URLs.
+     * Applicant and project creator are scrubbed to safe fields only.
      */
     public static function joinRequest(Model|array $request): array
     {
         $data = $request instanceof Model ? $request->toArray() : $request;
 
-        // Transform applicant avatar
-        if (isset($data['applicant']['avatar'])) {
-            $data['applicant']['avatar'] = StorageUrlHelper::url($data['applicant']['avatar']);
+        // Scrub applicant to safe fields only
+        if (isset($data['applicant'])) {
+            $data['applicant'] = self::user($data['applicant']);
         }
 
         // Transform project images
         if (isset($data['project']['images'])) {
             $images = $data['project']['images'] ?? [];
             $data['project']['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
+        }
+
+        // Scrub project creator to safe fields only
+        if (isset($data['project']['creator'])) {
+            $data['project']['creator'] = self::user($data['project']['creator']);
         }
 
         return $data;
