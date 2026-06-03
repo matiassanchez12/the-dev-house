@@ -125,6 +125,7 @@ class UserService
                 'name' => $tech->name,
                 'slug' => $tech->slug,
                 'years' => $tech->pivot->years_experience,
+                'proficiency' => $tech->pivot->proficiency,
             ])->toArray();
 
         return [

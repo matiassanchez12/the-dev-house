@@ -6,6 +6,14 @@ interface TechShowcaseProps {
     techs: UserTech[];
 }
 
+const PROFICIENCY_LABELS: Record<string, string> = {
+    basic: 'Principiante',
+    intermediate: 'Básico',
+    advanced: 'Intermedio',
+    expert: 'Avanzado',
+    master: 'Experto',
+};
+
 const proficiencyLevels = [
     { min: 6, label: 'Experto', badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
     { min: 4, label: 'Avanzado', badgeClass: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
@@ -13,9 +21,15 @@ const proficiencyLevels = [
     { min: 0, label: 'Principiante', badgeClass: 'bg-muted text-foreground' },
 ];
 
-function getProficiencyLevel(years: number | null) {
-    if (years === null) return proficiencyLevels[proficiencyLevels.length - 1];
-    return proficiencyLevels.find((c) => years >= c.min) ?? proficiencyLevels[proficiencyLevels.length - 1];
+function getProficiencyLevel(tech: UserTech) {
+    if (tech.proficiency && PROFICIENCY_LABELS[tech.proficiency]) {
+        return {
+            label: PROFICIENCY_LABELS[tech.proficiency],
+            badgeClass: proficiencyLevels.find((l) => l.label === PROFICIENCY_LABELS[tech.proficiency])?.badgeClass ?? 'bg-muted text-foreground',
+        };
+    }
+    if (tech.years === null) return proficiencyLevels[proficiencyLevels.length - 1];
+    return proficiencyLevels.find((c) => (tech.years ?? 0) >= c.min) ?? proficiencyLevels[proficiencyLevels.length - 1];
 }
 
 function groupTechsByProficiency(techs: UserTech[]) {
@@ -24,7 +38,7 @@ function groupTechsByProficiency(techs: UserTech[]) {
         groups[level.label] = [];
     }
     for (const tech of techs) {
-        const level = getProficiencyLevel(tech.years);
+        const level = getProficiencyLevel(tech);
         groups[level.label].push(tech);
     }
     return proficiencyLevels

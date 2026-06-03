@@ -127,6 +127,7 @@ export interface UserTech {
     name: string;
     slug: string;
     years: number | null;
+    proficiency?: string | null;
 }
 
 export interface DiscoverableUser {
