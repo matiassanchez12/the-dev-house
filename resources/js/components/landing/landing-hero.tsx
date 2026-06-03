@@ -1,11 +1,8 @@
 import type { ReactNode, CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
-import { HeroBackground } from './hero/hero-background';
-import { HeroHeadline } from './hero/hero-headline';
-import { HeroWordmark } from './hero/hero-wordmark';
-import { HeroTechGrid } from './hero/hero-tech-grid';
-import { HeroCta } from './hero/hero-cta';
-import type { LandingHeroProps } from './hero/types';
+import { HeroBackground, HeroTechBackground, HeroHeadline, HeroWordmark, HeroCta } from './hero';
+import { LandingHeroProps } from './hero/types';
+
 
 interface InViewItemProps {
     children: ReactNode;
@@ -29,10 +26,11 @@ export default function LandingHero({ auth, techs, className }: LandingHeroProps
     return (
         <section className={cn('relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32', className)}>
             <HeroBackground />
+            <HeroTechBackground />
 
             <div className="container mx-auto px-4 relative z-10">
-                <div className="flex flex-col md:flex-row items-center gap-12">
-                    <div className="flex-1 text-center md:text-left max-w-2xl">
+                <div className="flex justify-center flex-col md:flex-row items-center gap-12">
+                    <div className="flex-1 text-center md:text-left max-w-2xl space-y-4">
                         <InViewItem delayMs={0}>
                             <HeroHeadline />
                         </InViewItem>
@@ -45,10 +43,6 @@ export default function LandingHero({ auth, techs, className }: LandingHeroProps
                             <HeroCta auth={auth} />
                         </InViewItem>
                     </div>
-
-                    <InViewItem delayMs={240} className="flex-shrink-0 w-full md:w-auto">
-                        <HeroTechGrid techs={techs} />
-                    </InViewItem>
                 </div>
             </div>
         </section>

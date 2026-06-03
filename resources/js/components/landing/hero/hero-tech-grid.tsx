@@ -4,7 +4,7 @@ import { ReactIcon } from '@/components/ui/svgs/react-icon';
 import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
 import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
 import { PythonIcon } from '@/components/ui/svgs/python-icon';
-import { NodeJsIcon } from '@/components/ui/svgs/nodejs-icon';
+import { NodedotjsIcon } from '@/components/ui/svgs/nodedotjs-icon';
 
 const CURATED_TECHS = ['React', 'Laravel', 'TypeScript', 'Python', 'Node.js'] as const;
 
@@ -13,7 +13,7 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Laravel: LaravelIcon,
     TypeScript: TypeScriptIcon,
     Python: PythonIcon,
-    'Node.js': NodeJsIcon,
+    'Node.js': NodedotjsIcon,
 };
 
 function CuratedTechCard({ name }: { name: string }) {
