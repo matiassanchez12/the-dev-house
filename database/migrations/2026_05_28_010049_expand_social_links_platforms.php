@@ -10,6 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         // PostgreSQL uses VARCHAR with CHECK constraint, not ENUM
         // Drop old constraint and create new one with expanded values
         
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         // PostgreSQL: Not easily reversible - would require recreating the type
         // This is a one-way migration for adding new platforms
     }
