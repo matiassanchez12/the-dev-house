@@ -6,7 +6,6 @@ use App\Helpers\ApiResourceTransformer;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
-use App\Models\Tech;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +46,6 @@ class ProjectController extends Controller
 
         $paginator = $query->paginate(12)->withQueryString();
 
-        $techs = Tech::orderBy('name')->get();
-
         return Inertia::render('projects/index', [
             'projects' => [
                 'data' => ApiResourceTransformer::projects(collect($paginator->items())),
@@ -62,7 +59,6 @@ class ProjectController extends Controller
                     'to' => $paginator->lastItem(),
                 ],
             ],
-            'techs' => $techs,
             'filters' => [
                 'tech' => $request->tech,
                 'status' => $request->status,
@@ -76,11 +72,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $techs = Tech::orderBy('name')->get();
-
-        return Inertia::render('projects/create', [
-            'techs' => $techs,
-        ]);
+        return Inertia::render('projects/create');
     }
 
     /**
@@ -116,13 +108,10 @@ class ProjectController extends Controller
     {
         Gate::authorize('update', $project);
 
-        $techs = Tech::orderBy('name')->get();
-
         $project->load(['creator.techs', 'techs']);
 
         return Inertia::render('projects/edit', [
             'project' => ApiResourceTransformer::project($project),
-            'techs' => $techs,
         ]);
     }
 

@@ -7,6 +7,8 @@ import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
 import SocialLinksEditForm from './partials/social-links-edit-form';
 import { SocialLink } from '@/types';
 
+import { usePage } from '@inertiajs/react';
+
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
@@ -14,11 +16,11 @@ interface Props {
     email: string;
     emailVerifiedAt: string | null;
     userTechs: unknown[];
-    allTechs: unknown[];
     socialLinks?: SocialLink[];
 }
 
-export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, allTechs, socialLinks }: Props) {
+export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, socialLinks }: Props) {
+    const { techs } = usePage().props as { techs: unknown[] };
     return (
         <AppLayout
             header={
@@ -47,7 +49,7 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
                     <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
                         <UpdateProfileCompleteForm
                             userTechs={userTechs}
-                            allTechs={allTechs}
+                            allTechs={techs}
                             className="max-w-3xl"
                         />
                     </div>
