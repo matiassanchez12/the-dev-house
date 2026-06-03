@@ -21,6 +21,7 @@ const navLinks = [
     { label: 'Características', href: '#features' },
     { label: 'Proyectos', href: '/projects' },
     { label: 'Developers', href: '/users' },
+    { label: 'Cómo empezar', href: '/how-start' },
 ];
 
 export default function LandingNav({ auth, className }: LandingNavProps) {
