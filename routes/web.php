@@ -7,6 +7,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::get('/dashboard', [DashboardController::class, '__invoke'])
 Route::get('/how-start', [PublicPageController::class, 'howStart'])->name('how-start');
 Route::get('/about', [PublicPageController::class, 'about'])->name('about');
 Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store']);
 Route::get('/terms', [PublicPageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PublicPageController::class, 'privacy'])->name('privacy');
 
