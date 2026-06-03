@@ -48,9 +48,10 @@ export default function LandingStats({
     return (
         <section
             ref={ref}
-            className={cn('py-20 bg-primary text-primary-foreground', className)}
+            className={cn('relative overflow-hidden py-20 bg-primary-soft text-primary-foreground', className)}
         >
-            <div className="container mx-auto px-4">
+            <div className="absolute inset-0 bg-dots-primary opacity-60" />
+            <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     {stats.map((stat, index) => {
                         const Icon = stat.icon;
@@ -63,13 +64,13 @@ export default function LandingStats({
                                 )}
                                 style={{ transitionDelay: `${index * 150}ms` }}
                             >
-                                <div className="inline-flex items-center justify-center size-12 rounded-full bg-primary-foreground/10 mb-4">
+                                <div className="inline-flex items-center justify-center size-12 rounded-full bg-primary-foreground/15 mb-4">
                                     <Icon className="size-6" />
                                 </div>
                                 <div className="text-4xl md:text-5xl font-bold mb-2 font-display">
                                     {values[index].toLocaleString()}
                                 </div>
-                                <div className="text-primary-foreground/70 text-sm font-medium uppercase tracking-wider">
+                                <div className="text-primary-foreground/80 text-sm font-medium uppercase tracking-wider">
                                     {stat.label}
                                 </div>
                             </div>

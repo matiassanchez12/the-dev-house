@@ -28,8 +28,10 @@ export default function LandingHowItWorks({ className }: LandingHowItWorksProps)
     const [ref, isInView] = useInView({ threshold: 0.2 });
 
     return (
-        <section ref={ref} className={cn('py-20 bg-background', className)}>
-            <div className="container mx-auto px-4">
+        <section ref={ref} className={cn('relative overflow-hidden py-20 bg-background', className)}>
+            <div className="absolute inset-0 bg-dots" />
+            <div className="absolute inset-0 bg-glow-double" />
+            <div className="container mx-auto px-4 relative z-10">
                 {/* Section header */}
                 <div className={cn(
                     'text-center mb-16 transition-all duration-700',

@@ -183,6 +183,83 @@
     --cta-primary-foreground-dark: oklch(1 0 0);
 }
 
+/* --- Section Background Patterns --- */
+
+.bg-dots {
+    background-image: radial-gradient(oklch(0 0 0 / 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.dark .bg-dots {
+    background-image: radial-gradient(oklch(1 0 0 / 0.05) 1px, transparent 1px);
+}
+
+.bg-dots-primary {
+    background-image: radial-gradient(oklch(1 0 0 / 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.bg-primary-soft {
+    background-color: oklch(0.55 0.10 38.402);
+}
+
+.dark .bg-primary-soft {
+    background-color: oklch(0.52 0.08 37.304);
+}
+
+.bg-grid {
+    background-image:
+        linear-gradient(oklch(0 0 0 / 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, oklch(0 0 0 / 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+}
+
+.dark .bg-grid {
+    background-image:
+        linear-gradient(oklch(1 0 0 / 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, oklch(1 0 0 / 0.03) 1px, transparent 1px);
+}
+
+.bg-glow-double {
+    background-image:
+        radial-gradient(ellipse 500px 300px at 20% 30%, oklch(0.553 0.195 38.402 / 0.12), transparent),
+        radial-gradient(ellipse 450px 250px at 80% 70%, oklch(0.553 0.195 38.402 / 0.08), transparent);
+}
+
+.dark .bg-glow-double {
+    background-image:
+        radial-gradient(ellipse 500px 300px at 20% 30%, oklch(0.65 0.22 38.402 / 0.07), transparent),
+        radial-gradient(ellipse 450px 250px at 80% 70%, oklch(0.65 0.22 38.402 / 0.05), transparent);
+}
+
+.bg-glow-tr {
+    background-image: radial-gradient(ellipse 600px 350px at 75% 25%, oklch(0.553 0.195 38.402 / 0.12), transparent);
+}
+
+.dark .bg-glow-tr {
+    background-image: radial-gradient(ellipse 600px 350px at 75% 25%, oklch(0.65 0.22 38.402 / 0.08), transparent);
+}
+
+.bg-glow-bl {
+    background-image: radial-gradient(ellipse 500px 300px at 25% 75%, oklch(0.553 0.195 38.402 / 0.10), transparent);
+}
+
+.dark .bg-glow-bl {
+    background-image: radial-gradient(ellipse 500px 300px at 25% 75%, oklch(0.65 0.22 38.402 / 0.06), transparent);
+}
+
+.bg-pulse {
+    background:
+        radial-gradient(circle at 20% 50%, oklch(0.553 0.195 38.402 / 0.10) 0%, transparent 35%),
+        radial-gradient(circle at 80% 30%, oklch(0.553 0.195 38.402 / 0.07) 0%, transparent 25%);
+}
+
+.dark .bg-pulse {
+    background:
+        radial-gradient(circle at 20% 50%, oklch(0.65 0.22 38.402 / 0.06) 0%, transparent 35%),
+        radial-gradient(circle at 80% 30%, oklch(0.65 0.22 38.402 / 0.04) 0%, transparent 25%);
+}
+
 @keyframes accordion-down {
     from {
         height: 0;

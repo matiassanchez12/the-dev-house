@@ -11,8 +11,10 @@ const bgAvatarColors = ['bg-primary/20', 'bg-accent/30', 'bg-primary/40', 'bg-ac
 
 export default function LandingSocial({ developers, className }: LandingSocialProps) {
     return (
-        <section className={cn('py-20 bg-muted/30', className)}>
-            <div className="container mx-auto px-4">
+        <section className={cn('relative overflow-hidden py-20 bg-muted/40', className)}>
+            <div className="absolute inset-0 bg-dots" />
+            <div className="absolute inset-0 bg-pulse" />
+            <div className="container mx-auto px-4 relative z-10">
                 {/* Social proof header */}
                 <div className="text-center mb-16">
                     {/* Avatar stack */}

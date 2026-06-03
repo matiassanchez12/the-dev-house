@@ -26,8 +26,10 @@ export default function LandingFeatures() {
     const [ref, isInView] = useInView({ threshold: 0.2 });
 
     return (
-        <section ref={ref} id="features" className="bg-accent/30 py-20">
-            <div className="container mx-auto px-4">
+        <section ref={ref} id="features" className="relative overflow-hidden bg-accent/20 py-20">
+            <div className="absolute inset-0 bg-grid" />
+            <div className="absolute inset-0 bg-glow-bl" />
+            <div className="container mx-auto px-4 relative z-10">
                 <div className={cn(
                     'text-center mb-12 transition-all duration-700',
                     isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
