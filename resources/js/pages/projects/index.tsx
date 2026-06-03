@@ -1,4 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -152,7 +153,7 @@ export default function Index({ auth, projects, techs, filters }: Props) {
 
     return (
         <>
-            <Head title="Proyectos" />
+            <Seo title="Proyectos" description="Explorá proyectos colaborativos en The Dev House. Filtá por tecnología, estado o buscá por nombre para encontrar el equipo ideal." />
             <AppLayout
                 header={
                     <div className="flex items-center justify-between">

@@ -10,9 +10,12 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
     const [ref, isInView] = useInView({ threshold: 0.2 });
 
     return (
-        <section ref={ref} className={cn('py-20 bg-accent/5 relative overflow-hidden', className)}>
+        <section ref={ref} className={cn('py-20 bg-accent/15 relative overflow-hidden', className)}>
             {/* Accent background treatment */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />
+
+            {/* Floating atmospheric orb */}
+            <div className="absolute -top-24 -right-24 size-[500px] rounded-full bg-primary/10 blur-[100px] opacity-50 animate-float" />
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className={cn(
@@ -20,8 +23,8 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
                     isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
                 )}>
                     {/* Manifesto icon */}
-                    <div className="inline-flex items-center justify-center size-16 rounded-full bg-accent/10 mb-8">
-                        <Heart className="size-8 text-accent" />
+                    <div className="inline-flex items-center justify-center size-16 rounded-full bg-primary/10 mb-8">
+                        <Heart className="size-8 text-primary" />
                     </div>
 
                     {/* Statement */}
@@ -60,7 +63,7 @@ export default function LandingManifesto({ className }: LandingManifestoProps) {
                                     )}
                                     style={{ transitionDelay: `${400 + index * 100}ms` }}
                                 >
-                                    <Icon className="size-4 text-accent" />
+                                    <Icon className="size-4 text-primary" />
                                     {value.label}
                                 </div>
                             );

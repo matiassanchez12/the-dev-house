@@ -3,6 +3,7 @@ declare module 'ziggy-js' {
   interface RouteList {
     "sanctum.csrf-cookie": [],
     "landing": [],
+    "how-start": [],
     "dashboard": [],
     "projects.index": [],
     "projects.create": [],

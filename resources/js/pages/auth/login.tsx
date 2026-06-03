@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
-import { Head, Link, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,7 +24,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Seo title="Iniciar sesión" description="Iniciá sesión en The Dev House para acceder a tu dashboard, proyectos y comunidad de desarrolladores." />
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600 dark:text-green-400">

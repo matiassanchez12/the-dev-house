@@ -1,4 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { UserCard } from '@/components/user/user-card';
@@ -72,7 +73,7 @@ export default function Index({ users, techs, filters }: Props) {
 
     return (
         <>
-            <Head title="Developers" />
+            <Seo title="Developers" description="Encontrá desarrolladores en The Dev House. Buscá por nombre o filtrá por tecnología para conectar con colaboradores." />
             <AppLayout
                 header={
                     <h2 className="text-xl font-semibold leading-tight text-foreground">

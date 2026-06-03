@@ -91,19 +91,32 @@ El proyecto usa un favicon SVG escalable:
 
 ---
 
-## Páginas a Actualizar
+## Páginas con `<Seo />`
 
-Las siguientes páginas deberían usar el componente `<Seo />`:
+Todas las páginas usan el componente `<Seo />`:
 
 - [x] `landing.tsx` — Homepage
-- [ ] `dashboard.tsx` — Dashboard de usuario
-- [ ] `projects/index.tsx` — Listado de proyectos
-- [ ] `projects/show.tsx` — Detalle de proyecto
-- [ ] `projects/create.tsx` — Crear proyecto
-- [ ] `users/index.tsx` — Listado de developers
-- [ ] `users/show.tsx` — Perfil de usuario
-- [ ] `join_requests/index.tsx` — Solicitudes
-- [ ] `profile/edit.tsx` — Configuración
+- [x] `public/about.tsx` — Acerca de
+- [x] `public/contact.tsx` — Contacto
+- [x] `public/how-start.tsx` — Cómo empezar
+- [x] `public/privacy.tsx` — Privacidad
+- [x] `public/terms.tsx` — Términos de uso
+- [x] `dashboard.tsx` — Dashboard de usuario
+- [x] `projects/index.tsx` — Listado de proyectos
+- [x] `projects/show.tsx` — Detalle de proyecto (descripción dinámica)
+- [x] `projects/create.tsx` — Crear proyecto
+- [x] `projects/edit.tsx` — Editar proyecto
+- [x] `users/index.tsx` — Listado de developers
+- [x] `users/show.tsx` — Perfil de usuario (descripción dinámica)
+- [x] `join_requests/index.tsx` — Solicitudes
+- [x] `profile/edit.tsx` — Configuración
+- [x] `onboarding/index.tsx` — Onboarding
+- [x] `auth/login.tsx` — Iniciar sesión
+- [x] `auth/register.tsx` — Crear cuenta
+- [x] `auth/forgot-password.tsx` — Recuperar contraseña
+- [x] `auth/reset-password.tsx` — Restablecer contraseña
+- [x] `auth/confirm-password.tsx` — Confirmar contraseña
+- [x] `auth/verify-email.tsx` — Verificar email
 
 ---
 
@@ -111,20 +124,22 @@ Las siguientes páginas deberían usar el componente `<Seo />`:
 
 ### Prioridad Alta
 
-1. **Sitemap XML**: Generar automáticamente con Laravel
-2. **robots.txt**: Configurar reglas de crawling
-3. **Schema para Projects**: Agregar Product/SoftwareApplication schema
+1. **Sitemap XML**: Generar automáticamente con Laravel (ej: spatie/laravel-sitemap)
+2. **robots.txt**: Agregar referencia al sitemap y reglas de crawling
+3. **Schema para Projects**: Agregar Product/SoftwareApplication schema en detail page
+4. **Schema para User Profiles**: Person schema para perfiles públicos
 
 ### Prioridad Media
 
-4. **Open Graph Images**: La imagen `/og.jpg` ya está configurada como default
 5. **Breadcrumb Schema**: Para navegación jerárquica
-6. **FAQ Schema**: En landing page o secciones de ayuda
+6. **Hreflang**: Declarar `es_ES` para contenido en español
+7. **Per-page OG images**: Generar OG images dinámicas para proyectos y perfiles
 
 ### Prioridad Baja
 
-7. **Twitter Cards personalizadas**: Imágenes específicas para Twitter
-8. **Schema para User Profiles**: Person schema para perfiles públicos
+8. **FAQ Schema**: En landing page o secciones de ayuda
+9. **Favicon dark mode**: Variante para `prefers-color-scheme: dark`
+10. **`rel="prev"` / `rel="next"`**: Para páginas con paginación
 
 ---
 

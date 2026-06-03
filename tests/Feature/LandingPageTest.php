@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Project;
+use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,35 @@ class LandingPageTest extends TestCase
             ->component('landing')
             ->has('projects.data')
             ->has('projects.total')
+        );
+    }
+
+    public function test_landing_page_passes_techs_prop(): void
+    {
+        Tech::factory()->count(3)->sequence(
+            ['name' => 'Go'],
+            ['name' => 'Rust'],
+            ['name' => 'Zig'],
+        )->create();
+
+        $response = $this->get('/');
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('landing')
+            ->has('techs', 3)
+            ->where('techs.0.name', 'Go')
+            ->where('techs.1.name', 'Rust')
+            ->where('techs.2.name', 'Zig')
+        );
+    }
+
+    public function test_landing_hero_uses_fallback_when_techs_empty(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('landing')
+            ->has('techs', 0)
         );
     }
 }

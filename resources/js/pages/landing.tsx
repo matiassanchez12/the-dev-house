@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import Seo from '@/components/seo';
 import { Project as ProjectType, LandingPageProps, User } from '@/types';
 import LandingNav from '@/components/landing/landing-nav';
 import LandingHero from '@/components/landing/landing-hero';
@@ -25,16 +25,16 @@ interface Props extends LandingPageProps {
     users: User[]
 }
 
-export default function Landing({ auth, projects, project_count, collaboration_count, users }: Props) {
+export default function Landing({ auth, projects, project_count, collaboration_count, users, techs }: Props) {
     return (
         <>
-            <Head title="The Dev House — Donde los desarrolladores construyen juntos" />
+            <Seo title="Donde los desarrolladores construyen juntos" description="The Dev House es una plataforma colaborativa para desarrolladores. Creá proyectos, unite a equipos y construí software en comunidad." />
             <div className="min-h-screen bg-background">
                 {/* Navigation */}
                 <LandingNav auth={auth} />
 
                 {/* Hero */}
-                <LandingHero auth={auth} />
+                <LandingHero auth={auth} techs={techs} />
 
                 {/* Stats */}
                 <LandingStats

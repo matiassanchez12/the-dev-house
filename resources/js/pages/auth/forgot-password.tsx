@@ -2,7 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
-import { Head, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,7 +18,7 @@ export default function ForgotPassword({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Forgot Password" />
+            <Seo title="Recuperar contraseña" description="Olvidaste tu contraseña? Ingresá tu email y te enviaremos un enlace para restablecerla en The Dev House." />
 
             <div className="mb-4 text-sm text-muted-foreground">
                 Forgot your password? No problem. Just let us know your email

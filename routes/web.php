@@ -7,6 +7,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page
@@ -15,6 +16,13 @@ Route::get('/test-landing');
 Route::get('/dashboard', [DashboardController::class, '__invoke'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Páginas públicas institucionales
+Route::get('/how-start', [PublicPageController::class, 'howStart'])->name('how-start');
+Route::get('/about', [PublicPageController::class, 'about'])->name('about');
+Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact');
+Route::get('/terms', [PublicPageController::class, 'terms'])->name('terms');
+Route::get('/privacy', [PublicPageController::class, 'privacy'])->name('privacy');
 
 // Rutas públicas para ver proyectos
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');

@@ -1,4 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, useForm } from '@inertiajs/react';
 import { Check, X, Clock } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -50,7 +51,7 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
 
     return (
         <>
-            <Head title="Solicitudes de Unión" />
+            <Seo title="Solicitudes de Unión" description="Revisá y gestioná las solicitudes de unión a tus proyectos en The Dev House." />
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-foreground leading-tight">

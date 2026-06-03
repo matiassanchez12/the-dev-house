@@ -1,137 +1,50 @@
-import { Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Rocket, Sparkles } from 'lucide-react';
-import { Sanity } from '@/components/ui/svgs/sanityLight';
-import { ReactIcon } from '@/components/ui/svgs/react-icon';
-import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
-import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
-import { PythonIcon } from '@/components/ui/svgs/python-icon';
-import { VueIcon } from '@/components/ui/svgs/vue-icon';
-import { NodeJsIcon } from '@/components/ui/svgs/nodejs-icon';
-import { Unity } from '../ui/svgs/unity-icon';
+import type { ReactNode, CSSProperties } from 'react';
+import { cn } from '@/lib/utils';
+import { HeroBackground, HeroTechBackground, HeroHeadline, HeroWordmark, HeroCta } from './hero';
+import { LandingHeroProps } from './hero/types';
 
-interface LandingHeroProps {
-    auth: {
-        user: {
-            id: number;
-            name: string;
-            email: string;
-        } | null;
-    };
+
+interface InViewItemProps {
+    children: ReactNode;
+    /** Stagger delay in ms before animation starts */
+    delayMs?: number;
     className?: string;
 }
 
-interface FloatingTech {
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    label: string;
-    delay: string;
-    className?: string;
-}
-
-const floatingTechs: FloatingTech[] = [
-    { icon: ReactIcon, label: 'React', delay: '0s', className: 'size-4' },
-    { icon: LaravelIcon, label: 'Laravel', delay: '1s', className: 'size-4' },
-    { icon: TypeScriptIcon, label: 'TypeScript', delay: '2s', className: 'size-4' },
-    { icon: PythonIcon, label: 'Python', delay: '0.5s', className: 'size-4' },
-    { icon: VueIcon, label: 'Vue', delay: '1.5s', className: 'size-4' },
-    { icon: NodeJsIcon, label: 'Node.js', delay: '2.5s', className: 'size-4' },
-    { icon: Sanity, label: 'Sanity', delay: '3s', className: 'size-4' },
-    { icon: Unity, label: 'Unity', delay: '3.5s', className: 'size-4' },
-];
-
-export default function LandingHero({ auth, className }: LandingHeroProps) {
+function InViewItem({ children, delayMs = 0, className }: InViewItemProps) {
     return (
-        <section className={`relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32 ${className ?? ''}`}>
-            {/* Dot pattern background */}
-            <div
-                className="absolute inset-0 opacity-[0.4] dark:opacity-[0.2]"
-                style={{
-                    backgroundImage: 'radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)',
-                    backgroundSize: '24px 24px',
-                }}
-            />
+        <div
+            className={cn('motion-safe:animate-fade-in-up', className)}
+            style={{ animationDelay: `${delayMs}ms` } as CSSProperties}
+        >
+            {children}
+        </div>
+    );
+}
 
-            {/* Floating orbs */}
-            <div className="absolute top-20 left-10 size-64 bg-primary/5 rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-10 right-10 size-48 bg-accent/10 rounded-full blur-3xl animate-float-delayed" />
+export default function LandingHero({ auth, techs, className }: LandingHeroProps) {
+    return (
+        <section className={cn(
+            'relative overflow-hidden min-h-[calc(100vh-1px)] flex items-center',
+            'pt-20 pb-16 md:pt-32 md:pb-24',
+            className,
+        )}>
+            <HeroBackground />
+            <HeroTechBackground />
 
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="text-center max-w-3xl mx-auto">
-                    {/* Badge */}
-                    <div
-                        className="animate-fade-in-up mb-6"
-                        style={{ '--stagger-delay': '0ms' } as React.CSSProperties}
-                    >
-                        <Badge variant="secondary" className="gap-1.5 text-sm">
-                            <Sparkles className="size-3.5" />
-                            Donde los desarrolladores construyen juntos
-                        </Badge>
-                    </div>
+            <div className="container mx-auto px-4 relative z-10 w-full">
+                <div className="max-w-3xl mx-auto text-center space-y-6 md:space-y-8">
+                    <InViewItem delayMs={0}>
+                        <HeroHeadline />
+                    </InViewItem>
 
-                    {/* Headline */}
-                    <h1
-                        className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight animate-fade-in-up"
-                        style={{ '--stagger-delay': '100ms' } as React.CSSProperties}
-                    >
-                        Encontrá devs con tu mismo tech stack<br />
-                        <span className="text-primary">y llevá tu proyecto al siguiente nivel</span>
-                    </h1>
+                    <InViewItem delayMs={80}>
+                        <HeroWordmark />
+                    </InViewItem>
 
-                    {/* Subtitle */}
-                    <p
-                        className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in-up"
-                        style={{ '--stagger-delay': '200ms' } as React.CSSProperties}
-                    >
-                        The Dev House es donde los desarrolladores descubren proyectos, encuentran colaboradores
-                        y escriben código que importa.
-                    </p>
-
-                    {/* CTA buttons */}
-                    <div
-                        className="flex gap-4 justify-center flex-col sm:flex-row animate-fade-in-up"
-                        style={{ '--stagger-delay': '300ms' } as React.CSSProperties}
-                    >
-                        {auth.user ? (
-                            <Link href={route('projects.create')}>
-                                <Button size="lg" className="text-lg px-8">
-                                    <Rocket className="size-5 mr-2" />
-                                    Crear Proyecto
-                                </Button>
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href={route('register')}>
-                                    <Button size="lg" className="text-sm sm:text-lg px-8">
-                                        Comienza a Construir — Es Gratis
-                                    </Button>
-                                </Link>
-                                <Link href={route('login')}>
-                                    <Button variant="outline" size="lg" className="text-lg px-8">
-                                        Iniciar sesión
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Floating tech badges */}
-                    <div
-                        className="flex flex-wrap gap-3 justify-center mt-16 animate-fade-in-up"
-                        style={{ '--stagger-delay': '400ms' } as React.CSSProperties}
-                    >
-                        {floatingTechs.map((tech) => (
-                            <Badge
-                                key={tech.label}
-                                variant="outline"
-                                className="text-sm px-4 py-1.5 gap-2 animate-bob"
-                                style={{ animationDelay: tech.delay } as React.CSSProperties}
-                            >
-                                <tech.icon className={tech.className ?? 'size-3.5 text-muted-foreground'} />
-                                {tech.label}
-                            </Badge>
-                        ))}
-                    </div>
+                    <InViewItem delayMs={160}>
+                        <HeroCta auth={auth} />
+                    </InViewItem>
                 </div>
             </div>
         </section>

@@ -8,6 +8,8 @@ interface SeoProps {
     canonicalUrl?: string;
 }
 
+const appName = import.meta.env.VITE_APP_NAME || 'The Dev House';
+
 export default function Seo({
     title,
     description = 'The Dev House — Una plataforma colaborativa para desarrolladores. Crea proyectos, únete a equipos y construye software juntos.',
@@ -15,30 +17,25 @@ export default function Seo({
     type = 'website',
     canonicalUrl,
 }: SeoProps) {
-    const fullTitle = `${title} | The Dev House`;
+    const fullTitle = `${title} - ${appName}`;
     const appUrl = import.meta.env.VITE_APP_URL || 'https://the-dev-house-1.onrender.com';
     const canonical = canonicalUrl || `${appUrl}/${typeof window !== 'undefined' ? window.location.pathname : ''}`;
 
     return (
-        <Head>
-            {/* Basic Meta Tags */}
-            <title>{fullTitle}</title>
+        <Head title={title}>
             <meta name="title" content={fullTitle} />
             <meta name="description" content={description} />
             <meta name="author" content="Matias Sanchez" />
 
-            {/* Canonical URL */}
             {canonicalUrl && <link rel="canonical" href={canonical} />}
 
-            {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
             <meta property="og:url" content={canonical} />
             <meta property="og:title" content={fullTitle} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={`${appUrl}${image}`} />
-            <meta property="og:site_name" content="The Dev House" />
+            <meta property="og:site_name" content={appName} />
 
-            {/* Twitter */}
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:url" content={canonical} />
             <meta name="twitter:title" content={fullTitle} />

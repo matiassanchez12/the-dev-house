@@ -11,34 +11,28 @@
         <link rel="alternate icon" href="/favicon.ico">
         <link rel="apple-touch-icon" href="/favicon.svg">
 
-        <!-- SEO Meta Tags -->
+        <!-- Fallback SEO Meta Tags (overridden per-page by <Seo />) -->
         <meta name="description" content="The Dev House - Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
         <meta name="keywords" content="desarrolladores, programacion, proyectos, colaboracion, open source, comunidad, tech, software">
         <meta name="author" content="Matias Sanchez">
         <meta name="robots" content="index, follow">
-        
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
-        <meta property="og:title" content="{{ config('app.name', 'The Dev House') }}">
-        <meta property="og:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
-        <meta property="og:image" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/og.jpg">
-        <meta property="og:site_name" content="The Dev House">
+        <meta property="og:locale" content="es_ES">
 
-        <!-- Twitter -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:url" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
-        <meta name="twitter:title" content="{{ config('app.name', 'The Dev House') }}">
-        <meta name="twitter:description" content="Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
-        <meta name="twitter:image" content="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/og.jpg">
-        <meta name="twitter:creator" content="@matiassanchez_">
-
-        <!-- Canonical URL -->
+        <!-- Canonical URL (fallback when no per-page canonical) -->
         <link rel="canonical" href="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <!-- Prevent dark-mode FOUC — apply .dark class BEFORE CSS renders -->
+        <script>
+            (function() {
+                var theme = localStorage.getItem('theme');
+                if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+        </script>
 
         <!-- Scripts -->
         @routes
@@ -50,11 +44,10 @@
         <script defer src="https://cloud.umami.is/script.js" data-website-id="6c403120-fd9d-4d63-b365-33605619023a"></script>
 
         <!-- Structured Data - Organization -->
-        @verbatim
         <script type="application/ld+json">
         {
-          "@context": "https://schema.org",
-          "@type": "Organization",
+          "@@context": "https://schema.org",
+          "@@type": "Organization",
           "name": "The Dev House",
           "url": "{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}",
           "description": "Una plataforma colaborativa para desarrolladores",
@@ -63,12 +56,11 @@
             "https://github.com/matiassanchez12/the-dev-house"
           ],
           "founder": {
-            "@type": "Person",
+            "@@type": "Person",
             "name": "Matias Sanchez"
           }
         }
         </script>
-        @endverbatim
     </head>
     <body class="font-sans antialiased">
         @inertia

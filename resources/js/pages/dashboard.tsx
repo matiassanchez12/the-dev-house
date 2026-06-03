@@ -1,4 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, useForm } from '@inertiajs/react';
 import {
     Folder,
     Users,
@@ -80,7 +81,7 @@ export default function Dashboard({
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Seo title="Dashboard" description="Panel de control de The Dev House. Gestioná tus proyectos, revisá solicitudes de unión y seguí tu actividad en la plataforma." />
             <AppLayout
                 header={
                     <div className="flex justify-between items-center">

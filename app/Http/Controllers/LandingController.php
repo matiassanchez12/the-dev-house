@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResourceTransformer;
 use App\Models\Project;
+use App\Models\Tech;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ class LandingController extends Controller
                 'data' => ApiResourceTransformer::projects($projects),
                 'total' => Project::where('status', 'open')->count(),
             ],
+            'techs' => Tech::orderBy('name')->take(5)->get()->toArray(),
         ]);
     }
 }

@@ -7,33 +7,42 @@ interface LandingSocialProps {
     developers: User[]
 }
 
+const MAX_AVATARS = 5;
 const bgAvatarColors = ['bg-primary/20', 'bg-accent/30', 'bg-primary/40', 'bg-accent/20', 'bg-primary/30'];
 
 export default function LandingSocial({ developers, className }: LandingSocialProps) {
+    const visible = developers.slice(0, MAX_AVATARS);
+    const remaining = developers.length - MAX_AVATARS;
+
     return (
-        <section className={cn('py-20 bg-muted/30', className)}>
-            <div className="container mx-auto px-4">
-                {/* Social proof header */}
+        <section className={cn('relative overflow-hidden py-20 bg-muted/40', className)}>
+            <div className="absolute inset-0 bg-dots" />
+            <div className="absolute inset-0 bg-pulse" />
+            <div className="container mx-auto px-4 relative z-10">
                 <div className="text-center mb-16">
-                    {/* Avatar stack */}
                     <div className="flex justify-center mb-6">
                         <div className="flex -space-x-3">
-                            {developers.map((developer, i) => (
+                            {visible.map((developer, i) => (
                                 <div
-                                    key={i}
+                                    key={developer.id}
                                     className={`size-10 rounded-full ${bgAvatarColors[i]} border-2 border-background flex items-center justify-center text-xs font-bold text-foreground`}
                                 >
                                     {developer.name.charAt(0)}
                                 </div>
                             ))}
+                            {remaining > 0 ? (
+                                <div className="size-10 rounded-full bg-muted-foreground/15 border-2 border-background flex items-center justify-center text-xs font-bold text-foreground">
+                                    +{remaining}
+                                </div>
+                            ) : null}
                         </div>
                     </div>
 
                     <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                        {developers.length.toLocaleString()}+ developers ya estan construyendo algo juntos!
+                        {developers.length.toLocaleString()}+ developers ya están construyendo algo juntos!
                     </h2>
                     <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-                        Construir junto a otros nunca fue tan facil, publicá tu proyecto hoy y conecta con otros devs que están en la misma que vos.
+                        Construir junto a otros nunca fue tan fácil, publicá tu proyecto hoy y conectá con otros devs que están en la misma que vos.
                     </p>
                 </div>
 

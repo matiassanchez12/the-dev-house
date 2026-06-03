@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
-import { Head, Link, useForm } from '@inertiajs/react';
+import Seo from '@/components/seo';
+import { Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,7 +24,7 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Seo title="Crear cuenta" description="Registrate en The Dev House y empezá a colaborar en proyectos, conectá con desarrolladores y construí software en comunidad." />
 
             <form onSubmit={submit}>
                 <div>
