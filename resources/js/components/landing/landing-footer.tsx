@@ -5,16 +5,16 @@ const footerLinks = {
     platform: [
         { label: "Proyectos", href: route('projects.index') },
         { label: "Developers", href: route('users.index') },
-        { label: "Cómo funciona", href: "#como-funciona" },
+        { label: "Cómo empezar", href: route('how-start') },
     ],
     community: [
-        { label: "Acerca de", href: "#" },
+        { label: "Acerca de", href: route('about') },
         { label: "FAQ", href: "#faq" },
-        { label: "Contacto", href: "#contacto" },
+        { label: "Contacto", href: route('contact') },
     ],
     legal: [
-        { label: "Términos de uso", href: "#terminos" },
-        { label: "Privacidad", href: "#privacidad" },
+        { label: "Términos de uso", href: route('terms') },
+        { label: "Privacidad", href: route('privacy') },
     ],
 };
 

@@ -27,7 +27,7 @@ class MessageCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new \Illuminate\Broadcasting\Channel('project.' . $this->message->project_id),
+            new \Illuminate\Broadcasting\PrivateChannel('project.' . $this->message->project_id),
         ];
     }
 
