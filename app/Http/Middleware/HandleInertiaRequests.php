@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\StorageUrlHelper;
+use App\Models\Tech;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $userData,
             ],
+            'techs' => Tech::orderBy('name')->get(),
         ];
     }
 }

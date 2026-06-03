@@ -17,22 +17,27 @@ class ProjectService
     {
         $slug = Str::slug($title);
         $originalSlug = $slug;
-        $counter = 1;
 
         $query = Project::where('slug', $slug);
         if ($excludeId !== null) {
             $query->where('id', '!=', $excludeId);
         }
 
-        while ($query->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
-            $query = Project::where('slug', $slug);
-            if ($excludeId !== null) {
-                $query->where('id', '!=', $excludeId);
-            }
+        if (! $query->exists()) {
+            return $slug;
         }
 
-        return $slug;
+        $pattern = $originalSlug . '-%';
+        $existing = Project::where('slug', 'LIKE', $pattern);
+        if ($excludeId !== null) {
+            $existing->where('id', '!=', $excludeId);
+        }
+
+        $maxSuffix = $existing->pluck('slug')
+            ->map(fn($s) => (int) Str::after($s, $originalSlug . '-'))
+            ->max();
+
+        return $originalSlug . '-' . (max($maxSuffix, 0) + 1);
     }
 
     /**
