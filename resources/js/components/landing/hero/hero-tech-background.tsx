@@ -169,7 +169,7 @@ const TechTile = memo(function TechTile({
 
     return (
         <div
-            className="flex w-[100px] aspect-square shrink-0 flex-col items-center justify-center rounded p-1.5 text-[11px] font-medium text-foreground transition-all duration-200"
+            className="flex w-[130px] aspect-square shrink-0 flex-col items-center justify-center rounded p-2 text-xs font-medium text-foreground transition-all duration-200"
             style={{
                 fontFamily: 'var(--font-mono)',
                 opacity,
@@ -177,12 +177,12 @@ const TechTile = memo(function TechTile({
             }}
         >
             {hasIcon ? (
-                <Icon className="size-5 mb-0.5 shrink-0" />
+                <Icon className="size-6 mb-1 shrink-0" />
             ) : (
-                <div className="flex items-center justify-center w-7 h-7 mb-0.5 shrink-0">
+                <div className="flex items-center justify-center w-8 h-8 mb-1 shrink-0">
                     <div className="relative w-full h-full flex items-center justify-center">
                         <div className="absolute inset-0 rounded bg-foreground/5" />
-                        <span className="relative text-[9px] font-medium text-foreground">
+                        <span className="relative text-[10px] font-medium text-foreground">
                             {initials}
                         </span>
                     </div>
@@ -260,7 +260,7 @@ export function HeroTechBackground() {
         >
             <div
                 ref={gridRef}
-                className="absolute inset-0 flex flex-wrap justify-center content-center gap-2 p-3 select-none"
+                className="absolute inset-0 flex flex-wrap justify-center content-center gap-4 p-3 select-none"
             >
                 {TECHS.map((tech, i) => (
                     <TechTile key={tech} name={tech} opacity={opacities[i]} />
