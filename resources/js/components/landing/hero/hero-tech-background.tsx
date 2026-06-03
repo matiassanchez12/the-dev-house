@@ -169,7 +169,7 @@ const TechTile = memo(function TechTile({
 
     return (
         <div
-            className="flex aspect-square flex-col items-center justify-center rounded p-1.5 text-[11px] font-medium text-foreground transition-all duration-200"
+            className="flex w-[100px] aspect-square shrink-0 flex-col items-center justify-center rounded p-1.5 text-[11px] font-medium text-foreground transition-all duration-200"
             style={{
                 fontFamily: 'var(--font-mono)',
                 opacity,
@@ -260,13 +260,7 @@ export function HeroTechBackground() {
         >
             <div
                 ref={gridRef}
-                className="absolute inset-0 grid select-none"
-                style={{
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-                    gridAutoRows: 'auto',
-                    gap: '6px',
-                    padding: '12px',
-                }}
+                className="absolute inset-0 flex flex-wrap justify-center content-center gap-2 p-3 select-none"
             >
                 {TECHS.map((tech, i) => (
                     <TechTile key={tech} name={tech} opacity={opacities[i]} />
