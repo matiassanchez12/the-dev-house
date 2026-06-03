@@ -13,6 +13,7 @@ import {
     ProjectTechsCard,
     ProjectLinksCard,
     ProjectJoinForm,
+    ProjectStatusManager,
     ProjectDeleteDialog,
 } from '@/components/projects/show';
 
@@ -75,6 +76,12 @@ export default function Show({ auth, project }: Props) {
 
                         <div className="flex flex-col gap-6">
                             <ProjectCreatorCard creator={project.creator} />
+                            {isCreator && (
+                                <ProjectStatusManager
+                                    projectId={project.id}
+                                    currentStatus={project.status}
+                                />
+                            )}
                             <ProjectTechsCard techs={project.techs ?? []} />
                             <ProjectLinksCard
                                 repository_url={project.repository_url}
