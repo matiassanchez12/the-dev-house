@@ -25,7 +25,7 @@ interface Props extends LandingPageProps {
     users: User[]
 }
 
-export default function Landing({ auth, projects, project_count, collaboration_count, users }: Props) {
+export default function Landing({ auth, projects, project_count, collaboration_count, users, techs }: Props) {
     return (
         <>
             <Head title="The Dev House — Donde los desarrolladores construyen juntos" />
@@ -34,7 +34,7 @@ export default function Landing({ auth, projects, project_count, collaboration_c
                 <LandingNav auth={auth} />
 
                 {/* Hero */}
-                <LandingHero auth={auth} />
+                <LandingHero auth={auth} techs={techs} />
 
                 {/* Stats */}
                 <LandingStats

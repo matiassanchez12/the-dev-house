@@ -61,6 +61,8 @@
     --input: oklch(0.922 0.005 34.3);
     --ring: oklch(0.714 0.014 41.2);
     --radius: 0.625rem;
+    --wordmark-fg: var(--foreground);
+    --wordmark-cursor: var(--primary);
     --chart-1: oklch(0.868 0.007 39.5);
     --chart-2: oklch(0.547 0.021 43.1);
     --chart-3: oklch(0.438 0.017 39.3);
@@ -144,6 +146,8 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+    --color-wordmark-fg: var(--wordmark-fg);
+    --color-wordmark-cursor: var(--wordmark-cursor);
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);

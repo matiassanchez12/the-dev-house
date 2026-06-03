@@ -155,4 +155,5 @@ export interface LandingPageProps {
     user_count: number;
     project_count: number;
     collaboration_count: number;
+    techs: Tech[];
 }
