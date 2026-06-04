@@ -29,6 +29,7 @@ class UserService
         $query = User::query()
             ->select(['id', 'name', 'slug', 'bio', 'avatar'])
             ->withCount('createdProjects')
+            ->withCount(['participatingProjects as joined_projects_count'])
             ->with(['techs' => function ($q) {
                 $q->select('techs.id', 'name', 'slug');
             }]);

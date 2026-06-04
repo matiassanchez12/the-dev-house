@@ -62,10 +62,6 @@ return [
 
     ],
 
-    'project_images_disk' => env('PROJECT_IMAGES_DISK', 'public'),
-
-    'avatar_disk' => env('AVATAR_DISK', 'public'),
-
     /*
     |--------------------------------------------------------------------------
     | Symbolic Links

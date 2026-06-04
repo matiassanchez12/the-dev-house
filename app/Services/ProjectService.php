@@ -131,7 +131,7 @@ class ProjectService
      */
     public function uploadImages(array $files): array
     {
-        $disk = config('filesystems.project_images_disk', 'public');
+        $disk = config('filesystems.default', 'public');
         $paths = [];
         foreach ($files as $file) {
             $path = $file->store('projects', $disk);
@@ -152,7 +152,7 @@ class ProjectService
      */
     public function deleteImages(array $paths): void
     {
-        $disk = config('filesystems.project_images_disk', 'public');
+        $disk = config('filesystems.default', 'public');
         foreach ($paths as $path) {
             if (! $this->isSafeImagePath($path)) {
                 continue;

@@ -31,7 +31,7 @@ class ProfileService
             $this->deleteAvatarFile($user->avatar);
         }
 
-        $disk = config('filesystems.avatar_disk', 'public');
+        $disk = config('filesystems.default', 'public');
 
         // Store new avatar on the configured public disk
         $path = $file->store('avatars', $disk);
@@ -61,7 +61,7 @@ class ProfileService
     private function deleteAvatarFile(string $path): void
     {
         try {
-            Storage::disk(config('filesystems.avatar_disk', 'public'))->delete($path);
+            Storage::disk(config('filesystems.default', 'public'))->delete($path);
         } catch (\Exception $e) {
             // Ignore if file doesn't exist
         }

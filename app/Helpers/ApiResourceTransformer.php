@@ -18,11 +18,9 @@ class ApiResourceTransformer
     {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
-        $projectDisk = config('filesystems.project_images_disk', 'public');
-
         if (isset($data['images']) && is_array($data['images'])) {
             $data['images'] = array_map(
-                fn ($img) => StorageUrlHelper::url($img, $projectDisk),
+                fn ($img) => StorageUrlHelper::url($img),
                 $data['images']
             );
         }
@@ -47,13 +45,22 @@ class ApiResourceTransformer
     {
         $data = $user instanceof Model ? $user->toArray() : $user;
 
-        $safe = array_intersect_key($data, array_flip(['id', 'name', 'slug', 'bio', 'avatar', 'createdProjects', 'participatingProjects', 'techs', 'socialLinks']));
+        $safe = array_intersect_key($data, array_flip([
+            'id',
+            'name',
+            'slug',
+            'bio',
+            'avatar',
+            'created_projects_count',
+            'joined_projects_count',
+            'createdProjects',
+            'participatingProjects',
+            'techs',
+            'socialLinks',
+        ]));
 
         if (isset($safe['avatar'])) {
-            $safe['avatar'] = StorageUrlHelper::url(
-                $safe['avatar'],
-                config('filesystems.avatar_disk', 'public')
-            );
+            $safe['avatar'] = StorageUrlHelper::url($safe['avatar']);
         }
 
         if (isset($safe['createdProjects']) && is_array($safe['createdProjects'])) {

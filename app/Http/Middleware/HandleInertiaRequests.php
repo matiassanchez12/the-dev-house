@@ -37,10 +37,7 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             $userData = $user->only(['id', 'name', 'slug', 'bio', 'avatar']);
 
-            $userData['avatar'] = StorageUrlHelper::url(
-                $userData['avatar'] ?? null,
-                config('filesystems.avatar_disk', 'public')
-            );
+            $userData['avatar'] = StorageUrlHelper::url($userData['avatar'] ?? null);
         }
 
         return [
