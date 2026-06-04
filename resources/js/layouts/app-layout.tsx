@@ -1,6 +1,7 @@
 import ApplicationLogo from '@/components/application-logo';
 import MobileNavMenu from '@/components/mobile-nav-menu';
 import ThemeToggle from '@/components/theme-toggle';
+import NotificationBell from '@/components/notification-bell';
 import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
 import { Button } from '@/components/ui/button';
@@ -57,6 +58,7 @@ export default function AppLayout({ children, header }: Props) {
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
                             <ThemeToggle />
+                            {user && <NotificationBell />}
 
                             {user ? (
                                 <div className="relative ms-3">
