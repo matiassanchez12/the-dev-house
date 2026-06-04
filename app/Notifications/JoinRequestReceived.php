@@ -25,10 +25,8 @@ class JoinRequestReceived extends Notification
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Nueva solicitud de unirse a {$jr->project->title}")
-            ->line("{$jr->applicant->name} quiere unirse a tu proyecto.")
-            ->line($jr->message ?? '')
-            ->action('Ver proyecto', route('projects.show', $jr->project->slug));
+            ->subject("Nueva solicitud para {$jr->project->title}")
+            ->view('emails.join-request-received', ['joinRequest' => $jr]);
     }
 
     public function toArray(object $notifiable): array
