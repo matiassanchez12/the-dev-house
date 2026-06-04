@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\JoinRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class JoinRequestReceived extends Notification
@@ -16,7 +17,18 @@ class JoinRequestReceived extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $jr = $this->joinRequest;
+
+        return (new MailMessage())
+            ->subject("Nueva solicitud de unirse a {$jr->project->title}")
+            ->line("{$jr->applicant->name} quiere unirse a tu proyecto.")
+            ->line($jr->message ?? '')
+            ->action('Ver proyecto', route('projects.show', $jr->project->slug));
     }
 
     public function toArray(object $notifiable): array

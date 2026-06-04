@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\JoinRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class JoinRequestRejected extends Notification
@@ -16,7 +17,17 @@ class JoinRequestRejected extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $jr = $this->joinRequest;
+
+        return (new MailMessage())
+            ->subject("Tu solicitud para {$jr->project->title} fue rechazada")
+            ->line("Lamentamos informarte que tu solicitud para {$jr->project->title} fue rechazada.")
+            ->action('Ver proyecto', route('projects.show', $jr->project->slug));
     }
 
     public function toArray(object $notifiable): array
