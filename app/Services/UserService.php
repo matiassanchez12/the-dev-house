@@ -27,7 +27,7 @@ class UserService
     public function getDiscoverableUsers(array $filters = []): LengthAwarePaginator
     {
         $query = User::query()
-            ->withCount('techs')
+            ->select(['id', 'name', 'slug', 'bio', 'avatar'])
             ->withCount('createdProjects')
             ->with(['techs' => function ($q) {
                 $q->select('techs.id', 'name', 'slug');

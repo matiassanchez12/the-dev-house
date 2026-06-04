@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\StorageUrlHelper;
 use App\Models\Tech;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -35,6 +36,11 @@ class HandleInertiaRequests extends Middleware
 
         if ($user) {
             $userData = $user->only(['id', 'name', 'slug', 'bio', 'avatar']);
+
+            $userData['avatar'] = StorageUrlHelper::url(
+                $userData['avatar'] ?? null,
+                config('filesystems.avatar_disk', 'public')
+            );
         }
 
         return [

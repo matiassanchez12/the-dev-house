@@ -6,17 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
- * Transform Eloquent models/collections to API-safe arrays with full S3 URLs.
+ * Transform Eloquent models/collections to API-safe arrays with disk-aware file URLs.
  */
 class ApiResourceTransformer
 {
     /**
-     * Transform a project model to array with full image URLs.
+     * Transform a project model to array with disk-aware image URLs.
      * Creator and participants are scrubbed to safe fields only.
      */
     public static function project(Model|array $project): array
     {
         $data = $project instanceof Model ? $project->toArray() : $project;
+
+        $projectDisk = config('filesystems.project_images_disk', 'public');
+
+        if (isset($data['images']) && is_array($data['images'])) {
+            $data['images'] = array_map(
+                fn ($img) => StorageUrlHelper::url($img, $projectDisk),
+                $data['images']
+            );
+        }
 
         // Scrub creator to safe fields only
         if (isset($data['creator'])) {
@@ -32,14 +41,28 @@ class ApiResourceTransformer
     }
 
     /**
-     * Transform a user model to array with safe fields only.
-     * Never exposes email, timestamps, or internal data.
+     * Transform a user model to array with safe fields and disk-aware avatar URLs.
      */
     public static function user(Model|array $user): array
     {
         $data = $user instanceof Model ? $user->toArray() : $user;
 
         $safe = array_intersect_key($data, array_flip(['id', 'name', 'slug', 'bio', 'avatar', 'createdProjects', 'participatingProjects', 'techs', 'socialLinks']));
+
+        if (isset($safe['avatar'])) {
+            $safe['avatar'] = StorageUrlHelper::url(
+                $safe['avatar'],
+                config('filesystems.avatar_disk', 'public')
+            );
+        }
+
+        if (isset($safe['createdProjects']) && is_array($safe['createdProjects'])) {
+            $safe['createdProjects'] = array_map(fn ($project) => self::project($project), $safe['createdProjects']);
+        }
+
+        if (isset($safe['participatingProjects']) && is_array($safe['participatingProjects'])) {
+            $safe['participatingProjects'] = array_map(fn ($project) => self::project($project), $safe['participatingProjects']);
+        }
 
         if (isset($data['pivot'])) {
             $safe['pivot'] = $data['pivot'];
@@ -49,7 +72,7 @@ class ApiResourceTransformer
     }
 
     /**
-     * Transform a join request to array with full URLs.
+     * Transform a join request to array with disk-aware file URLs.
      * Applicant and project creator are scrubbed to safe fields only.
      */
     public static function joinRequest(Model|array $request): array
@@ -61,9 +84,8 @@ class ApiResourceTransformer
             $data['applicant'] = self::user($data['applicant']);
         }
 
-        // Scrub project creator to safe fields only
-        if (isset($data['project']['creator'])) {
-            $data['project']['creator'] = self::user($data['project']['creator']);
+        if (isset($data['project'])) {
+            $data['project'] = self::project($data['project']);
         }
 
         return $data;

@@ -104,6 +104,7 @@ class ProjectServiceTest extends TestCase
     public function create_always_stores_project_images_on_the_public_disk(): void
     {
         Storage::fake('public');
+        config(['filesystems.project_images_disk' => 'public']);
         config(['filesystems.default' => 's3']);
 
         $image = UploadedFile::fake()->image('project.jpg');
