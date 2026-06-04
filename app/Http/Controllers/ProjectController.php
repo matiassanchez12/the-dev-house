@@ -111,7 +111,7 @@ class ProjectController extends Controller
         $project->load(['creator.techs', 'techs']);
 
         return Inertia::render('projects/edit', [
-            'project' => ApiResourceTransformer::project($project),
+            'project' => $project,
         ]);
     }
 

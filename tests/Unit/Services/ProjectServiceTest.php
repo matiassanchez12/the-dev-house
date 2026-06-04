@@ -100,6 +100,26 @@ class ProjectServiceTest extends TestCase
         Storage::disk('public')->assertExists($paths[1]);
     }
 
+    /** @test */
+    public function create_always_stores_project_images_on_the_public_disk(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.default' => 's3']);
+
+        $image = UploadedFile::fake()->image('project.jpg');
+
+        $project = $this->service->create($this->user, [
+            'title' => 'Project with Images',
+            'description' => 'Project description',
+            'techs' => $this->techIds,
+            'images' => [$image],
+        ]);
+
+        $this->assertCount(1, $project->images);
+        $this->assertIsString($project->images[0]);
+        Storage::disk('public')->assertExists($project->images[0]);
+    }
+
     // === deleteImages tests ===
 
     /** @test */

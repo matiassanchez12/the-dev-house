@@ -18,10 +18,6 @@ class ApiResourceTransformer
     {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
-        // Transform project images
-        $images = $data['images'] ?? [];
-        $data['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
-
         // Scrub creator to safe fields only
         if (isset($data['creator'])) {
             $data['creator'] = self::user($data['creator']);
@@ -36,21 +32,17 @@ class ApiResourceTransformer
     }
 
     /**
-     * Transform a user model to array with full avatar URL.
-     * Only exposes safe fields — never email, timestamps, or internal data.
+     * Transform a user model to array with safe fields only.
+     * Never exposes email, timestamps, or internal data.
      */
     public static function user(Model|array $user): array
     {
         $data = $user instanceof Model ? $user->toArray() : $user;
 
-        $safe = array_intersect_key($data, array_flip(['id', 'name', 'slug', 'bio', 'avatar']));
+        $safe = array_intersect_key($data, array_flip(['id', 'name', 'slug', 'bio', 'avatar', 'createdProjects', 'participatingProjects', 'techs', 'socialLinks']));
 
         if (isset($data['pivot'])) {
             $safe['pivot'] = $data['pivot'];
-        }
-
-        if (isset($data['avatar'])) {
-            $safe['avatar'] = StorageUrlHelper::url($data['avatar']);
         }
 
         return $safe;
@@ -67,12 +59,6 @@ class ApiResourceTransformer
         // Scrub applicant to safe fields only
         if (isset($data['applicant'])) {
             $data['applicant'] = self::user($data['applicant']);
-        }
-
-        // Transform project images
-        if (isset($data['project']['images'])) {
-            $images = $data['project']['images'] ?? [];
-            $data['project']['images'] = array_map(fn($img) => StorageUrlHelper::url($img), $images);
         }
 
         // Scrub project creator to safe fields only

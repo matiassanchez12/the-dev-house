@@ -27,7 +27,7 @@ class UserDiscoveryTest extends TestCase
         $response->assertInertia(
             fn ($page) => $page
                 ->has('users.data', 5)
-                ->has('users.total')
+                ->has('users.meta.total')
                 ->has('techs')
                 ->has('filters')
         );
@@ -130,7 +130,7 @@ class UserDiscoveryTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(
             fn ($page) => $page
-                ->where('users.per_page', 12)
+                ->where('users.meta.per_page', 12)
                 ->has('users.data', 12)
         );
     }
@@ -151,7 +151,7 @@ class UserDiscoveryTest extends TestCase
         $response->assertInertia(
             fn ($page) => $page
                 ->has('users.data', 0)
-                ->where('users.total', 0)
+                ->where('users.meta.total', 0)
         );
     }
 
@@ -201,7 +201,7 @@ class UserDiscoveryTest extends TestCase
         $response->assertInertia(
             fn ($page) => $page
                 ->has('users.data', 0)
-                ->where('users.total', 0)
+                ->where('users.meta.total', 0)
         );
     }
 }

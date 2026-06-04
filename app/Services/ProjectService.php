@@ -131,10 +131,15 @@ class ProjectService
      */
     public function uploadImages(array $files): array
     {
-        $disk = config('filesystems.default', 'public');
         $paths = [];
         foreach ($files as $file) {
-            $paths[] = $file->store('projects', $disk);
+            $path = $file->store('projects', 'public');
+
+            if ($path === false) {
+                throw new \RuntimeException('Unable to store project image.');
+            }
+
+            $paths[] = $path;
         }
         return $paths;
     }
@@ -146,14 +151,13 @@ class ProjectService
      */
     public function deleteImages(array $paths): void
     {
-        $disk = config('filesystems.default', 'public');
         foreach ($paths as $path) {
             if (! $this->isSafeImagePath($path)) {
                 continue;
             }
 
             try {
-                Storage::disk($disk)->delete($path);
+                Storage::disk('public')->delete($path);
             } catch (\Exception $e) {
                 // Ignore if file doesn't exist
             }
