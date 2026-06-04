@@ -188,7 +188,7 @@ export default function Dashboard({
                                         </Link>
                                     </div>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="py-6">
                                     {createdProjects.length === 0 ? (
                                         <div className="text-center py-8">
                                             <p className="text-muted-foreground mb-4">
@@ -203,7 +203,7 @@ export default function Dashboard({
                                             {createdProjects.map((project) => (
                                                 <Card key={project.id} className="relative pb-0">
                                                     {project.join_requests_count > 0 && (
-                                                        <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                                                        <div className="absolute -top-2 -right-2 z-10 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                                                             {project.join_requests_count}
                                                         </div>
                                                     )}
@@ -274,7 +274,7 @@ export default function Dashboard({
                                         </Link>
                                     </div>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="py-6">
                                     {participatingProjects.length === 0 ? (
                                         <div className="text-center py-8">
                                             <p className="text-muted-foreground">

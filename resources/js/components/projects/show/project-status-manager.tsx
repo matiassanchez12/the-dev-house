@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
     SelectTrigger,
     SelectValue,
@@ -10,24 +12,18 @@ import {
 import { statusConfig, type ProjectStatus } from '@/components/projects/project-utils';
 
 const transitions: Record<ProjectStatus, ProjectStatus[]> = {
-    open: ['in_progress', 'closed'],
+    open: ['in_progress', 'closed', 'completed'],
     in_progress: ['completed', 'closed'],
     completed: ['closed'],
     closed: [],
 };
 
-const transitionLabels: Record<string, string> = {
-    in_progress: 'En Progreso',
-    completed: 'Completado',
-    closed: 'Cerrado',
-};
-
 interface ProjectStatusManagerProps {
-    projectId: number;
-    currentStatus: string;
+    projectSlug: string;
+    currentStatus: ProjectStatus;
 }
 
-export function ProjectStatusManager({ projectId, currentStatus }: ProjectStatusManagerProps) {
+export function ProjectStatusManager({ projectSlug, currentStatus }: ProjectStatusManagerProps) {
     const { data, setData, patch, processing, errors } = useForm({
         status: '',
     });
@@ -39,7 +35,7 @@ export function ProjectStatusManager({ projectId, currentStatus }: ProjectStatus
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!data.status) return;
-        patch(route('projects.status.update', projectId), {
+        patch(route('projects.status.update', projectSlug), {
             preserveScroll: true,
         });
     }
@@ -49,17 +45,26 @@ export function ProjectStatusManager({ projectId, currentStatus }: ProjectStatus
             <h3 className="mb-3 font-semibold text-sm text-card-foreground">
                 Cambiar Estado
             </h3>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-                <Select value={data.status} onValueChange={(v) => setData('status', v)}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar..." />
+            <form onSubmit={handleSubmit} className="flex flex-col w-full gap-2">
+                <Select
+                    key={currentStatus}
+                    value={data.status} onValueChange={(v) => setData('status', v || '')}
+                >
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccione estado">
+                            {(value: string | null) =>
+                                value ? statusConfig[value as ProjectStatus]?.label : 'Seleccione estado'
+                            }
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                        {available.map((status) => (
-                            <SelectItem key={status} value={status}>
-                                {transitionLabels[status] ?? status}
-                            </SelectItem>
-                        ))}
+                        <SelectGroup>
+                            {available.map((status) => (
+                                <SelectItem key={status} value={status}>
+                                    {statusConfig[status]?.label ?? status}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
                 {errors.status && (
