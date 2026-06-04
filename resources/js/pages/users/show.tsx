@@ -35,13 +35,13 @@ function StatItem({ icon, label, value }: { icon: React.ReactNode; label: string
 }
 
 export default function Show({ auth, user }: Props) {
-    const hasProjects = user.createdProjects.length > 0 || user.participatingProjects.length > 0;
-    const hasTechs = user.techs.length > 0;
+    const hasProjects = (user.createdProjects?.length ?? 0) > 0 || (user.participatingProjects?.length ?? 0) > 0;
+    const hasTechs = (user.techs?.length ?? 0) > 0;
 
     const stats = [
-        { label: 'Proyectos creados', value: user.createdProjects.length, icon: <FolderOpen className="size-5" /> },
-        { label: 'Proyectos participando', value: user.participatingProjects.length, icon: <Users className="size-5" /> },
-        { label: 'Tecnologías', value: user.techs.length, icon: <Wrench className="size-5" /> },
+        { label: 'Proyectos creados', value: user.createdProjects?.length ?? 0, icon: <FolderOpen className="size-5" /> },
+        { label: 'Proyectos participando', value: user.participatingProjects?.length ?? 0, icon: <Users className="size-5" /> },
+        { label: 'Tecnologías', value: user.techs?.length ?? 0, icon: <Wrench className="size-5" /> },
     ];
 
     return (
@@ -92,7 +92,7 @@ export default function Show({ auth, user }: Props) {
                     {/* Project Showcase */}
                     {hasProjects ? (
                         <Card>
-                            <CardContent className="pt-6">
+                            <CardContent className="py-6">
                                 <ProjectShowcase
                                     createdProjects={user.createdProjects}
                                     participatingProjects={user.participatingProjects}
