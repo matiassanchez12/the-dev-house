@@ -1,24 +1,8 @@
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Link } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dropdown } from '@/components/ui/dropdown';
-import { Link } from '@inertiajs/react';
-import { cn } from '@/lib/utils';
-
-interface Notification {
-    id: string;
-    type: string;
-    data: {
-        type: 'join_request_received' | 'join_request_approved' | 'join_request_rejected';
-        project_id: number;
-        project_slug: string;
-        project_title: string;
-        applicant_id?: number;
-        applicant_name?: string;
-    };
-    read_at: string | null;
-    created_at: string;
-}
+import { NotificationList } from '@/components/notification-list';
 
 interface User {
     id: number;
@@ -29,14 +13,10 @@ interface User {
 
 interface PageProps {
     auth: { user: User | null };
-    notifications?: { data: Notification[] };
+    notifications?: { data: NotificationItem[] };
 }
 
-const typeLabels: Record<Notification['data']['type'], string> = {
-    join_request_received: 'quiere unirse a tu proyecto',
-    join_request_approved: 'aprobó tu solicitud',
-    join_request_rejected: 'rechazó tu solicitud',
-};
+export type { NotificationItem } from '@/components/notification-list';
 
 export default function NotificationBell() {
     const page = usePage<PageProps>();
@@ -47,7 +27,7 @@ export default function NotificationBell() {
 
     return (
         <Dropdown>
-            <Dropdown.Trigger>
+            <Dropdown.Trigger asChild>
                 <button
                     type="button"
                     aria-label="Notificaciones"
@@ -82,7 +62,7 @@ export default function NotificationBell() {
                 </div>
 
                 <div className="max-h-96 overflow-y-auto">
-                    <NotificationList />
+                    <NotificationList limit={5} />
                 </div>
 
                 <div className="border-t border-border p-2">
@@ -95,57 +75,5 @@ export default function NotificationBell() {
                 </div>
             </Dropdown.Content>
         </Dropdown>
-    );
-}
-
-function NotificationList() {
-    const page = usePage<{ notifications?: { data: Notification[] } }>();
-    const notifications = page.props.notifications?.data ?? [];
-
-    if (notifications.length === 0) {
-        return (
-            <div className="px-4 py-8 text-center">
-                <Bell className="mx-auto h-8 w-8 text-muted-foreground/50" />
-                <p className="mt-2 text-sm text-muted-foreground">Sin notificaciones</p>
-            </div>
-        );
-    }
-
-    return (
-        <ul className="divide-y divide-border">
-            {notifications.slice(0, 5).map((n) => {
-                const label = typeLabels[n.data.type] ?? 'actualizó un proyecto';
-                const project = n.data.project_title;
-                const from = n.data.applicant_name;
-
-                return (
-                    <li key={n.id}>
-                        <Link
-                            href={route('projects.show', n.data.project_slug)}
-                            onClick={() => {
-                                if (!n.read_at) {
-                                    router.patch(route('notifications.read', n.id), {
-                                        preserveScroll: true,
-                                    });
-                                }
-                            }}
-                            className={cn(
-                                'block px-4 py-3 transition hover:bg-muted',
-                                !n.read_at && 'bg-primary/5'
-                            )}
-                        >
-                            <p className="text-sm text-foreground">
-                                {from && <span className="font-semibold">{from}</span>}{' '}
-                                <span className="text-muted-foreground">{label}</span>{' '}
-                                <span className="font-medium">{project}</span>
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                {new Date(n.created_at).toLocaleDateString()}
-                            </p>
-                        </Link>
-                    </li>
-                );
-            })}
-        </ul>
     );
 }
