@@ -2,7 +2,6 @@ import ApplicationLogo from '@/components/application-logo';
 import MobileNavMenu from '@/components/mobile-nav-menu';
 import ThemeToggle from '@/components/theme-toggle';
 import NotificationBell from '@/components/notification-bell';
-import NotificationBellLink from '@/components/notification-bell-link';
 import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
 import { Button } from '@/components/ui/button';
@@ -124,7 +123,7 @@ export default function AppLayout({ children, header }: Props) {
 
                         <div className="-me-2 flex items-center sm:hidden">
                             <ThemeToggle />
-                            {user && <NotificationBellLink className="me-1" />}
+                            {user && <NotificationBell />}
                             <button
                                 onClick={() => setMobileMenuOpen(true)}
                                 className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition duration-150 ease-in-out hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none"
@@ -154,12 +153,6 @@ export default function AppLayout({ children, header }: Props) {
                             {link.label}
                         </MobileNavMenu.Link>
                     ))}
-
-                    {user && (user.unread_notifications_count ?? 0) > 0 && (
-                        <MobileNavMenu.Link href={route('notifications.index')}>
-                            Notificaciones ({user.unread_notifications_count > 9 ? '9+' : user.unread_notifications_count})
-                        </MobileNavMenu.Link>
-                    )}
 
                     <MobileNavMenu.Divider />
 
