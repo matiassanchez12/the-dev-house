@@ -6,26 +6,18 @@ use Illuminate\Support\Facades\Storage;
 
 class StorageUrlHelper
 {
-    /**
-     * Generate the correct URL for a stored file based on the configured disk.
-     */
-    public static function url(?string $path): ?string
+    public static function url(?string $path, ?string $disk = null): ?string
     {
         if (! $path) {
             return null;
         }
 
-        // If it's already a full URL (external storage), return as-is
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+        if (str_contains($path, '://') || str_starts_with($path, '/storage/')) {
             return $path;
         }
 
-        $disk = config('filesystems.default');
+        $diskName = $disk ?? config('filesystems.default', 'public');
 
-        if ($disk === 's3') {
-            return Storage::disk('s3')->url($path);
-        }
-
-        return '/storage/' . $path;
+        return Storage::disk($diskName)->url($path);
     }
 }

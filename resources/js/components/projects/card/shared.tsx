@@ -1,7 +1,7 @@
 import { ProjectCardViewModel } from "@/lib/get-project-card-model";
 import { cn } from "@/lib/utils";
 import { CalendarDays, Clock, Users } from "lucide-react";
-import { getInitials, relativeDate } from "../project-utils";
+import { getInitials, relativeDate, avatarUrl } from "../project-utils";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "@inertiajs/react";
@@ -62,7 +62,7 @@ export function ProjectCardCreator({ card }: ProjectCardSectionProps) {
     return (
         <div className="flex items-center gap-2">
             <Avatar size="sm">
-                <AvatarImage src={card.creator.avatar ?? undefined} />
+                <AvatarImage src={avatarUrl(card.creator.avatar) ?? undefined} />
                 <AvatarFallback>{getInitials(card.creator.name)}</AvatarFallback>
             </Avatar>
             <span className="text-sm text-muted-foreground">Por: {card.creator.name}</span>

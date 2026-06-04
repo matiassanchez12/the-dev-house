@@ -48,6 +48,11 @@ export function storageUrl(path: string | null | undefined): string | null {
         return path;
     }
 
+    // Already has /storage/ prefix from backend
+    if (path.startsWith('/storage/')) {
+        return path;
+    }
+
     // Local storage path
     return `/storage/${path}`;
 }

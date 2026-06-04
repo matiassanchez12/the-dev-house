@@ -22,6 +22,7 @@ interface Props {
 
 export default function Edit({ auth, project, techs }: Props) {
     const form = useForm({
+        _method: 'put',
         title: project.title,
         description: project.description,
         vision: project.vision ?? '',
@@ -34,8 +35,9 @@ export default function Edit({ auth, project, techs }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        form.put(`/projects/${project.slug}`, {
+
+        form.post(`/projects/${project.slug}`, {
+            forceFormData: true,
             onSuccess: () => {
                 toast.success('Proyecto actualizado exitosamente');
                 form.reset('images', 'remove_images');

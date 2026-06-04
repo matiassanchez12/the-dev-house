@@ -134,7 +134,13 @@ class ProjectService
         $disk = config('filesystems.default', 'public');
         $paths = [];
         foreach ($files as $file) {
-            $paths[] = $file->store('projects', $disk);
+            $path = $file->store('projects', $disk);
+
+            if ($path === false) {
+                throw new \RuntimeException('Unable to store project image.');
+            }
+
+            $paths[] = $path;
         }
         return $paths;
     }
