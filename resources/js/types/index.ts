@@ -6,6 +6,7 @@ export interface User {
     avatar?: string | null;
     slug?: string;
     email_verified_at?: string | null;
+    unread_notifications_count?: number;
     created_at: string;
     updated_at: string;
 }
