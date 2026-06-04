@@ -224,6 +224,45 @@ class NotificationTest extends TestCase
 
         $this->assertNotEmpty($mailMessage->subject);
         $this->assertStringContainsString('Test Project Beta', $mailMessage->subject);
+        $this->assertEquals('emails.join-request-received', $mailMessage->view);
+    }
+
+    public function test_join_request_approved_to_mail_uses_custom_view(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $mailMessage = (new JoinRequestApproved($joinRequest))->toMail($applicant);
+
+        $this->assertEquals('emails.join-request-approved', $mailMessage->view);
+        $this->assertStringContainsString($project->title, $mailMessage->subject);
+    }
+
+    public function test_join_request_rejected_to_mail_uses_custom_view(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $mailMessage = (new JoinRequestRejected($joinRequest))->toMail($applicant);
+
+        $this->assertEquals('emails.join-request-rejected', $mailMessage->view);
+        $this->assertStringContainsString($project->title, $mailMessage->subject);
     }
 
     public function test_authenticated_user_can_view_their_notifications_index(): void

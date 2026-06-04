@@ -25,9 +25,8 @@ class JoinRequestRejected extends Notification
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Tu solicitud para {$jr->project->title} fue rechazada")
-            ->line("Lamentamos informarte que tu solicitud para {$jr->project->title} fue rechazada.")
-            ->action('Ver proyecto', route('projects.show', $jr->project->slug));
+            ->subject("Tu solicitud para {$jr->project->title} no fue aceptada")
+            ->view('emails.join-request-rejected', ['joinRequest' => $jr]);
     }
 
     public function toArray(object $notifiable): array

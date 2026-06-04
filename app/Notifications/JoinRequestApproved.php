@@ -25,9 +25,8 @@ class JoinRequestApproved extends Notification
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Tu solicitud para {$jr->project->title} fue aprobida")
-            ->line("¡Tu solicitud para {$jr->project->title} fue aprobida!")
-            ->action('Ver proyecto', route('projects.show', $jr->project->slug));
+            ->subject("¡Tu solicitud para {$jr->project->title} fue aprobada!")
+            ->view('emails.join-request-approved', ['joinRequest' => $jr]);
     }
 
     public function toArray(object $notifiable): array
