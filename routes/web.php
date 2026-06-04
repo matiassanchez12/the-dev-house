@@ -10,6 +10,7 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page
@@ -55,6 +56,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/join-requests/{joinRequest}/approve', [JoinRequestController::class, 'approve'])->name('join-requests.approve');
     Route::post('/join-requests/{joinRequest}/reject', [JoinRequestController::class, 'reject'])->name('join-requests.reject');
     Route::post('/join-requests/{joinRequest}/cancel', [JoinRequestController::class, 'cancel'])->name('join-requests.cancel');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 
     // Onboarding
     Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');

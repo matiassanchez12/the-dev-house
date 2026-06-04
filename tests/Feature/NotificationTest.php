@@ -5,7 +5,11 @@ namespace Tests\Feature;
 use App\Models\JoinRequest;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\JoinRequestApproved;
+use App\Notifications\JoinRequestReceived;
+use App\Notifications\JoinRequestRejected;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
@@ -114,5 +118,193 @@ class NotificationTest extends TestCase
         $this->assertEquals('Test Project Alpha', $data['project_title']);
         $this->assertEquals($applicant->id, $data['applicant_id']);
         $this->assertEquals($applicant->name, $data['applicant_name']);
+    }
+
+    public function test_join_request_received_uses_mail_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        Notification::fake();
+
+        $response = $this->actingAs($applicant)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero unirme',
+            ]);
+
+        Notification::assertSentTo(
+            $creator,
+            JoinRequestReceived::class,
+            fn ($notification, $channels) => in_array('mail', $channels)
+        );
+    }
+
+    public function test_join_request_approved_uses_mail_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $response = $this->actingAs($creator)
+            ->post(route('join-requests.approve', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestApproved::class,
+            fn ($notification, $channels) => in_array('mail', $channels)
+        );
+    }
+
+    public function test_join_request_rejected_uses_mail_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $response = $this->actingAs($creator)
+            ->post(route('join-requests.reject', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestRejected::class,
+            fn ($notification, $channels) => in_array('mail', $channels)
+        );
+    }
+
+    public function test_join_request_received_to_mail_returns_valid_message(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Test Project Beta',
+            'status' => 'open',
+        ]);
+
+        $this->actingAs($applicant)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero participar',
+            ]);
+
+        $notification = $creator->notifications()->where('type', JoinRequestReceived::class)->first();
+
+        $this->assertNotNull($notification);
+
+        $jr = JoinRequest::find($notification->data['join_request_id']);
+
+        $mailMessage = (new JoinRequestReceived($jr))->toMail($creator);
+
+        $this->assertNotEmpty($mailMessage->subject);
+        $this->assertStringContainsString('Test Project Beta', $mailMessage->subject);
+    }
+
+    public function test_authenticated_user_can_view_their_notifications_index(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $other->id, 'status' => 'open']);
+
+        $this->actingAs($user)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero unirme al proyecto',
+            ]);
+
+        $other->notify(new JoinRequestReceived(
+            JoinRequest::where('user_id', $user->id)->first()
+        ));
+
+        $response = $this->actingAs($other)->get(route('notifications.index'));
+
+        $response->assertOk();
+    }
+
+    public function test_authenticated_user_can_mark_notification_as_read(): void
+    {
+        $user = User::factory()->create();
+        $notification = $user->notifications()->create([
+            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'type' => 'App\\Notifications\\JoinRequestReceived',
+            'data' => ['type' => 'join_request_received'],
+        ]);
+
+        $this->assertNull($notification->fresh()->read_at);
+
+        $response = $this->actingAs($user)
+            ->patch(route('notifications.read', $notification->id));
+
+        $response->assertRedirect();
+
+        $this->assertNotNull($notification->fresh()->read_at);
+    }
+
+    public function test_authenticated_user_can_mark_all_notifications_as_read(): void
+    {
+        $user = User::factory()->create();
+        $n1 = $user->notifications()->create([
+            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'type' => 'App\\Notifications\\JoinRequestReceived',
+            'data' => ['type' => 'join_request_received'],
+        ]);
+        $n2 = $user->notifications()->create([
+            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'type' => 'App\\Notifications\\JoinRequestApproved',
+            'data' => ['type' => 'join_request_approved'],
+        ]);
+
+        $n1->markAsRead();
+
+        $response = $this->actingAs($user)
+            ->post(route('notifications.read-all'));
+
+        $response->assertRedirect();
+
+        $this->assertNotNull($n1->fresh()->read_at);
+        $this->assertNotNull($n2->fresh()->read_at);
+    }
+
+    public function test_unread_notifications_count_is_shared_via_inertia(): void
+    {
+        $user = User::factory()->create();
+        for ($i = 0; $i < 3; $i++) {
+            $user->notifications()->create([
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'type' => 'App\\Notifications\\JoinRequestReceived',
+                'data' => ['type' => 'join_request_received'],
+            ]);
+        }
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertInertia(
+            fn ($page) => $page->where('auth.user.unread_notifications_count', 3)
+        );
     }
 }
