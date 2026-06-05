@@ -292,6 +292,32 @@ class NotificationTest extends TestCase
         $this->assertStringContainsString(route('projects.show', $project->slug), $html);
     }
 
+    public function test_join_request_received_mail_uses_dark_theme_shell(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Test Project Dark',
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero participar',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-received', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('background-color:#020617', $html);
+        $this->assertStringContainsString('background-color:#0b1220', $html);
+        $this->assertStringContainsString('background-color:#38bdf8', $html);
+    }
+
     public function test_join_request_approved_mail_renders_minimal_tech_layout(): void
     {
         $creator = User::factory()->create();
