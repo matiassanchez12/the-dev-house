@@ -346,4 +346,95 @@ class NotificationTest extends TestCase
             fn ($page) => $page->where('auth.user.unread_notifications_count', 3)
         );
     }
+
+    public function test_user_routes_notifications_for_broadcast_to_private_user_channel(): void
+    {
+        $user = User::factory()->create();
+
+        $this->assertEquals(
+            'App.Models.User.' . $user->id,
+            $user->routeNotificationForBroadcast(new \stdClass()),
+        );
+    }
+
+    public function test_join_request_received_uses_broadcast_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($applicant)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero unirme',
+            ]);
+
+        Notification::assertSentTo(
+            $creator,
+            JoinRequestReceived::class,
+            fn ($notification, $channels) => in_array('broadcast', $channels, true)
+                && in_array('database', $channels, true)
+                && in_array('mail', $channels, true),
+        );
+    }
+
+    public function test_join_request_approved_uses_broadcast_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($creator)
+            ->post(route('join-requests.approve', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestApproved::class,
+            fn ($notification, $channels) => in_array('broadcast', $channels, true),
+        );
+    }
+
+    public function test_join_request_rejected_uses_broadcast_channel(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($creator)
+            ->post(route('join-requests.reject', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestRejected::class,
+            fn ($notification, $channels) => in_array('broadcast', $channels, true),
+        );
+    }
 }

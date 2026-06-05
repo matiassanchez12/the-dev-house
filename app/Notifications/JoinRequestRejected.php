@@ -4,10 +4,12 @@ namespace App\Notifications;
 
 use App\Models\JoinRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JoinRequestRejected extends Notification
+class JoinRequestRejected extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -17,7 +19,7 @@ class JoinRequestRejected extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -27,6 +29,11 @@ class JoinRequestRejected extends Notification
         return (new MailMessage())
             ->subject("Tu solicitud para {$jr->project->title} no fue aceptada")
             ->view('emails.join-request-rejected', ['joinRequest' => $jr]);
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
     }
 
     public function toArray(object $notifiable): array
