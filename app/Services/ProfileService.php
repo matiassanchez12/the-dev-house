@@ -31,8 +31,9 @@ class ProfileService
             $this->deleteAvatarFile($user->avatar);
         }
 
-        // Store new avatar - use S3 in production, local in dev
         $disk = config('filesystems.default', 'public');
+
+        // Store new avatar on the configured public disk
         $path = $file->store('avatars', $disk);
 
         // Update user record
@@ -60,8 +61,7 @@ class ProfileService
     private function deleteAvatarFile(string $path): void
     {
         try {
-            $disk = config('filesystems.default', 'public');
-            Storage::disk($disk)->delete($path);
+            Storage::disk(config('filesystems.default', 'public'))->delete($path);
         } catch (\Exception $e) {
             // Ignore if file doesn't exist
         }

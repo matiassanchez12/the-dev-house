@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import InputError from '@/components/input-error';
 import { User, Tech, Platform, SocialLink } from '@/types';
+import { avatarUrl } from '@/components/projects/project-utils';
 
 interface OnboardingProps {
     auth: {
@@ -455,7 +456,7 @@ export default function OnboardingIndex() {
                                             />
                                         ) : user.avatar ? (
                                             <img
-                                                src={user.avatar}
+                                                src={avatarUrl(user.avatar) ?? ''}
                                                 alt="Current avatar"
                                                 className="w-full h-full object-cover"
                                             />

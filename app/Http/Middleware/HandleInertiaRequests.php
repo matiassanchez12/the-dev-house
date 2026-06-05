@@ -43,9 +43,7 @@ class HandleInertiaRequests extends Middleware
                 ->take(5)
                 ->get();
 
-            if ($user->avatar) {
-                $userData['avatar_url'] = StorageUrlHelper::url($user->avatar);
-            }
+            $userData['avatar'] = StorageUrlHelper::url($userData['avatar'] ?? null);
         }
 
         return [

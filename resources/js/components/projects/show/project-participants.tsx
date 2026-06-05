@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getInitials } from '@/components/projects/project-utils';
+import { getInitials, avatarUrl } from '@/components/projects/project-utils';
 import { User } from '@/types';
 
 interface ProjectParticipantsProps {
@@ -29,7 +29,7 @@ export function ProjectParticipants({ participants }: ProjectParticipantsProps) 
                         return (
                             <Avatar key={participant.id} className="size-8">
                                 <AvatarImage
-                                    src={participant.avatar ?? undefined}
+                                    src={avatarUrl(participant.avatar) ?? undefined}
                                     alt={participant.name}
                                 />
                                 <AvatarFallback className="text-xs">

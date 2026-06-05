@@ -6,6 +6,7 @@ import { useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { Tech } from '@/types';
 import { toast } from 'sonner';
+import { avatarUrl } from '@/components/projects/project-utils';
 
 interface UserTech extends Tech {
     pivot: {
@@ -36,7 +37,7 @@ interface Props {
 export default function UpdateProfileCompleteForm({ className = '', userTechs, allTechs }: Props) {
     const user = usePage().props.auth.user;
     const [previewAvatar, setPreviewAvatar] = useState<string | null>(
-        user.avatar_url || (user.avatar ? `/storage/${user.avatar}` : null)
+        avatarUrl(user.avatar)
     );
     const avatarInput = useRef<HTMLInputElement>(null);
 

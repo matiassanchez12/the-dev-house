@@ -46,7 +46,17 @@ class OnboardingService
             ];
         }, $links);
 
-        SocialLink::upsert($records, ['user_id', 'platform'], ['url']);
+        foreach ($records as $record) {
+            SocialLink::updateOrCreate(
+                [
+                    'user_id' => $record['user_id'],
+                    'platform' => $record['platform'],
+                ],
+                [
+                    'url' => $record['url'],
+                ]
+            );
+        }
     }
 
     public function saveAvatar(User $user, $file): ?string

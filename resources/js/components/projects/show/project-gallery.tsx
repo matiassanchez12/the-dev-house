@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
-import { storageUrl } from '@/components/projects/project-utils';
+import type { ProjectImage } from '@/types';
 
 interface ProjectGalleryProps {
-    images: string[];
+    images: ProjectImage[];
     title: string;
 }
 
@@ -34,7 +34,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
                         {remainingImages.map((image, index) => (
                             <img
                                 key={index}
-                                src={storageUrl(image) ?? ''}
+                                src={image.url}
                                 alt={`${title} - ${index + 2}`}
                                 className="w-full h-48 sm:h-64 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                                 onClick={() => handleOpenGallery(index)}
@@ -44,7 +44,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
                 </CardContent>
             </Card>
             <ImageGalleryDialog
-                images={images.map((img) => storageUrl(img) ?? '')}
+                images={images.map((img) => img.url)}
                 open={galleryOpen}
                 initialIndex={galleryIndex}
                 onOpenChange={setGalleryOpen}

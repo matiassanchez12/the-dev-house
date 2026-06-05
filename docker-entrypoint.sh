@@ -3,6 +3,11 @@ set -e
 
 SERVICE="${SERVICE:-web}"
 
+if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "SomeRandomString" ]; then
+    echo "→ Generating APP_KEY..."
+    export APP_KEY=$(php artisan key:generate --show --force)
+fi
+
 if [ "$RUN_MIGRATIONS" = "true" ]; then
     echo "→ Running migrations..."
     php artisan migrate --force

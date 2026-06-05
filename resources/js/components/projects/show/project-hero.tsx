@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { ProjectStatusBadge } from '@/components/projects/project-status-badge';
 import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
-import { storageUrl } from '@/components/projects/project-utils';
-import type { User } from '@/types';
+import type { ProjectImage } from '@/types';
 
 interface ProjectHeroProps {
     title: string;
     status: string;
-    images: string[] | null | undefined;
+    images: ProjectImage[] | null | undefined;
     creatorName: string;
 }
 
@@ -22,7 +21,7 @@ export function ProjectHero({ title, status, images, creatorName }: ProjectHeroP
                     onClick={() => setGalleryOpen(true)}
                 >
                     <img
-                        src={storageUrl(images[0]) ?? ''}
+                        src={images[0].url}
                         alt={title}
                         className="w-full h-96 sm:h-[450px] object-cover group-hover:opacity-90 transition-opacity"
                     />
@@ -35,7 +34,7 @@ export function ProjectHero({ title, status, images, creatorName }: ProjectHeroP
                     </div>
                 </div>
                 <ImageGalleryDialog
-                    images={images.map((img) => storageUrl(img) ?? '')}
+                    images={images.map((img) => img.url)}
                     open={galleryOpen}
                     initialIndex={0}
                     onOpenChange={setGalleryOpen}

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +22,32 @@ export type { NotificationItem } from '@/components/notification-list';
 export default function NotificationBell() {
     const page = usePage<PageProps>();
     const user = page.props.auth.user;
-    const unreadCount = user?.unread_notifications_count ?? 0;
+    const initialUnread = user?.unread_notifications_count ?? 0;
+    const [unreadCount, setUnreadCount] = useState(initialUnread);
+
+    useEffect(() => {
+        setUnreadCount(initialUnread);
+    }, [initialUnread]);
+
+    useEffect(() => {
+        if (!user || typeof window === 'undefined' || !window.Echo) return;
+
+        const channel = window.Echo.private(`App.Models.User.${user.id}`);
+
+        const handler = (event: { notification?: NotificationItem }) => {
+            setUnreadCount((current) => current + 1);
+            if (event.notification) {
+                router.reload({ only: ['notifications'] });
+            }
+        };
+
+        channel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
+
+        return () => {
+            channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
+            window.Echo.leave(`App.Models.User.${user.id}`);
+        };
+    }, [user?.id]);
 
     if (!user) return null;
 
@@ -51,9 +77,10 @@ export default function NotificationBell() {
                     {unreadCount > 0 && (
                         <button
                             type="button"
-                            onClick={() =>
-                                router.post(route('notifications.read-all'), {}, { preserveScroll: true })
-                            }
+                            onClick={() => {
+                                setUnreadCount(0);
+                                router.post(route('notifications.read-all'), {}, { preserveScroll: true });
+                            }}
                             className="text-xs font-medium text-primary hover:underline"
                         >
                             Marcar todas

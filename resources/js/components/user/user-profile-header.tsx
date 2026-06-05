@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserProfile } from '@/types';
 import { SocialLinksDisplay } from './social-links-display';
+import { avatarUrl } from '@/components/projects/project-utils';
 
 interface UserProfileHeaderProps {
     user: UserProfile;
@@ -25,7 +26,7 @@ export function UserProfileHeader({ user }: UserProfileHeaderProps) {
     return (
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <Avatar className="size-20 ring-2 ring-border">
-                <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
+                <AvatarImage src={avatarUrl(user.avatar) ?? undefined} alt={user.name} />
                 <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 text-center sm:text-left">

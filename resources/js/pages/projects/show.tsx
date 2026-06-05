@@ -78,7 +78,7 @@ export default function Show({ auth, project }: Props) {
                             <ProjectCreatorCard creator={project.creator} />
                             {isCreator && (
                                 <ProjectStatusManager
-                                    projectId={project.id}
+                                    projectSlug={project.slug}
                                     currentStatus={project.status}
                                 />
                             )}

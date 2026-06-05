@@ -5,14 +5,14 @@ import { FormError } from '@/components/ui/form-error';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { storageUrl } from './project-utils';
+import type { ProjectImage } from '@/types';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MAX_FILES = 5;
 
 interface ImageUploaderProps {
     files: File[];
-    existingImages?: string[];
+    existingImages?: ProjectImage[];
     onFilesChange: (files: File[]) => void;
     onRemoveExisting?: (imagePath: string) => void;
     error?: string;
@@ -109,7 +109,7 @@ export function ImageUploader({
 
     const totalImages = files.length + existingImages.length;
 
-    const existingImageUrls = existingImages.map((img) => storageUrl(img) ?? '');
+    const existingImageUrls = existingImages.map((img) => img.url);
 
     return (
         <>
@@ -154,7 +154,7 @@ export function ImageUploader({
                             {existingImages.map((image, index) => (
                                 <div key={index} className="relative group">
                                     <img
-                                        src={storageUrl(image) ?? ''}
+                                        src={image.url}
                                         alt={`Imagen ${index + 1}`}
                                         className="size-full aspect-square object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
                                         onClick={() => handleOpenExistingGallery(index)}
@@ -167,7 +167,7 @@ export function ImageUploader({
                                             className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onRemoveExisting(image);
+                                                onRemoveExisting(image.path);
                                             }}
                                         >
                                             <X className="size-3" />

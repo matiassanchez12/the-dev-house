@@ -130,6 +130,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Canal privado de broadcasting para notificaciones de este usuario.
+     */
+    public function routeNotificationForBroadcast($notification): string
+    {
+        return 'App.Models.User.' . $this->id;
+    }
+
+    /**
      * Boot the model.
      */
     protected static function booted(): void

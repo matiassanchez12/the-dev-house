@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DiscoverableUser } from '@/types';
+import { avatarUrl } from '@/components/projects/project-utils';
 
 interface UserCardProps {
     user: DiscoverableUser;
@@ -33,7 +34,7 @@ export function UserCard({ user }: UserCardProps) {
                 <div className="flex items-start gap-3">
                     <Link href={route('users.show', user.slug)} className="shrink-0">
                         <Avatar size="lg">
-                            <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
+                            <AvatarImage src={avatarUrl(user.avatar) ?? undefined} alt={user.name} />
                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                     </Link>
