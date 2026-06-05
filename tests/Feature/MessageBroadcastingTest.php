@@ -6,10 +6,8 @@ use App\Events\MessageCreated;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class MessageBroadcastingTest extends TestCase
@@ -27,17 +25,12 @@ class MessageBroadcastingTest extends TestCase
             'type' => 'text',
         ]);
 
-        Event::fake([MessageCreated::class]);
+        $event = new MessageCreated($message);
+        $channels = $event->broadcastOn();
 
-        event(new MessageCreated($message));
-
-        Event::assertDispatched(MessageCreated::class, function (MessageCreated $event) use ($project) {
-            $channels = $event->broadcastOn();
-
-            return count($channels) === 1
-                && $channels[0] instanceof PrivateChannel
-                && $channels[0]->name === 'project.' . $project->id;
-        });
+        $this->assertCount(1, $channels);
+        $this->assertInstanceOf(PrivateChannel::class, $channels[0]);
+        $this->assertSame('private-project.' . $project->id, $channels[0]->name);
     }
 
     public function test_message_created_does_not_broadcast_on_public_channel(): void
@@ -51,18 +44,10 @@ class MessageBroadcastingTest extends TestCase
             'type' => 'text',
         ]);
 
-        Event::fake([MessageCreated::class]);
+        $event = new MessageCreated($message);
 
-        event(new MessageCreated($message));
+        $channels = $event->broadcastOn();
 
-        Event::assertDispatched(MessageCreated::class, function (MessageCreated $event) {
-            foreach ($event->broadcastOn() as $channel) {
-                if ($channel instanceof Channel && ! $channel instanceof PrivateChannel) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
+        $this->assertContainsOnlyInstancesOf(PrivateChannel::class, $channels);
     }
 }

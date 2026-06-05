@@ -28,7 +28,7 @@ class UserFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => str($name)->slug(),
+            'slug' => str($name)->slug()->toString(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

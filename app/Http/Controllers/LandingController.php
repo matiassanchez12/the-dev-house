@@ -31,6 +31,7 @@ class LandingController extends Controller
 
         return Inertia::render('landing', [
             'users' => $allUsers->map(fn($user) => $user->only(['id', 'name', 'slug', 'bio', 'avatar']))->toArray(), 
+            'user_count' => User::count(),
             'project_count' => Project::count(),
             'collaboration_count' => DB::table('project_participants')->count(),
             'projects' => [
