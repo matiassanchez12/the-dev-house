@@ -265,6 +265,79 @@ class NotificationTest extends TestCase
         $this->assertStringContainsString($project->title, $mailMessage->subject);
     }
 
+    public function test_join_request_received_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Test Project Gamma',
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero participar',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-received', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Nueva solicitud de acceso', $html);
+        $this->assertStringContainsString('Abrir solicitud', $html);
+        $this->assertStringContainsString(route('projects.show', $project->slug), $html);
+    }
+
+    public function test_join_request_approved_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-approved', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Acceso aprobado', $html);
+        $this->assertStringContainsString('Abrir proyecto', $html);
+        $this->assertStringContainsString(route('projects.show', $project->slug), $html);
+    }
+
+    public function test_join_request_rejected_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-rejected', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Solicitud no aprobada', $html);
+        $this->assertStringContainsString('Explorar proyectos', $html);
+        $this->assertStringContainsString(route('projects.index'), $html);
+    }
+
     public function test_authenticated_user_can_view_their_notifications_index(): void
     {
         $user = User::factory()->create();
