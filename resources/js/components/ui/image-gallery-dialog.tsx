@@ -41,7 +41,7 @@ export function ImageGalleryDialog({
             {/* Centered dialog with margin auto */}
             <DialogContent
                 showCloseButton={false}
-                className="sm:max-w-5xl"
+                className="sm:max-w-7xl p-2 sm:p-3"
             >
                 <DialogHeader className="flex flex-row justify-end items-center py-2 px-4">
                     <DialogTitle className="sr-only">Image Gallery</DialogTitle>
@@ -118,15 +118,15 @@ function GalleryCarousel({ images, currentIndex, onSlideChange }: {
             opts={{ loop: true, align: 'center' }}
             className="w-full"
         >
-            <CarouselContent>
+            <CarouselContent className="items-center">
                 {images.map((src, index) => (
                     <CarouselItem key={index} className="p-0">
                         <Card className="m-0 border-0 bg-transparent shadow-none">
-                            <CardContent className="flex items-center justify-center p-0 h-full w-full">
+                            <CardContent className="flex h-[min(82vh,900px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-black/10 p-0">
                                 <img
                                     src={src}
                                     alt=""
-                                    className="max-h-[75vh] w-full object-contain"
+                                    className="h-full w-auto max-w-full object-contain"
                                 />
                             </CardContent>
                         </Card>

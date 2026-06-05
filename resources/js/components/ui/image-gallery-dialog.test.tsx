@@ -34,7 +34,17 @@ vi.mock('@/components/ui/carousel', () => ({
             {children}
         </div>
     ),
-    CarouselContent: ({ children }: { children: ReactNode }) => <div data-testid="carousel-content">{children}</div>,
+    CarouselContent: ({
+        children,
+        className,
+    }: {
+        children: ReactNode;
+        className?: string;
+    }) => (
+        <div data-testid="carousel-content" className={className}>
+            {children}
+        </div>
+    ),
     CarouselItem: ({
         children,
         className,
@@ -53,7 +63,7 @@ vi.mock('@/components/ui/carousel', () => ({
 
 describe('ImageGalleryDialog', () => {
     it('renders a wider dialog and a full-width carousel', () => {
-        render(
+        const { container } = render(
             <ImageGalleryDialog
                 images={['/one.jpg', '/two.jpg']}
                 open
@@ -62,9 +72,12 @@ describe('ImageGalleryDialog', () => {
             />,
         );
 
-        expect(screen.getByTestId('dialog-content')).toHaveClass('sm:max-w-5xl');
+        expect(screen.getByTestId('dialog-content')).toHaveClass('sm:max-w-7xl');
         expect(screen.getByTestId('dialog-content')).not.toHaveClass('sm:max-w-sm');
         expect(screen.getByTestId('carousel')).toHaveClass('w-full');
+        expect(screen.getByTestId('carousel-content')).toHaveClass('items-center');
+        expect(container.querySelector('img')).toHaveClass('h-full');
+        expect(container.querySelector('img')).toHaveClass('w-auto');
         expect(screen.getByText('1 / 2')).toBeInTheDocument();
     });
 
