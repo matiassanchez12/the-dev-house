@@ -25,6 +25,11 @@ export interface Tech {
     };
 }
 
+export interface ProjectImage {
+    path: string;
+    url: string;
+}
+
 export interface Project {
     id: number;
     user_id: number;
@@ -32,7 +37,7 @@ export interface Project {
     slug: string;
     description: string;
     vision?: string | null;
-    images?: string[] | null;
+    images?: ProjectImage[] | null;
     status: 'open' | 'closed' | 'completed';
     repository_url?: string | null;
     demo_url?: string | null;
@@ -107,7 +112,7 @@ export interface UserProject {
     title: string;
     slug: string;
     status: 'open' | 'closed' | 'completed';
-    images: string[] | null;
+    images: ProjectImage[] | null;
     description: string;
     creator: {
         id: number;

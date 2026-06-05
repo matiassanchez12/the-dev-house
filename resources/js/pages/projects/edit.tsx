@@ -15,7 +15,6 @@ interface Props {
     };
     project: ProjectType & {
         techs: Tech[];
-        images?: string[] | null;
     };
     techs: Tech[];
 }
