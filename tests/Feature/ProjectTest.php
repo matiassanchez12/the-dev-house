@@ -295,7 +295,10 @@ class ProjectTest extends TestCase
     public function test_creator_can_view_edit_form(): void
     {
         // Arrange
-        $project = Project::factory()->create(['user_id' => $this->user->id]);
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => ['projects/edit-image.jpg'],
+        ]);
 
         // Act
         $response = $this->actingAs($this->user)
@@ -307,6 +310,8 @@ class ProjectTest extends TestCase
             fn ($page) => $page
                 ->component('projects/edit')
                 ->where('project.id', $project->id)
+                ->where('project.images.0.path', 'projects/edit-image.jpg')
+                ->where('project.images.0.url', Storage::disk('public')->url('projects/edit-image.jpg'))
         );
     }
 

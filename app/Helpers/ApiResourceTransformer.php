@@ -20,7 +20,10 @@ class ApiResourceTransformer
 
         if (isset($data['images']) && is_array($data['images'])) {
             $data['images'] = array_map(
-                fn ($img) => StorageUrlHelper::url($img),
+                fn ($img) => [
+                    'path' => $img,
+                    'url' => StorageUrlHelper::url($img),
+                ],
                 $data['images']
             );
         }

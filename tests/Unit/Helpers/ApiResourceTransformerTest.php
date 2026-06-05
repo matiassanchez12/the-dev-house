@@ -13,7 +13,7 @@ class ApiResourceTransformerTest extends TestCase
     use RefreshDatabase;
 
     /** @test */
-    public function project_images_are_transformed_to_disk_urls(): void
+    public function project_images_are_transformed_to_path_and_disk_url_objects(): void
     {
         $project = Project::factory()->create([
             'images' => ['projects/example.jpg'],
@@ -21,6 +21,11 @@ class ApiResourceTransformerTest extends TestCase
 
         $data = ApiResourceTransformer::project($project);
 
-        $this->assertSame([Storage::disk('public')->url('projects/example.jpg')], $data['images']);
+        $this->assertSame([
+            [
+                'path' => 'projects/example.jpg',
+                'url' => Storage::disk('public')->url('projects/example.jpg'),
+            ],
+        ], $data['images']);
     }
 }

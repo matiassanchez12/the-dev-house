@@ -1,4 +1,3 @@
-import { storageUrl } from "@/components/projects/project-utils";
 import { Project, UserProject } from "@/types";
 
 type ProjectCardVariant = 'default' | 'featured' | 'compact';
@@ -59,7 +58,7 @@ export function getProjectCardViewModel(
         overflowCount: Math.max(techs.length - maxVisibleTechs, 0),
         participantsCount,
         createdAt: 'created_at' in project ? project.created_at : null,
-        imageUrl: storageUrl(firstImage),
+        imageUrl: firstImage?.url ?? null,
         gradientFallback: STATUS_GRADIENTS[project.status] ?? STATUS_GRADIENTS.closed,
         isFeatured,
         isCompact,

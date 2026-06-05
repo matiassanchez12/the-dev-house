@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 interface ProjectFormProps {
     mode: 'create' | 'edit';
-    project?: ProjectType & { techs?: Tech[]; images?: string[] | null };
+    project?: ProjectType & { techs?: Tech[] };
     techs: Tech[];
     form: ReturnType<typeof import('@inertiajs/react').useForm<{
         title: string;
@@ -198,7 +198,7 @@ export function ProjectForm({
                     existingImages={
                         mode === 'edit'
                             ? (project?.images ?? []).filter(
-                                  (img) => !(data.remove_images ?? []).includes(img)
+                                  (img) => !(data.remove_images ?? []).includes(img.path)
                               )
                             : []
                     }
