@@ -346,4 +346,35 @@ class NotificationTest extends TestCase
             fn ($page) => $page->where('auth.user.unread_notifications_count', 3)
         );
     }
+
+    public function test_latest_notifications_are_shared_via_inertia_for_the_navbar_dropdown(): void
+    {
+        $user = User::factory()->create();
+
+        for ($i = 1; $i <= 6; $i++) {
+            $user->notifications()->create([
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'type' => 'App\\Notifications\\JoinRequestReceived',
+                'data' => [
+                    'type' => 'join_request_received',
+                    'project_id' => $i,
+                    'project_slug' => "project-{$i}",
+                    'project_title' => "Project {$i}",
+                    'applicant_id' => $i,
+                    'applicant_name' => "Applicant {$i}",
+                ],
+                'created_at' => now()->subMinutes(6 - $i),
+                'updated_at' => now()->subMinutes(6 - $i),
+            ]);
+        }
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('notifications', 5)
+                ->where('notifications.0.data.project_title', 'Project 6')
+                ->where('notifications.4.data.project_title', 'Project 2')
+        );
+    }
 }

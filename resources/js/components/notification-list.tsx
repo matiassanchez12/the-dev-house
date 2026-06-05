@@ -29,8 +29,11 @@ interface NotificationListProps {
 }
 
 export function NotificationList({ limit, emptyText = 'Sin notificaciones' }: NotificationListProps) {
-    const page = usePage<{ notifications?: { data: NotificationItem[] } }>();
-    const notifications = page.props.notifications?.data ?? [];
+    const page = usePage<{ notifications?: NotificationItem[] | { data: NotificationItem[] } }>();
+    const notificationsProp = page.props.notifications;
+    const notifications = Array.isArray(notificationsProp)
+        ? notificationsProp
+        : notificationsProp?.data ?? [];
     const items = limit ? notifications.slice(0, limit) : notifications;
 
     if (items.length === 0) {
