@@ -3,7 +3,7 @@ services:
     name: devcollab
     env: php
     buildCommand: composer install --no-dev && npm ci && npm run build
-    startCommand: php artisan serve --host 0.0.0.0 --port 10000
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
     plan: free
 
  

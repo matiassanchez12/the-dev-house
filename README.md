@@ -77,6 +77,7 @@ REST API documentation is available at http://localhost/docs/api.
 | Servicio | URL | Credenciales |
 |----------|-----|--------------|
 | Aplicación | http://localhost | - |
+| Reverb WebSocket | ws://localhost:8080 | - |
 | Mailpit Dashboard | http://localhost:8025 | - |
 | MySQL | localhost:3306 | sail / password |
 | Redis | localhost:6379 | - |

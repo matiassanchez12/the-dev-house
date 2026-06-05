@@ -34,17 +34,14 @@ export default function NotificationBell() {
 
         const channel = window.Echo.private(`App.Models.User.${user.id}`);
 
-        const handler = (event: { notification?: NotificationItem }) => {
+        const handler = () => {
             setUnreadCount((current) => current + 1);
-            if (event.notification) {
-                router.reload({ only: ['notifications'] });
-            }
+            router.reload({ only: ['notifications'] });
         };
 
-        channel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
+        channel.notification(handler);
 
         return () => {
-            channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
             window.Echo.leave(`App.Models.User.${user.id}`);
         };
     }, [user?.id]);
