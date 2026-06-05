@@ -32,11 +32,16 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $userData = null;
+        $notifications = [];
         $user = $request->user();
 
         if ($user) {
             $userData = $user->only(['id', 'name', 'slug', 'bio', 'avatar']);
             $userData['unread_notifications_count'] = $user->unreadNotifications()->count();
+            $notifications = $user->notifications()
+                ->latest()
+                ->take(5)
+                ->get();
 
             $userData['avatar'] = StorageUrlHelper::url($userData['avatar'] ?? null);
         }
@@ -46,6 +51,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $userData,
             ],
+            'notifications' => $notifications,
             'techs' => Tech::orderBy('name')->get(),
         ];
     }

@@ -14,7 +14,7 @@ interface User {
 
 interface PageProps {
     auth: { user: User | null };
-    notifications?: { data: NotificationItem[] };
+    notifications?: NotificationItem[] | { data: NotificationItem[] };
 }
 
 export type { NotificationItem } from '@/components/notification-list';
