@@ -5,8 +5,11 @@ import NotificationBell from '@/components/notification-bell';
 import { Dropdown } from '@/components/ui/dropdown';
 import NavLink from '@/components/nav-link';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, UserRound, UsersRound } from 'lucide-react';
 import { User } from '@/types';
 
 interface Props {
@@ -17,17 +20,66 @@ interface Props {
 export default function AppLayout({ children, header }: Props) {
     const user = usePage().props.auth.user as User | null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const unreadNotifications = user?.unread_notifications_count ?? 0;
 
     const navLinks = [
-        { href: route('projects.index'), label: 'Proyectos', active: route().current('projects.*') },
-        { href: route('users.index'), label: 'Developers', active: route().current('users.*') },
+        {
+            href: route('projects.index'),
+            label: 'Proyectos',
+            description: 'Explorá proyectos activos',
+            icon: FolderKanban,
+            active: route().current('projects.*'),
+        },
+        {
+            href: route('users.index'),
+            label: 'Developers',
+            description: 'Encontrá perfiles y skills',
+            icon: UsersRound,
+            active: route().current('users.*'),
+        },
     ];
 
     const authenticatedNavLinks = user
         ? [
-              { href: route('join-requests.index'), label: 'Solicitudes', active: route().current('join-requests.*') },
+              {
+                  href: route('join-requests.index'),
+                  label: 'Solicitudes',
+                  description: 'Gestioná tus invitaciones',
+                  icon: Inbox,
+                  active: route().current('join-requests.*'),
+              },
           ]
         : [];
+
+    const accountLinks = user
+        ? [
+              {
+                  href: route('users.show', user.slug),
+                  label: 'Mi Perfil',
+                  description: 'Viendo tu espacio público',
+                  icon: UserRound,
+              },
+              {
+                  href: route('profile.edit'),
+                  label: 'Configuración',
+                  description: 'Ajustes de cuenta y perfil',
+                  icon: Settings2,
+              },
+          ]
+        : [
+              {
+                  href: route('login'),
+                  label: 'Iniciar Sesión',
+                  description: 'Entrá a tu cuenta',
+                  icon: LogIn,
+              },
+              {
+                  href: route('register'),
+                  label: 'Registrarse',
+                  description: 'Creá tu cuenta gratis',
+                  icon: UserRound,
+              },
+          ];
 
     const logoHref = user ? route('dashboard') : '/';
 
@@ -122,8 +174,6 @@ export default function AppLayout({ children, header }: Props) {
                         </div>
 
                         <div className="-me-2 flex items-center sm:hidden">
-                            <ThemeToggle />
-                            {user && <NotificationBell />}
                             <button
                                 onClick={() => setMobileMenuOpen(true)}
                                 className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition duration-150 ease-in-out hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none"
@@ -148,38 +198,102 @@ export default function AppLayout({ children, header }: Props) {
 
                 {/* Mobile full-screen menu */}
                 <MobileNavMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
-                    {[...navLinks, ...authenticatedNavLinks].map((link) => (
-                        <MobileNavMenu.Link key={link.href} href={link.href}>
-                            {link.label}
-                        </MobileNavMenu.Link>
-                    ))}
+                    <div className="mb-4 rounded-3xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm">
+                        <div className="flex items-start gap-4">
+                            {user ? (
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="size-11">
+                                            <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
+                                            <AvatarFallback>
+                                                {user.name
+                                                    .split(' ')
+                                                    .map((n) => n[0])
+                                                    .slice(0, 2)
+                                                    .join('')
+                                                    .toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
 
-                    <MobileNavMenu.Divider />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-semibold text-foreground">{user.name}</p>
+                                            <p className="truncate text-xs text-muted-foreground">@{user.slug}</p>
+                                        </div>
 
-                    {user ? (
-                        <>
-                            <MobileNavMenu.Link href={route('users.show', user.slug)}>
-                                Mi Perfil
-                            </MobileNavMenu.Link>
-                            <MobileNavMenu.Link
-                                href={route('logout')}
-                                method="post"
-                                as="button"
-                                variant="destructive"
-                            >
-                                Cerrar Sesión
-                            </MobileNavMenu.Link>
-                        </>
-                    ) : (
-                        <>
-                            <MobileNavMenu.Link href={route('login')}>
-                                Iniciar Sesión
-                            </MobileNavMenu.Link>
-                            <MobileNavMenu.Link href={route('register')}>
-                                Registrarse
-                            </MobileNavMenu.Link>
-                        </>
-                    )}
+                                        {unreadNotifications > 0 && (
+                                            <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[11px] font-semibold">
+                                                {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="min-w-0 flex-1 pt-0.5">
+                                    <p className="text-sm font-semibold text-foreground">The Dev House</p>
+                                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                                        Construí, conectá y mové tu proyecto desde acá.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-4 overflow-y-auto scrollbar-none pb-4">
+                        <MobileNavMenu.Section title="Explorar" description="Navegá por los principales espacios de la app">
+                            {[...navLinks, ...authenticatedNavLinks].map((link) => (
+                                <MobileNavMenu.Link
+                                    key={link.href}
+                                    href={link.href}
+                                    icon={link.icon}
+                                    description={link.description}
+                                    className={link.active ? 'bg-primary/5 text-foreground ring-1 ring-primary/10' : undefined}
+                                >
+                                    {link.label}
+                                </MobileNavMenu.Link>
+                            ))}
+                        </MobileNavMenu.Section>
+
+                        <MobileNavMenu.Section title="Preferencias" description="Ajustes rápidos sin salir del menú">
+                            <ThemeToggle appearance="menu" />
+
+                            {user && (
+                                <MobileNavMenu.Link
+                                    href={route('notifications.index')}
+                                    icon={Bell}
+                                    description="Revisá lo nuevo y marcá todo como leído"
+                                    badge={unreadNotifications > 0 ? unreadNotifications : undefined}
+                                >
+                                    Notificaciones
+                                </MobileNavMenu.Link>
+                            )}
+                        </MobileNavMenu.Section>
+
+                        <MobileNavMenu.Section title="Cuenta" description="Acceso a tu perfil y sesión">
+                            {accountLinks.map((link) => (
+                                <MobileNavMenu.Link
+                                    key={link.href}
+                                    href={link.href}
+                                    icon={link.icon}
+                                    description={link.description}
+                                >
+                                    {link.label}
+                                </MobileNavMenu.Link>
+                            ))}
+
+                            {user ? (
+                                <MobileNavMenu.Link
+                                    href={route('logout')}
+                                    method="post"
+                                    as="button"
+                                    icon={LogOut}
+                                    variant="destructive"
+                                    description="Cerrá la sesión en este dispositivo"
+                                >
+                                    Cerrar Sesión
+                                </MobileNavMenu.Link>
+                            ) : null}
+                        </MobileNavMenu.Section>
+                    </div>
                 </MobileNavMenu>
             </nav>
 
