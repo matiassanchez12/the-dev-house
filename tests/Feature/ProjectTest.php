@@ -20,7 +20,7 @@ class ProjectTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Crear usuario de prueba
         $this->user = User::factory()->create();
         
@@ -438,7 +438,7 @@ class ProjectTest extends TestCase
     public function test_update_only_deletes_images_owned_by_project(): void
     {
         // Arrange
-        $disk = config('filesystems.default', 'public');
+        $disk = 'public';
         Storage::fake($disk);
 
         $ownedPath = 'projects/owned-image.jpg';
@@ -472,7 +472,7 @@ class ProjectTest extends TestCase
     public function test_update_ignores_remove_image_paths_not_in_project(): void
     {
         // Arrange
-        $disk = config('filesystems.default', 'public');
+        $disk = 'public';
         Storage::fake($disk);
 
         $ownedPath = 'projects/owned.jpg';
@@ -509,7 +509,7 @@ class ProjectTest extends TestCase
     public function test_update_rejects_remove_image_paths_with_traversal(): void
     {
         // Arrange
-        $disk = config('filesystems.default', 'public');
+        $disk = 'public';
         Storage::fake($disk);
 
         $victimPath = 'users/avatars/admin.jpg';
@@ -544,7 +544,7 @@ class ProjectTest extends TestCase
     public function test_delete_images_guard_rejects_unsafe_paths(): void
     {
         // Arrange
-        $disk = config('filesystems.default', 'public');
+        $disk = 'public';
         Storage::fake($disk);
 
         $victimAvatar = 'users/avatars/admin.jpg';

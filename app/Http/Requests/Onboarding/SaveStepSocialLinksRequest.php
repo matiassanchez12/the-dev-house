@@ -31,7 +31,7 @@ class SaveStepSocialLinksRequest extends FormRequest
             'links.*.platform' => [
                 'required',
                 'string',
-                'in:github,linkedin,twitter,website',
+                'in:github,linkedin,twitter,website,youtube,discord,stackoverflow',
             ],
             'links.*.url' => [
                 'required',
@@ -53,7 +53,7 @@ class SaveStepSocialLinksRequest extends FormRequest
             'links.array' => 'El formato de links es inválido.',
             'links.min' => 'Debes incluir al menos un link social.',
             'links.*.platform.required' => 'Cada link debe especificar una plataforma.',
-            'links.*.platform.in' => 'La plataforma debe ser github, linkedin, twitter o website.',
+            'links.*.platform.in' => 'La plataforma debe ser una de las plataformas soportadas.',
             'links.*.url.required' => 'Cada link debe tener una URL.',
             'links.*.url.url' => 'La URL debe tener un formato válido.',
             'links.*.url.max' => 'La URL no debe exceder los 2048 caracteres.',

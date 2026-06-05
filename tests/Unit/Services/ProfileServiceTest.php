@@ -21,6 +21,8 @@ class ProfileServiceTest extends TestCase
     {
         parent::setUp();
 
+        config(['filesystems.default' => 'public']);
+
         $this->service = new ProfileService();
         $this->user = User::factory()->create();
     }

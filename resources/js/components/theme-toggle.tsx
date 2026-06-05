@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
+import { MoonStar, SunMedium } from 'lucide-react';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+    appearance?: 'icon' | 'menu';
+    className?: string;
+}
+
+export default function ThemeToggle({ appearance = 'icon', className }: ThemeToggleProps) {
     // Read from localStorage synchronously to avoid flash
     const getInitialTheme = (): 'light' | 'dark' => {
         if (typeof window === 'undefined') return 'light';
@@ -28,52 +35,46 @@ export default function ThemeToggle() {
         setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
     };
 
+    if (appearance === 'menu') {
+        return (
+            <Button
+                type="button"
+                variant="outline"
+                onClick={toggleTheme}
+                aria-pressed={theme === 'dark'}
+                className={cn(
+                    'h-auto w-full justify-between rounded-3xl border-border/70 bg-card/80 px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/20 hover:bg-card',
+                    className,
+                )}
+            >
+                <span className="flex min-w-0 items-center gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/10">
+                        {theme === 'light' ? <MoonStar data-icon="inline-start" /> : <SunMedium data-icon="inline-start" />}
+                    </span>
+                    <span className="flex min-w-0 flex-col">
+                        <span className="text-sm font-semibold text-foreground">Tema</span>
+                        <span className="truncate text-xs text-muted-foreground">
+                            {theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+                        </span>
+                    </span>
+                </span>
+
+                <span className="rounded-full border border-border/70 bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                    {theme === 'light' ? 'Claro' : 'Oscuro'}
+                </span>
+            </Button>
+        );
+    }
+
     return (
         <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
             title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
+            className={className}
         >
-            {theme === 'light' ? (
-                // Moon icon (for light mode)
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                </svg>
-            ) : (
-                // Sun icon (for dark mode)
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <circle cx="12" cy="12" r="4" />
-                    <path d="M12 2v2" />
-                    <path d="M12 20v2" />
-                    <path d="m4.93 4.93 1.41 1.41" />
-                    <path d="m17.66 17.66 1.41 1.41" />
-                    <path d="M2 12h2" />
-                    <path d="M20 12h2" />
-                    <path d="m6.34 17.66-1.41 1.41" />
-                    <path d="m19.07 4.93-1.41 1.41" />
-                </svg>
-            )}
+            {theme === 'light' ? <MoonStar /> : <SunMedium />}
         </Button>
     );
 }

@@ -130,7 +130,17 @@ class ProfileController extends Controller
         }, $newLinks);
 
         if (! empty($records)) {
-            SocialLink::upsert($records, ['user_id', 'platform'], ['url']);
+            foreach ($records as $record) {
+                SocialLink::updateOrCreate(
+                    [
+                        'user_id' => $record['user_id'],
+                        'platform' => $record['platform'],
+                    ],
+                    [
+                        'url' => $record['url'],
+                    ]
+                );
+            }
         }
 
         return Redirect::route('profile.edit')->with('success', 'Links sociales actualizados!');

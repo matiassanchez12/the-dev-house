@@ -38,9 +38,7 @@ class HandleInertiaRequests extends Middleware
             $userData = $user->only(['id', 'name', 'slug', 'bio', 'avatar']);
             $userData['unread_notifications_count'] = $user->unreadNotifications()->count();
 
-            if ($user->avatar) {
-                $userData['avatar_url'] = StorageUrlHelper::url($user->avatar);
-            }
+            $userData['avatar'] = StorageUrlHelper::url($userData['avatar'] ?? null);
         }
 
         return [

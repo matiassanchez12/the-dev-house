@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class UserProfileTest extends TestCase
@@ -49,7 +50,7 @@ class UserProfileTest extends TestCase
                 ->has('user')
                 ->where('user.name', 'Juan Pérez')
                 ->where('user.bio', 'Desarrollador full-stack con 5 años de experiencia')
-                ->where('user.avatar', 'avatars/juan.jpg')
+                ->where('user.avatar', Storage::disk('public')->url('avatars/juan.jpg'))
                 ->missing('user.email') // email should NOT be exposed
         );
     }
