@@ -9,6 +9,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 /**
  * Canal de proyecto para el chat
- * Solo acceden: creator, participantes aprobados, y solicitantes pendientes
+ * Solo acceden: creator y participantes aprobados
  */
 Broadcast::channel('project.{projectId}', ProjectChannel::class);

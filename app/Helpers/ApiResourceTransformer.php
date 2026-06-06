@@ -38,6 +38,24 @@ class ApiResourceTransformer
             $data['participants'] = array_map(fn($p) => self::user($p), $data['participants']);
         }
 
+        if (isset($data['messages']) && is_array($data['messages'])) {
+            $data['messages'] = array_map(fn ($message) => self::message($message), $data['messages']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Transform a message to a safe array with sender details.
+     */
+    public static function message(Model|array $message): array
+    {
+        $data = $message instanceof Model ? $message->toArray() : $message;
+
+        if (isset($data['sender'])) {
+            $data['sender'] = self::user($data['sender']);
+        }
+
         return $data;
     }
 

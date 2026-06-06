@@ -4,7 +4,6 @@ namespace App\Broadcasting;
 
 use App\Models\User;
 use App\Models\Project;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProjectChannel
 {
@@ -22,7 +21,6 @@ class ProjectChannel
      * Solo pueden acceder:
      * - El creator del proyecto
      * - Los participantes aprobados
-     * - Usuarios con solicitudes pendientes (para ver updates)
      */
     public function join(User $user, int $projectId): array|bool
     {
@@ -32,28 +30,10 @@ class ProjectChannel
             return false;
         }
 
-        // El creator siempre tiene acceso
-        if ($project->user_id === $user->id) {
-            return ['creator' => true];
-        }
-
-        // Participantes aprobados
-        $isParticipant = $user->participatingProjects()
-            ->where('project_id', $projectId)
-            ->exists();
-
-        if ($isParticipant) {
-            return ['participant' => true];
-        }
-
-        // Usuarios con solicitudes pendientes
-        $hasPendingRequest = $project->joinRequests()
-            ->where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->exists();
-
-        if ($hasPendingRequest) {
-            return ['applicant' => true];
+        if ($project->isMember($user)) {
+            return $project->user_id === $user->id
+                ? ['creator' => true]
+                : ['participant' => true];
         }
 
         return false;

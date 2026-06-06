@@ -61,7 +61,16 @@ class Project extends Model
      */
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class)->orderBy('created_at');
+    }
+
+    /**
+     * Determine whether the given user belongs to the project chat.
+     */
+    public function isMember(User $user): bool
+    {
+        return $this->user_id === $user->id
+            || $this->participants()->whereKey($user->id)->exists();
     }
 
     /**
