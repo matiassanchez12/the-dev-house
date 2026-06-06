@@ -29,7 +29,7 @@ case "$SERVICE" in
         ;;
     reverb)
         echo "→ Starting Reverb WebSocket server..."
-        exec php artisan reverb:start
+        exec php artisan reverb:start --host=0.0.0.0 --port="${PORT:-8080}"
         ;;
     *)
         echo "Unknown service: $SERVICE. Must be web, worker, or reverb."
