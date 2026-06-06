@@ -216,7 +216,7 @@ function getOrbitConfig(viewportWidth: number): OrbitConfig {
         radii: DESKTOP_ORBIT_RADII,
         phases: DESKTOP_ORBIT_PHASES,
         scales: DESKTOP_ORBIT_SCALES,
-        ringWeights: [0.82, 0.96, 1, 1.06, 1.16],
+        ringWeights: [0.45, 0.96, 1.06, 1.18, 1.35],
     };
 }
 
@@ -362,7 +362,7 @@ const TechTile = memo(function TechTile({
             }}
         >
             {hasIcon ? (
-                <Icon className={compact ? 'size-4 md:size-5 shrink-0' : 'size-6 md:size-7 shrink-0'} />
+                <Icon className={compact ? 'size-5 md:size-6 shrink-0' : 'size-6 md:size-7 shrink-0'} />
             ) : (
                 <span className={compact ? 'flex h-6 w-6 items-center justify-center rounded-full border border-border/40 text-[9px] tracking-[0.12em]' : 'flex h-8 w-8 items-center justify-center rounded-full border border-border/40 text-[10px] tracking-[0.14em]'}>
                     {initials}
