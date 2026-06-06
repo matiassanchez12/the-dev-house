@@ -39,6 +39,8 @@ interface Props {
 export default function Index({ users, techs, filters }: Props) {
     const [search, setSearch] = useState(filters.q || '');
     const [selectedTech, setSelectedTech] = useState(filters.tech || '');
+    const appliedSearch = filters.q || null;
+    const appliedTech = filters.tech || null;
 
     const hasActiveFilters = search || selectedTech;
 
@@ -65,8 +67,8 @@ export default function Index({ users, techs, filters }: Props) {
     const handlePageChange = (url: string | null) => {
         if (url) {
             router.get(url, {
-                q: search || null,
-                tech: selectedTech || null,
+                q: appliedSearch,
+                tech: appliedTech,
             });
         }
     };
@@ -109,6 +111,7 @@ export default function Index({ users, techs, filters }: Props) {
                                                 onChange={(e) => setSearch(e.target.value)}
                                                 placeholder="Nombre del developer..."
                                                 className="pl-9"
+                                                onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
                                             />
                                         </div>
                                     </div>
@@ -117,10 +120,7 @@ export default function Index({ users, techs, filters }: Props) {
                                         <label className="mb-2 block text-sm font-medium">
                                             Tecnología
                                         </label>
-                                        <Select value={selectedTech} onValueChange={(val) => {
-                                                setSelectedTech(val);
-                                                handleFilter();
-                                            }}>
+                                        <Select value={selectedTech} onValueChange={setSelectedTech}>
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Todas" />
                                             </SelectTrigger>
@@ -134,12 +134,17 @@ export default function Index({ users, techs, filters }: Props) {
                                         </Select>
                                     </div>
 
-                                    {hasActiveFilters && (
-                                        <Button variant="outline" onClick={clearFilters}>
-                                            <X className="size-4" />
-                                            Limpiar
+                                    <div className="flex gap-2">
+                                        <Button onClick={handleFilter}>
+                                            Filtrar
                                         </Button>
-                                    )}
+                                        {hasActiveFilters && (
+                                            <Button variant="outline" onClick={clearFilters}>
+                                                <X className="size-4" />
+                                                Limpiar
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -205,7 +210,7 @@ export default function Index({ users, techs, filters }: Props) {
                                                                     variant={link.active ? 'default' : 'outline'}
                                                                     disabled={!link.url}
                                                                     size="sm"
-                                                                    onClick={() => link.url && router.get(link.url)}
+                                                                    onClick={() => handlePageChange(link.url)}
                                                                 >
                                                                     {isPrev ? 'Anterior' : isNext ? 'Siguiente' : link.label}
                                                                 </Button>
