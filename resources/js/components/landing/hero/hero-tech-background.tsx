@@ -459,7 +459,7 @@ export function HeroTechBackground() {
     return (
         <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 overflow-visible"
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
         >
             <div className="absolute left-1/2 top-[48%] size-[min(92vw,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-gradient-to-b from-background/0 via-background/20 to-background/40 blur-[1px] dark:from-background/0 dark:via-background/10 dark:to-background/20" />
             <div className="absolute left-1/2 top-[48%] size-[min(76vw,52rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/10 opacity-70" />
