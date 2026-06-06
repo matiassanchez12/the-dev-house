@@ -25,7 +25,7 @@ function InViewItem({ children, delayMs = 0, className }: InViewItemProps) {
 export default function LandingHero({ auth, techs, className }: LandingHeroProps) {
     return (
         <section className={cn(
-            'relative overflow-hidden min-h-[calc(100vh-1px)] flex items-center',
+            'relative overflow-x-hidden overflow-y-visible min-h-[calc(100vh-1px)] flex items-center',
             'pt-20 pb-16 md:pt-32 md:pb-24',
             className,
         )}>

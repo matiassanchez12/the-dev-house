@@ -149,15 +149,15 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
 const SPOTLIGHT_RADIUS = 280;
 const BASE_OPACITY = 0.15;
 const MAX_ADDITIONAL = 0.70;
-const DESKTOP_ORBIT_RADII = [12, 20, 28, 35, 42] as const;
+const DESKTOP_ORBIT_RADII = [10, 20, 30, 40, 50] as const;
 const DESKTOP_ORBIT_PHASES = [-18, 26, -8, 18, -34] as const;
 const DESKTOP_ORBIT_SCALES = [1.08, 1.02, 0.96, 0.9, 0.84] as const;
 
-const TABLET_ORBIT_RADII = [14, 22, 30, 38] as const;
+const TABLET_ORBIT_RADII = [16, 27, 38, 49] as const;
 const TABLET_ORBIT_PHASES = [-16, 22, -10, 28] as const;
 const TABLET_ORBIT_SCALES = [0.92, 0.88, 0.84, 0.8] as const;
 
-const MOBILE_ORBIT_RADII = [16, 27, 38] as const;
+const MOBILE_ORBIT_RADII = [16, 24, 32] as const;
 const MOBILE_ORBIT_PHASES = [-12, 28, -20] as const;
 const MOBILE_ORBIT_SCALES = [0.84, 0.8, 0.76] as const;
 
@@ -459,11 +459,11 @@ export function HeroTechBackground() {
     return (
         <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+            className="pointer-events-none absolute inset-0 z-0 overflow-visible"
         >
-            <div className="absolute left-1/2 top-[48%] size-[min(82vw,56rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-gradient-to-b from-background/0 via-background/20 to-background/40 blur-[1px] dark:from-background/0 dark:via-background/10 dark:to-background/20" />
-            <div className="absolute left-1/2 top-[48%] size-[min(66vw,45rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/10 opacity-70" />
-            <div className="absolute left-1/2 top-[48%] size-[min(46vw,30rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-primary/4 blur-2xl" />
+            <div className="absolute left-1/2 top-[48%] size-[min(92vw,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-gradient-to-b from-background/0 via-background/20 to-background/40 blur-[1px] dark:from-background/0 dark:via-background/10 dark:to-background/20" />
+            <div className="absolute left-1/2 top-[48%] size-[min(76vw,52rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/10 opacity-70" />
+            <div className="absolute left-1/2 top-[48%] size-[min(54vw,36rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-primary/4 blur-2xl" />
             <div
                 ref={gridRef}
                 className="absolute inset-0 select-none"
