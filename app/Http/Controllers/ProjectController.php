@@ -96,6 +96,10 @@ class ProjectController extends Controller
     {
         $project->load(['creator.techs', 'techs', 'participants']);
 
+        if (Auth::check() && $project->isMember(Auth::user())) {
+            $project->load(['messages.sender']);
+        }
+
         return Inertia::render('projects/show', [
             'project' => ApiResourceTransformer::project($project),
         ]);

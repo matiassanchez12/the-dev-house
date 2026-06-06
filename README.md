@@ -281,7 +281,7 @@ npm run build                        # Build para producción
 
 ### En Desarrollo
 - 🔲 Sistema de Join Requests
-- 🔲 Chat en tiempo real (Reverb + Echo)
+- ✅ Chat en tiempo real (Reverb + Echo)
 - 🔲 Perfil de usuario con avatar
 - 🔲 Notificaciones por email
 

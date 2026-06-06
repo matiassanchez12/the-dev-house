@@ -3,6 +3,7 @@
 namespace Tests\Feature\Projects;
 
 use App\Models\Project;
+use App\Models\Message;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -93,5 +94,74 @@ class ShowTest extends TestCase
         $props = $response->viewData('page')['props'];
         $this->assertArrayHasKey('project', $props);
         $this->assertEquals('Responsive Project', $props['project']['title']);
+    }
+
+    /**
+     * Test: Project members can see chat messages on the detail page
+     *
+     * Scenario: A participant opens a project they belong to
+     * Expected: The project payload includes chat messages with sender data
+     */
+    public function test_project_detail_includes_chat_messages_for_members(): void
+    {
+        $creator = User::factory()->create(['name' => 'Project Creator']);
+        $participant = User::factory()->create(['name' => 'Chat Member']);
+
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Chat Project',
+            'slug' => 'chat-project',
+            'status' => 'open',
+        ]);
+
+        $project->participants()->attach($participant->id, ['role' => 'developer', 'joined_at' => now()]);
+
+        Message::create([
+            'project_id' => $project->id,
+            'user_id' => $participant->id,
+            'body' => 'Listo para arrancar',
+            'type' => 'text',
+        ]);
+
+        $response = $this->actingAs($participant)->get(route('projects.show', $project));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('project.messages', 1)
+            ->where('project.messages.0.body', 'Listo para arrancar')
+            ->where('project.messages.0.sender.name', 'Chat Member')
+        );
+    }
+
+    /**
+     * Test: Project members can send messages to the chat
+     *
+     * Scenario: A participant submits a new chat message
+     * Expected: The message is stored and the user is redirected back to the project
+     */
+    public function test_project_members_can_send_chat_messages(): void
+    {
+        $creator = User::factory()->create();
+        $participant = User::factory()->create();
+
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'slug' => 'chat-project-store',
+            'status' => 'open',
+        ]);
+
+        $project->participants()->attach($participant->id, ['role' => 'developer', 'joined_at' => now()]);
+
+        $response = $this->actingAs($participant)->post(route('projects.messages.store', $project), [
+            'body' => 'Ya estoy listo para revisar el backlog',
+        ]);
+
+        $response->assertRedirect(route('projects.show', $project));
+
+        $this->assertDatabaseHas('messages', [
+            'project_id' => $project->id,
+            'user_id' => $participant->id,
+            'body' => 'Ya estoy listo para revisar el backlog',
+            'type' => 'text',
+        ]);
     }
 }
