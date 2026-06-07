@@ -50,6 +50,7 @@ export interface Project {
     viewerJoinRequest?: {
         id: number;
         status: 'pending' | 'approved' | 'rejected';
+        message?: string;
     } | null;
 }
 

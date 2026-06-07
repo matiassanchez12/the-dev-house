@@ -313,6 +313,31 @@ class ProjectTest extends TestCase
         );
     }
 
+    public function test_project_detail_includes_viewer_rejected_join_request(): void
+    {
+        $project = Project::factory()->create(['slug' => 'project-rejected']);
+        $viewer = User::factory()->create();
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $viewer->id,
+            'message' => 'I would like to contribute.',
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($viewer)->get('/projects/project-rejected');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('projects/show')
+                ->where('project.viewerJoinRequest.status', 'rejected')
+                ->where('project.viewerJoinRequest.id', $joinRequest->id)
+                ->where('project.viewerJoinRequest.message', 'I would like to contribute.')
+        );
+    }
+
     /**
      * TEST 11: Ver formulario de edición (solo creator)
      */

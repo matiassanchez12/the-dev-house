@@ -12,11 +12,12 @@ interface ProjectJoinFormProps {
     projectId: number;
     isOpen: boolean;
     isCreator: boolean;
+    isParticipant: boolean;
     user: User | null;
-    viewerJoinRequest?: Pick<JoinRequest, 'id' | 'status'> | null;
+    viewerJoinRequest?: Pick<JoinRequest, 'id' | 'status' | 'message'> | null;
 }
 
-export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoinRequest }: ProjectJoinFormProps) {
+export function ProjectJoinForm({ projectId, isOpen, isCreator, isParticipant, user, viewerJoinRequest }: ProjectJoinFormProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         message: '',
     });
@@ -32,7 +33,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoin
         });
     };
 
-    if (isCreator) {
+    if (isCreator || isParticipant) {
         return null;
     }
 
@@ -67,6 +68,26 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoin
                             <Button variant="outline">Registrarme</Button>
                         </Link>
                     </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (viewerJoinRequest?.status === 'rejected') {
+        return (
+            <Card className="border-destructive/20">
+                <CardHeader>
+                    <CardTitle>Solicitud rechazada</CardTitle>
+                    <CardDescription>
+                        Tu solicitud para unirte a este proyecto fue rechazada.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Link href={route('projects.index')}>
+                        <Button variant="outline" className="w-full">
+                            Explorar otros proyectos
+                        </Button>
+                    </Link>
                 </CardContent>
             </Card>
         );

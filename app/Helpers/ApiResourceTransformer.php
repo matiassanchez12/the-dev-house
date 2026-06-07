@@ -48,6 +48,7 @@ class ApiResourceTransformer
             : [
                 'id' => $viewerJoinRequest->id,
                 'status' => $viewerJoinRequest->status,
+                'message' => $viewerJoinRequest->message,
             ];
 
         return $data;
