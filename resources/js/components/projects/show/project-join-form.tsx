@@ -1,5 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
-import { Send } from 'lucide-react';
+import { Clock, Send, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,17 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoin
     const { data, setData, post, processing, errors, reset } = useForm({
         message: '',
     });
+
+    const handleCancel = (joinRequestId: number) => {
+        post(route('join-requests.cancel', joinRequestId), {
+            onSuccess: () => {
+                toast.success('Solicitud cancelada');
+            },
+            onError: () => {
+                toast.error('Error al cancelar la solicitud');
+            },
+        });
+    };
 
     if (isCreator) {
         return null;
@@ -65,11 +76,26 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoin
         return (
             <Card className="border-primary/20">
                 <CardHeader>
-                    <CardTitle>Solicitud enviada</CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Clock className="size-4 text-muted-foreground" />
+                        <CardTitle>Solicitud enviada</CardTitle>
+                    </div>
                     <CardDescription>
                         Ya enviaste una solicitud para unirte a este proyecto.
                     </CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={processing}
+                        onClick={() => handleCancel(viewerJoinRequest.id)}
+                    >
+                        <X className="size-4" data-icon="inline-start" />
+                        {processing ? 'Cancelando...' : 'Cancelar solicitud'}
+                    </Button>
+                </CardContent>
             </Card>
         );
     }
