@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import type { User } from '@/types';
+import type { JoinRequest, User } from '@/types';
+import InputError from '@/components/input-error';
 
 interface ProjectJoinFormProps {
     projectId: number;
     isOpen: boolean;
     isCreator: boolean;
     user: User | null;
+    viewerJoinRequest?: Pick<JoinRequest, 'id' | 'status'> | null;
 }
 
-export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJoinFormProps) {
+export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoinRequest }: ProjectJoinFormProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         message: '',
     });
@@ -59,6 +61,19 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
         );
     }
 
+    if (viewerJoinRequest?.status === 'pending') {
+        return (
+            <Card className="border-primary/20">
+                <CardHeader>
+                    <CardTitle>Solicitud enviada</CardTitle>
+                    <CardDescription>
+                        Ya enviaste una solicitud para unirte a este proyecto.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+        );
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('join-requests.store', projectId), {
@@ -88,6 +103,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
                         </Label>
                         <Textarea
                             id="message"
+                            className="mt-1 block w-full"
                             value={data.message}
                             onChange={(e) => setData('message', e.target.value)}
                             placeholder="Hola, me interesa este proyecto porque..."
@@ -95,7 +111,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
                             required
                         />
                         {errors.message && (
-                            <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                            <InputError className="mt-2" message={errors.message} />
                         )}
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>

@@ -92,6 +92,7 @@ export default function Show({ auth, project }: Props) {
                                 isOpen={project.status === 'open'}
                                 isCreator={isCreator}
                                 user={auth.user}
+                                viewerJoinRequest={project.viewerJoinRequest}
                             />
                         </div>
                     </div>
