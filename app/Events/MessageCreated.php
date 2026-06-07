@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Helpers\ApiResourceTransformer;
 use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -44,17 +45,6 @@ class MessageCreated implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        return [
-            'id' => $this->message->id,
-            'body' => $this->message->body,
-            'type' => $this->message->type,
-            'file_url' => $this->message->file_url,
-            'user' => [
-                'id' => $this->message->user_id,
-                'name' => $this->message->sender->name,
-                'avatar' => $this->message->sender->avatar,
-            ],
-            'created_at' => $this->message->created_at->toIso8601String(),
-        ];
+        return ApiResourceTransformer::message($this->message->loadMissing('sender'));
     }
 }

@@ -98,6 +98,9 @@ class ProjectController extends Controller
     {
         $project->load(['creator.techs', 'techs', 'participants']);
 
+        if (Auth::check() && $project->isMember(Auth::user())) {
+            $project->load(['messages.sender']);
+        }
         $viewerJoinRequest = null;
 
         if (Auth::check()) {

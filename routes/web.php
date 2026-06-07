@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProjectMessageController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page
@@ -41,6 +42,7 @@ Route::middleware('auth')->group(function () {
 
     // Project Status
     Route::patch('/projects/{project:slug}/status', [ProjectStatusController::class, 'update'])->name('projects.status.update');
+    Route::post('/projects/{project:slug}/messages', [ProjectMessageController::class, 'store'])->name('projects.messages.store');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
