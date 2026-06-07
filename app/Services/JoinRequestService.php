@@ -31,6 +31,21 @@ class JoinRequestService
             ->first();
     }
     /**
+     * Get the viewer's latest join request for a project (any status).
+     *
+     * @param Project $project
+     * @param User $viewer
+     * @return JoinRequest|null
+     */
+    public function getViewerFullRequest(Project $project, User $viewer): ?JoinRequest
+    {
+        return JoinRequest::where('project_id', $project->id)
+            ->where('user_id', $viewer->id)
+            ->latest()
+            ->first();
+    }
+
+    /**
      * Validate that a user can create a join request for a project.
      *
      * @throws DuplicateJoinRequestException

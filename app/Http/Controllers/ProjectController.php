@@ -102,7 +102,7 @@ class ProjectController extends Controller
 
         if (Auth::check()) {
             $viewerJoinRequest = $this->joinRequestService
-                ->getViewerPendingRequest($project, Auth::user());
+                ->getViewerFullRequest($project, Auth::user());
         }
 
         return Inertia::render('projects/show', [

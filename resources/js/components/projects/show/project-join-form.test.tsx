@@ -66,6 +66,7 @@ describe('ProjectJoinForm', () => {
                 projectId={1}
                 isOpen
                 isCreator={false}
+                isParticipant={false}
                 user={{
                     id: 1,
                     name: 'Ada Lovelace',
@@ -83,6 +84,54 @@ describe('ProjectJoinForm', () => {
         expect(screen.getByRole('button', { name: 'Cancelar solicitud' })).toBeInTheDocument();
     });
 
+    it('renders rejected state when the join request was rejected', () => {
+        Object.defineProperty(globalThis, 'route', {
+            configurable: true,
+            value: vi.fn().mockReturnValue('/projects'),
+        });
+
+        render(
+            <ProjectJoinForm
+                projectId={1}
+                isOpen
+                isCreator={false}
+                isParticipant={false}
+                user={{
+                    id: 1,
+                    name: 'Ada Lovelace',
+                    email: 'ada@example.com',
+                    created_at: '2026-06-07T00:00:00.000Z',
+                    updated_at: '2026-06-07T00:00:00.000Z',
+                }}
+                viewerJoinRequest={{ id: 5, status: 'rejected', message: 'Thanks but no thanks' }}
+            />,
+        );
+
+        expect(screen.getByText('Solicitud rechazada')).toBeInTheDocument();
+        expect(screen.getByText('Tu solicitud para unirte a este proyecto fue rechazada.')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Explorar otros proyectos' })).toBeInTheDocument();
+    });
+
+    it('returns null when viewer is already a participant', () => {
+        const { container } = render(
+            <ProjectJoinForm
+                projectId={1}
+                isOpen
+                isCreator={false}
+                isParticipant
+                user={{
+                    id: 1,
+                    name: 'Ada Lovelace',
+                    email: 'ada@example.com',
+                    created_at: '2026-06-07T00:00:00.000Z',
+                    updated_at: '2026-06-07T00:00:00.000Z',
+                }}
+            />,
+        );
+
+        expect(container.innerHTML).toBe('');
+    });
+
     it('cancels the pending join request from the replacement state', async () => {
         const user = userEvent.setup();
 
@@ -96,6 +145,7 @@ describe('ProjectJoinForm', () => {
                 projectId={1}
                 isOpen
                 isCreator={false}
+                isParticipant={false}
                 user={{
                     id: 1,
                     name: 'Ada Lovelace',

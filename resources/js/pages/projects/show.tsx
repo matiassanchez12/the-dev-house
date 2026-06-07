@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
@@ -33,6 +34,10 @@ interface Props {
 
 export default function Show({ auth, project }: Props) {
     const isCreator = auth.user?.id === project.user_id;
+    const isParticipant = useMemo(
+        () => project.participants?.some((p) => p.id === auth.user?.id) ?? false,
+        [project.participants, auth.user?.id],
+    );
 
     return (
         <AppLayout
@@ -91,6 +96,7 @@ export default function Show({ auth, project }: Props) {
                                 projectId={project.id}
                                 isOpen={project.status === 'open'}
                                 isCreator={isCreator}
+                                isParticipant={isParticipant}
                                 user={auth.user}
                                 viewerJoinRequest={project.viewerJoinRequest}
                             />
