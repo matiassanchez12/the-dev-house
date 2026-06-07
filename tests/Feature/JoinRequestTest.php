@@ -6,6 +6,8 @@ use App\Models\JoinRequest;
 use App\Models\Project;
 use App\Models\Tech;
 use App\Models\User;
+use App\Services\Exceptions\DuplicateJoinRequestException;
+use App\Services\JoinRequestService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -114,6 +116,26 @@ class JoinRequestTest extends TestCase
         // Assert
         $response->assertSessionHasErrors('message');
         $this->assertEquals(1, JoinRequest::where('project_id', $this->project->id)->count());
+    }
+
+    /**
+     * TEST 4B: El controller maneja duplicados que vienen del service al crear
+     */
+    public function test_store_handles_duplicate_join_request_from_create(): void
+    {
+        $this->mock(JoinRequestService::class, function ($mock) {
+            $mock->shouldReceive('validateCanCreate')->once();
+            $mock->shouldReceive('create')
+                ->once()
+                ->andThrow(new DuplicateJoinRequestException());
+        });
+
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), [
+                'message' => 'Segunda solicitud con duplicado en create',
+            ]);
+
+        $response->assertSessionHasErrors('message');
     }
 
     /**

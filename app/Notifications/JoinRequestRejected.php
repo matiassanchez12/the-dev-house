@@ -27,7 +27,7 @@ class JoinRequestRejected extends Notification implements ShouldBroadcast
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Tu solicitud para {$jr->project->title} no fue aceptada")
+            ->subject("Solicitud no aprobada: {$jr->project->title}")
             ->view('emails.join-request-rejected', ['joinRequest' => $jr]);
     }
 

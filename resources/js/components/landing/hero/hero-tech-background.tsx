@@ -149,55 +149,240 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
 const SPOTLIGHT_RADIUS = 280;
 const BASE_OPACITY = 0.15;
 const MAX_ADDITIONAL = 0.70;
+const DESKTOP_ORBIT_RADII = [10, 20, 30, 40, 50] as const;
+const DESKTOP_ORBIT_PHASES = [-18, 26, -8, 18, -34] as const;
+const DESKTOP_ORBIT_SCALES = [1.08, 1.02, 0.96, 0.9, 0.84] as const;
+
+const TABLET_ORBIT_RADII = [16, 27, 38, 49] as const;
+const TABLET_ORBIT_PHASES = [-16, 22, -10, 28] as const;
+const TABLET_ORBIT_SCALES = [0.92, 0.88, 0.84, 0.8] as const;
+
+const MOBILE_ORBIT_RADII = [16, 24, 32] as const;
+const MOBILE_ORBIT_PHASES = [-12, 28, -20] as const;
+const MOBILE_ORBIT_SCALES = [0.84, 0.8, 0.76] as const;
+
+interface OrbitTile {
+    name: string;
+    ringIndex: number;
+    x: number;
+    y: number;
+    scale: number;
+    tilt: number;
+}
+
+interface OrbitConfig {
+    maxItems: number;
+    showLabels: boolean;
+    compact: boolean;
+    radii: readonly number[];
+    phases: readonly number[];
+    scales: readonly number[];
+    ringWeights: readonly number[];
+}
 
 function getInitials(name: string): string {
     return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
 }
 
+function getOrbitConfig(viewportWidth: number): OrbitConfig {
+    if (viewportWidth < 640) {
+        return {
+            maxItems: 18,
+            showLabels: false,
+            compact: true,
+            radii: MOBILE_ORBIT_RADII,
+            phases: MOBILE_ORBIT_PHASES,
+            scales: MOBILE_ORBIT_SCALES,
+            ringWeights: [1, 1, 1],
+        };
+    }
+
+    if (viewportWidth < 1024) {
+        return {
+            maxItems: 30,
+            showLabels: false,
+            compact: true,
+            radii: TABLET_ORBIT_RADII,
+            phases: TABLET_ORBIT_PHASES,
+            scales: TABLET_ORBIT_SCALES,
+            ringWeights: [1, 1, 1, 1],
+        };
+    }
+
+    return {
+        maxItems: TECHS.length,
+        showLabels: true,
+        compact: false,
+        radii: DESKTOP_ORBIT_RADII,
+        phases: DESKTOP_ORBIT_PHASES,
+        scales: DESKTOP_ORBIT_SCALES,
+        ringWeights: [0.45, 0.96, 1.06, 1.18, 1.35],
+    };
+}
+
+function selectResponsiveTechs(limit: number): readonly string[] {
+    if (limit >= TECHS.length) {
+        return TECHS;
+    }
+
+    const stride = Math.ceil(TECHS.length / limit);
+    return TECHS.filter((_, index) => index % stride === 0).slice(0, limit);
+}
+
+function buildRingCounts(totalItems: number, weights: readonly number[]): number[] {
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    const rawCounts = weights.map((weight) => (totalItems * weight) / totalWeight);
+    const counts = rawCounts.map((count) => Math.floor(count));
+    let remaining = totalItems - counts.reduce((sum, count) => sum + count, 0);
+
+    const order = rawCounts
+        .map((count, index) => ({ index, remainder: count - counts[index] }))
+        .sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+
+    for (const { index } of order) {
+        if (remaining <= 0) break;
+        counts[index] += 1;
+        remaining -= 1;
+    }
+
+    return counts;
+}
+
+function buildRingSequence(counts: number[]): number[] {
+    const assigned = counts.map(() => 0);
+    const sequence: number[] = [];
+
+    for (let i = 0; i < counts.reduce((sum, count) => sum + count, 0); i++) {
+        let chosenRing = 0;
+        let bestScore = Number.POSITIVE_INFINITY;
+
+        for (let ringIndex = 0; ringIndex < counts.length; ringIndex++) {
+            if (assigned[ringIndex] >= counts[ringIndex]) continue;
+
+            const score = assigned[ringIndex] / counts[ringIndex];
+            if (score < bestScore) {
+                bestScore = score;
+                chosenRing = ringIndex;
+            }
+        }
+
+        sequence.push(chosenRing);
+        assigned[chosenRing] += 1;
+    }
+
+    return sequence;
+}
+
+function buildOrbitLayout(config: OrbitConfig): OrbitTile[] {
+    const techs = selectResponsiveTechs(config.maxItems);
+    const counts = buildRingCounts(techs.length, config.ringWeights);
+    const ringSequence = buildRingSequence(counts);
+    const buckets = config.radii.map(() => [] as string[]);
+
+    techs.forEach((tech, index) => {
+        buckets[ringSequence[index]].push(tech);
+    });
+
+    const layout: OrbitTile[] = [];
+
+    buckets.forEach((bucket, ringIndex) => {
+        const step = (Math.PI * 2) / bucket.length;
+        const phase = (config.phases[ringIndex] * Math.PI) / 180;
+
+        bucket.forEach((name, itemIndex) => {
+            const angle = phase + (itemIndex * step);
+            const drift = ringIndex % 2 === 0 ? 0.55 : -0.55;
+
+            layout.push({
+                name,
+                ringIndex,
+                x: 50 + (Math.cos(angle) * config.radii[ringIndex]),
+                y: 50 + (Math.sin(angle) * config.radii[ringIndex]) + drift,
+                scale: config.scales[ringIndex],
+                tilt: ((itemIndex % 5) - 2) * 1.5,
+            });
+        });
+    });
+
+    return layout;
+}
+
 const TechTile = memo(function TechTile({
     name,
     opacity,
+    x,
+    y,
+    scale,
+    tilt,
+    ringIndex,
+    compact,
+    showLabel,
 }: {
     name: string;
     opacity: number;
+    x: number;
+    y: number;
+    scale: number;
+    tilt: number;
+    ringIndex: number;
+    compact: boolean;
+    showLabel: boolean;
 }) {
     const Icon = ICON_MAP[name];
     const hasIcon = !!Icon;
     const initials = getInitials(name);
-    const bgAlpha = opacity > BASE_OPACITY ? ((opacity - BASE_OPACITY) / MAX_ADDITIONAL) * 0.15 : 0;
-    const bgColor = bgAlpha > 0.01 ? `oklch(var(--foreground) / ${bgAlpha})` : 'transparent';
+    const intensity = Math.max(0, Math.min(1, (opacity - BASE_OPACITY) / MAX_ADDITIONAL));
+    const glow = intensity > 0
+        ? `0 0 ${10 + (intensity * 18)}px color-mix(in oklab, var(--primary) ${18 + (intensity * 34)}%, transparent)`
+        : 'none';
+    const textColor = intensity > 0
+        ? `color-mix(in oklab, var(--foreground) ${70 + (intensity * 30)}%, var(--primary) ${8 + (intensity * 12)}%)`
+        : 'color-mix(in oklab, var(--foreground) 58%, transparent)';
 
     return (
         <div
-            className="flex w-[130px] aspect-square shrink-0 flex-col items-center justify-center rounded p-2 text-xs font-medium text-foreground transition-all duration-200"
+            className={compact
+                ? 'absolute flex w-[clamp(44px,9vw,68px)] aspect-square shrink-0 flex-col items-center justify-center gap-0.5 text-center font-medium transition-all duration-200 will-change-transform'
+                : 'absolute flex w-[clamp(84px,8.2vw,136px)] aspect-square shrink-0 flex-col items-center justify-center gap-1.5 text-center font-medium transition-all duration-200 will-change-transform'}
+            aria-hidden="true"
             style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                transform: `translate(-50%, -50%) scale(${scale}) rotate(${tilt}deg)`,
                 fontFamily: 'var(--font-mono)',
                 opacity,
-                backgroundColor: bgColor,
+                zIndex: ringIndex + 1,
+                color: textColor,
+                filter: intensity > 0
+                    ? `drop-shadow(${glow}) saturate(${1 + (intensity * 0.08)}) brightness(${1 + (intensity * 0.05)})`
+                    : 'none',
+                textShadow: intensity > 0
+                    ? `0 0 ${6 + (intensity * 10)}px color-mix(in oklab, var(--primary) ${14 + (intensity * 26)}%, transparent)`
+                    : 'none',
             }}
         >
             {hasIcon ? (
-                <Icon className="size-6 mb-1 shrink-0" />
+                <Icon className={compact ? 'size-5 md:size-6 shrink-0' : 'size-6 md:size-7 shrink-0'} />
             ) : (
-                <div className="flex items-center justify-center w-8 h-8 mb-1 shrink-0">
-                    <div className="relative w-full h-full flex items-center justify-center">
-                        <div className="absolute inset-0 rounded bg-foreground/5" />
-                        <span className="relative text-[10px] font-medium text-foreground">
-                            {initials}
-                        </span>
-                    </div>
-                </div>
+                <span className={compact ? 'flex h-6 w-6 items-center justify-center rounded-full border border-border/40 text-[9px] tracking-[0.12em]' : 'flex h-8 w-8 items-center justify-center rounded-full border border-border/40 text-[10px] tracking-[0.14em]'}>
+                    {initials}
+                </span>
             )}
-            <span className="whitespace-nowrap leading-[1.1] text-center overflow-hidden text-ellipsis max-w-full">
-                {name}
-            </span>
+            {showLabel ? (
+                <span className="whitespace-nowrap text-[11px] md:text-sm leading-[1.1] text-center overflow-hidden text-ellipsis max-w-full">
+                    {name}
+                </span>
+            ) : null}
         </div>
     );
 });
 
 export function HeroTechBackground() {
     const gridRef = useRef<HTMLDivElement>(null);
-    const [opacities, setOpacities] = useState<number[]>(() => TECHS.map(() => BASE_OPACITY));
+    const [viewportWidth, setViewportWidth] = useState<number>(() => (typeof window === 'undefined' ? 0 : window.innerWidth));
+    const orbitConfig = getOrbitConfig(viewportWidth);
+    const layout = buildOrbitLayout(orbitConfig);
+    const [opacities, setOpacities] = useState<number[]>(() => layout.map(() => BASE_OPACITY));
     const rafId = useRef(0);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -234,8 +419,26 @@ export function HeroTechBackground() {
             cancelAnimationFrame(rafId.current);
             rafId.current = 0;
         }
-        setOpacities(TECHS.map(() => BASE_OPACITY));
+        setOpacities(Array.from({ length: layout.length }, () => BASE_OPACITY));
+    }, [layout.length]);
+
+    useEffect(() => {
+        const updateViewportWidth = () => {
+            setViewportWidth(window.innerWidth);
+        };
+
+        updateViewportWidth();
+
+        window.addEventListener('resize', updateViewportWidth);
+
+        return () => {
+            window.removeEventListener('resize', updateViewportWidth);
+        };
     }, []);
+
+    useEffect(() => {
+        setOpacities(Array.from({ length: layout.length }, () => BASE_OPACITY));
+    }, [layout.length]);
 
     useEffect(() => {
         const grid = gridRef.current;
@@ -258,12 +461,26 @@ export function HeroTechBackground() {
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
         >
+            <div className="absolute left-1/2 top-[48%] size-[min(92vw,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-gradient-to-b from-background/0 via-background/20 to-background/40 blur-[1px] dark:from-background/0 dark:via-background/10 dark:to-background/20" />
+            <div className="absolute left-1/2 top-[48%] size-[min(76vw,52rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/10 opacity-70" />
+            <div className="absolute left-1/2 top-[48%] size-[min(54vw,36rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-primary/4 blur-2xl" />
             <div
                 ref={gridRef}
-                className="absolute inset-0 flex flex-wrap justify-center content-center gap-4 p-3 select-none"
+                className="absolute inset-0 select-none"
             >
-                {TECHS.map((tech, i) => (
-                    <TechTile key={tech} name={tech} opacity={opacities[i]} />
+                {layout.map((tile, i) => (
+                    <TechTile
+                        key={tile.name}
+                        name={tile.name}
+                        opacity={opacities[i]}
+                        x={tile.x}
+                        y={tile.y}
+                        scale={tile.scale}
+                        tilt={tile.tilt}
+                        ringIndex={tile.ringIndex}
+                        compact={orbitConfig.compact}
+                        showLabel={orbitConfig.showLabels}
+                    />
                 ))}
             </div>
         </div>

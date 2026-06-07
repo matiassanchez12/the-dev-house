@@ -39,7 +39,11 @@ class JoinRequestController extends Controller
     public function store(StoreJoinRequestRequest $request, Project $project)
     {
         try {
-            $this->joinRequestService->validateCanCreate($project, Auth::user());
+            $user = Auth::user();
+
+            $this->joinRequestService->validateCanCreate($project, $user);
+
+            $this->joinRequestService->create($project, $user, $request->validated()['message']);
         } catch (DuplicateJoinRequestException) {
             return back()->withErrors([
                 'message' => 'Ya tienes una solicitud pendiente para este proyecto',
@@ -49,8 +53,6 @@ class JoinRequestController extends Controller
                 'message' => 'No puedes unirte a tu propio proyecto',
             ]);
         }
-
-        $this->joinRequestService->create($project, Auth::user(), $request->validated()['message']);
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Solicitud enviada. El creator te avisará cuando la revise.');

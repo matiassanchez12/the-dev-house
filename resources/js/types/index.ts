@@ -47,6 +47,10 @@ export interface Project {
     techs?: Tech[];
     participants_count?: number;
     messages?: Message[];
+    viewerJoinRequest?: {
+        id: number;
+        status: 'pending' | 'approved' | 'rejected';
+    } | null;
 }
 
 export interface JoinRequest {

@@ -1,23 +1,36 @@
 import { Link, useForm } from '@inertiajs/react';
-import { Send } from 'lucide-react';
+import { Clock, Send, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import type { User } from '@/types';
+import type { JoinRequest, User } from '@/types';
+import InputError from '@/components/input-error';
 
 interface ProjectJoinFormProps {
     projectId: number;
     isOpen: boolean;
     isCreator: boolean;
     user: User | null;
+    viewerJoinRequest?: Pick<JoinRequest, 'id' | 'status'> | null;
 }
 
-export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJoinFormProps) {
+export function ProjectJoinForm({ projectId, isOpen, isCreator, user, viewerJoinRequest }: ProjectJoinFormProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         message: '',
     });
+
+    const handleCancel = (joinRequestId: number) => {
+        post(route('join-requests.cancel', joinRequestId), {
+            onSuccess: () => {
+                toast.success('Solicitud cancelada');
+            },
+            onError: () => {
+                toast.error('Error al cancelar la solicitud');
+            },
+        });
+    };
 
     if (isCreator) {
         return null;
@@ -59,6 +72,34 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
         );
     }
 
+    if (viewerJoinRequest?.status === 'pending') {
+        return (
+            <Card className="border-primary/20">
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <Clock className="size-4 text-muted-foreground" />
+                        <CardTitle>Solicitud enviada</CardTitle>
+                    </div>
+                    <CardDescription>
+                        Ya enviaste una solicitud para unirte a este proyecto.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={processing}
+                        onClick={() => handleCancel(viewerJoinRequest.id)}
+                    >
+                        <X className="size-4" data-icon="inline-start" />
+                        {processing ? 'Cancelando...' : 'Cancelar solicitud'}
+                    </Button>
+                </CardContent>
+            </Card>
+        );
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('join-requests.store', projectId), {
@@ -88,6 +129,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
                         </Label>
                         <Textarea
                             id="message"
+                            className="mt-1 block w-full"
                             value={data.message}
                             onChange={(e) => setData('message', e.target.value)}
                             placeholder="Hola, me interesa este proyecto porque..."
@@ -95,7 +137,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, user }: ProjectJ
                             required
                         />
                         {errors.message && (
-                            <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                            <InputError className="mt-2" message={errors.message} />
                         )}
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>
