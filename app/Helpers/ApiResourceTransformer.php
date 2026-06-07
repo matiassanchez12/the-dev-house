@@ -42,7 +42,28 @@ class ApiResourceTransformer
             $data['messages'] = array_map(fn ($message) => self::message($message), $data['messages']);
         }
 
+        if (isset($data['phases']) && is_array($data['phases'])) {
+            $data['phases'] = array_map(fn ($phase) => self::phase($phase), $data['phases']);
+        }
+
         return $data;
+    }
+
+    /**
+     * Transform a phase to a safe array.
+     */
+    public static function phase(Model|array $phase): array
+    {
+        $data = $phase instanceof Model ? $phase->toArray() : $phase;
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'title',
+            'description',
+            'completed_at',
+            'created_at',
+            'updated_at',
+        ]));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Projects;
 
 use App\Models\Project;
+use App\Models\Phase;
 use App\Models\Message;
 use App\Models\Tech;
 use App\Models\User;
@@ -39,6 +40,11 @@ class ShowTest extends TestCase
         $react = Tech::factory()->create(['name' => 'React']);
         $project->techs()->attach($react->id);
         $project->participants()->attach($participant->id, ['role' => 'developer', 'joined_at' => now()]);
+        Phase::factory()->create([
+            'project_id' => $project->id,
+            'title' => 'Discovery',
+            'description' => 'Validated the main idea',
+        ]);
 
         // Act
         $response = $this->get("/projects/{$project->slug}");
@@ -59,6 +65,8 @@ class ShowTest extends TestCase
         $this->assertEquals('Project Creator', $props['project']['creator']['name']);
         $this->assertCount(1, $props['project']['techs']);
         $this->assertCount(1, $props['project']['participants']);
+        $this->assertCount(1, $props['project']['phases']);
+        $this->assertEquals('Discovery', $props['project']['phases'][0]['title']);
     }
 
     /**

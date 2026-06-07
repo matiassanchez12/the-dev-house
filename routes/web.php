@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
+use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectMessageController;
@@ -39,6 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/{project:slug}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project:slug}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project:slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    Route::scopeBindings()->group(function () {
+        Route::post('/projects/{project:slug}/phases', [PhaseController::class, 'store'])->name('projects.phases.store');
+        Route::put('/projects/{project:slug}/phases/{phase}', [PhaseController::class, 'update'])->name('projects.phases.update');
+        Route::delete('/projects/{project:slug}/phases/{phase}', [PhaseController::class, 'destroy'])->name('projects.phases.destroy');
+    });
 
     // Project Status
     Route::patch('/projects/{project:slug}/status', [ProjectStatusController::class, 'update'])->name('projects.status.update');
