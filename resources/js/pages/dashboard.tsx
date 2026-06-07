@@ -97,7 +97,7 @@ export default function Dashboard({
                 }
             >
                 <div className="py-12">
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                         {/* === ESTADÍSTICAS === */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <Card>
@@ -201,7 +201,7 @@ export default function Dashboard({
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {createdProjects.map((project) => (
-                                                <Card key={project.id} className="relative pb-0">
+                                                <Card key={project.id} className="relative pb-0 overflow-visible">
                                                     {project.join_requests_count > 0 && (
                                                         <div className="absolute -top-2 -right-2 z-10 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                                                             {project.join_requests_count}

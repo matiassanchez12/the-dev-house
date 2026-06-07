@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
+import type { CSSProperties } from 'react';
 import { ReactIcon } from '@/components/ui/svgs/react-icon';
 import { LaravelIcon } from '@/components/ui/svgs/laravel-icon';
 import { TypeScriptIcon } from '@/components/ui/svgs/typescript-icon';
@@ -146,9 +147,9 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
     Bun: BunIcon,
 };
 
-const SPOTLIGHT_RADIUS = 280;
-const BASE_OPACITY = 0.15;
-const MAX_ADDITIONAL = 0.70;
+const BASE_OPACITY = 0.3;
+const MAX_ADDITIONAL = 0.7;
+const SPOTLIGHT_RADIUS = 360;
 const DESKTOP_ORBIT_RADII = [10, 20, 30, 40, 50] as const;
 const DESKTOP_ORBIT_PHASES = [-18, 26, -8, 18, -34] as const;
 const DESKTOP_ORBIT_SCALES = [1.08, 1.02, 0.96, 0.9, 0.84] as const;
@@ -168,6 +169,7 @@ interface OrbitTile {
     y: number;
     scale: number;
     tilt: number;
+    opacity: number;
 }
 
 interface OrbitConfig {
@@ -300,6 +302,7 @@ function buildOrbitLayout(config: OrbitConfig): OrbitTile[] {
                 y: 50 + (Math.sin(angle) * config.radii[ringIndex]) + drift,
                 scale: config.scales[ringIndex],
                 tilt: ((itemIndex % 5) - 2) * 1.5,
+                opacity: 0.15 + (((config.radii.length - ringIndex - 1) / Math.max(config.radii.length - 1, 1)) * 0.16),
             });
         });
     });
@@ -317,6 +320,7 @@ const TechTile = memo(function TechTile({
     ringIndex,
     compact,
     showLabel,
+    tileRef,
 }: {
     name: string;
     opacity: number;
@@ -327,6 +331,7 @@ const TechTile = memo(function TechTile({
     ringIndex: number;
     compact: boolean;
     showLabel: boolean;
+    tileRef?: (node: HTMLDivElement | null) => void;
 }) {
     const Icon = ICON_MAP[name];
     const hasIcon = !!Icon;
@@ -341,9 +346,10 @@ const TechTile = memo(function TechTile({
 
     return (
         <div
+            ref={tileRef}
             className={compact
-                ? 'absolute flex w-[clamp(44px,9vw,68px)] aspect-square shrink-0 flex-col items-center justify-center gap-0.5 text-center font-medium transition-all duration-200 will-change-transform'
-                : 'absolute flex w-[clamp(84px,8.2vw,136px)] aspect-square shrink-0 flex-col items-center justify-center gap-1.5 text-center font-medium transition-all duration-200 will-change-transform'}
+                ? 'absolute flex w-[clamp(44px,9vw,68px)] aspect-square shrink-0 flex-col items-center justify-center gap-0.5 text-center font-medium transition-opacity duration-200 will-change-transform motion-reduce:transition-none pointer-events-none'
+                : 'absolute flex w-[clamp(84px,8.2vw,136px)] aspect-square shrink-0 flex-col items-center justify-center gap-1.5 text-center font-medium transition-opacity duration-200 will-change-transform motion-reduce:transition-none pointer-events-none'}
             aria-hidden="true"
             style={{
                 left: `${x}%`,
@@ -359,7 +365,7 @@ const TechTile = memo(function TechTile({
                 textShadow: intensity > 0
                     ? `0 0 ${6 + (intensity * 10)}px color-mix(in oklab, var(--primary) ${14 + (intensity * 26)}%, transparent)`
                     : 'none',
-            }}
+            } as CSSProperties & Record<string, string | number>}
         >
             {hasIcon ? (
                 <Icon className={compact ? 'size-5 md:size-6 shrink-0' : 'size-6 md:size-7 shrink-0'} />
@@ -378,49 +384,62 @@ const TechTile = memo(function TechTile({
 });
 
 export function HeroTechBackground() {
-    const gridRef = useRef<HTMLDivElement>(null);
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const tileRefs = useRef<Array<HTMLDivElement | null>>([]);
+    const cursorRef = useRef<{ x: number; y: number } | null>(null);
+    const frameRef = useRef<number | null>(null);
     const [viewportWidth, setViewportWidth] = useState<number>(() => (typeof window === 'undefined' ? 0 : window.innerWidth));
     const orbitConfig = getOrbitConfig(viewportWidth);
     const layout = buildOrbitLayout(orbitConfig);
-    const [opacities, setOpacities] = useState<number[]>(() => layout.map(() => BASE_OPACITY));
-    const rafId = useRef(0);
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (rafId.current) return;
-        rafId.current = requestAnimationFrame(() => {
-            rafId.current = 0;
-            const grid = gridRef.current;
-            if (!grid) return;
+    const applyBaseOpacities = () => {
+        layout.forEach((tile, index) => {
+            const node = tileRefs.current[index];
 
-            const tiles = grid.children;
-            const newOps: number[] = [];
+            if (!node) return;
 
-            for (let i = 0; i < tiles.length; i++) {
-                const rect = tiles[i].getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-                const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-                let intensity = 1 - dist / SPOTLIGHT_RADIUS;
-                if (intensity <= 0) {
-                    newOps.push(BASE_OPACITY);
-                    continue;
-                }
-                // Smoothstep easing: suave entrada y salida
-                intensity = intensity * intensity * (3 - 2 * intensity);
-                newOps.push(BASE_OPACITY + intensity * MAX_ADDITIONAL);
+            node.style.opacity = String(tile.opacity);
+        });
+    };
+
+    const applySpotlight = () => {
+        frameRef.current = null;
+
+        const root = rootRef.current;
+        const section = root?.closest('section');
+        const cursor = cursorRef.current;
+
+        if (!root || !section || !cursor) {
+            return;
+        }
+
+        const rect = section.getBoundingClientRect();
+
+        layout.forEach((tile, index) => {
+            const node = tileRefs.current[index];
+
+            if (!node) return;
+
+            const cx = rect.left + ((tile.x / 100) * rect.width);
+            const cy = rect.top + ((tile.y / 100) * rect.height);
+            const distance = Math.hypot(cursor.x - cx, cursor.y - cy);
+            let intensity = 1 - (distance / SPOTLIGHT_RADIUS);
+
+            if (intensity <= 0) {
+                node.style.opacity = String(tile.opacity);
+                return;
             }
 
-            setOpacities(newOps);
+            intensity = intensity * intensity * (3 - (2 * intensity));
+            node.style.opacity = String(Math.min(1, tile.opacity + (intensity * 0.75)));
         });
-    }, []);
+    };
 
-    const handleMouseLeave = useCallback(() => {
-        if (rafId.current) {
-            cancelAnimationFrame(rafId.current);
-            rafId.current = 0;
-        }
-        setOpacities(Array.from({ length: layout.length }, () => BASE_OPACITY));
-    }, [layout.length]);
+    const scheduleSpotlight = () => {
+        if (frameRef.current !== null) return;
+
+        frameRef.current = window.requestAnimationFrame(applySpotlight);
+    };
 
     useEffect(() => {
         const updateViewportWidth = () => {
@@ -437,42 +456,65 @@ export function HeroTechBackground() {
     }, []);
 
     useEffect(() => {
-        setOpacities(Array.from({ length: layout.length }, () => BASE_OPACITY));
-    }, [layout.length]);
+        applyBaseOpacities();
+    }, [layout]);
 
     useEffect(() => {
-        const grid = gridRef.current;
-        if (!grid) return;
-        const section = grid.closest('section');
-        if (!section) return;
+        const root = rootRef.current;
+        const section = root?.closest('section');
 
-        section.addEventListener('mousemove', handleMouseMove);
+        if (!root || !section) {
+            return;
+        }
+
+        const handleMouseMove = (event: MouseEvent) => {
+            cursorRef.current = { x: event.clientX, y: event.clientY };
+            scheduleSpotlight();
+        };
+
+        const handleMouseLeave = () => {
+            cursorRef.current = null;
+
+            if (frameRef.current !== null) {
+                window.cancelAnimationFrame(frameRef.current);
+                frameRef.current = null;
+            }
+
+            applyBaseOpacities();
+        };
+
+        section.addEventListener('mousemove', handleMouseMove, { passive: true });
         section.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             section.removeEventListener('mousemove', handleMouseMove);
             section.removeEventListener('mouseleave', handleMouseLeave);
-            cancelAnimationFrame(rafId.current);
+
+            if (frameRef.current !== null) {
+                window.cancelAnimationFrame(frameRef.current);
+                frameRef.current = null;
+            }
         };
-    }, [handleMouseMove, handleMouseLeave]);
+    }, [layout]);
 
     return (
         <div
+            ref={rootRef}
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
         >
             <div className="absolute left-1/2 top-[48%] size-[min(92vw,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-gradient-to-b from-background/0 via-background/20 to-background/40 blur-[1px] dark:from-background/0 dark:via-background/10 dark:to-background/20" />
             <div className="absolute left-1/2 top-[48%] size-[min(76vw,52rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/10 opacity-70" />
             <div className="absolute left-1/2 top-[48%] size-[min(54vw,36rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10 bg-primary/4 blur-2xl" />
-            <div
-                ref={gridRef}
-                className="absolute inset-0 select-none"
-            >
-                {layout.map((tile, i) => (
+            <div className="absolute inset-0 select-none">
+                {layout.map((tile, index) => (
                     <TechTile
                         key={tile.name}
                         name={tile.name}
-                        opacity={opacities[i]}
+                        opacity={tile.opacity}
+                        tileRef={(node) => {
+                            tileRefs.current[index] = node;
+                        }}
                         x={tile.x}
                         y={tile.y}
                         scale={tile.scale}
