@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.34",
+        "predis/predis": "^2.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

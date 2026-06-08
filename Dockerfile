@@ -12,10 +12,13 @@ RUN apk add --no-cache \
     npm \
     postgresql-dev \
     oniguruma-dev \
-    && docker-php-ext-install pdo pdo_pgsql mbstring fileinfo pcntl
+    && docker-php-ext-install pdo pdo_pgsql mbstring fileinfo pcntl opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install FrankenPHP
+COPY --from=dunglas/frankenphp:latest /usr/local/bin/frankenphp /usr/local/bin/frankenphp
 
 # Set working directory
 WORKDIR /var/www/html
@@ -23,15 +26,27 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Install PHP/Node dependencies
+# Create Caddyfile for FrankenPHP
+RUN echo '{
+    admin off
+    http_port 10000
+    server {
+        root * /var/www/html/public
+        php_server
+    }
+}' > Caddyfile
+
+# Install PHP/Node dependencies and optimize
 RUN composer install --no-dev --optimize-autoloader \
     && npm ci \
     && npm run build \
-    && composer clear-cache
+    && composer clear-cache \
+    && php artisan optimize
 
 # Create storage directories
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/views storage/framework/sessions \
-    && chmod -R 775 storage
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R nobody:nobody /var/www/html
 
 # Copy entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

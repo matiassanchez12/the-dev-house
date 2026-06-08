@@ -20,12 +20,12 @@ fi
 
 case "$SERVICE" in
     web)
-        echo "→ Starting web server on port ${PORT:-10000}..."
-        exec php artisan serve --host=0.0.0.0 --port="${PORT:-10000}"
+        echo "→ Starting FrankenPHP server on port ${PORT:-10000}..."
+        exec frankenphp run --config Caddyfile
         ;;
     worker)
         echo "→ Starting queue worker..."
-        exec php artisan queue:work --tries=3 --timeout=90
+        exec php artisan queue:work redis --tries=3 --timeout=90 --sleep=3 --max-jobs=100
         ;;
     reverb)
         echo "→ Starting Reverb WebSocket server..."
