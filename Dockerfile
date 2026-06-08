@@ -1,4 +1,4 @@
-FROM dunglas/franken-php:8.2-alpine
+FROM dunglas/frankenphp:alpine
 
 WORKDIR /var/www/html
 
