@@ -26,15 +26,8 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Create Caddyfile for FrankenPHP
-RUN echo '{
-    admin off
-    http_port 10000
-    server {
-        root * /var/www/html/public
-        php_server
-    }
-}' > Caddyfile
+# Create Caddyfile
+RUN printf '{ \n    admin off\n    http_port 10000\n    server { \n        root * /var/www/html/public\n        php_server\n    }\n}\n' > Caddyfile
 
 # Install PHP/Node dependencies and optimize
 RUN composer install --no-dev --optimize-autoloader \
