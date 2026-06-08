@@ -39,7 +39,7 @@ RUN composer install --no-dev --optimize-autoloader \
 # Create storage directories
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/views storage/framework/sessions \
     && chmod -R 775 storage bootstrap/cache \
-    && chown -R nobody:nobody /var/www/html
+    && chown -R nobody:nobody storage bootstrap/cache
 
 # Copy entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
