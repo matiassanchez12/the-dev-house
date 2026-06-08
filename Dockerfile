@@ -19,7 +19,7 @@ RUN composer install --no-dev --optimize-autoloader \
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/views storage/framework/sessions \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R nobody:nobody storage bootstrap/cache \
-    && printf '{\n    admin off\n}\n\n0.0.0.0:8080 {\n    root * /var/www/html/public\n    php_server\n}\n' > Caddyfile
+    && printf '{\n    admin off\n}\n\n0.0.0.0:8080 {\n    root * /var/www/html/public\n    trusted_proxies static 0.0.0.0/0\n    php_server\n}\n' > Caddyfile
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
