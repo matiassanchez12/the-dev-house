@@ -1,5 +1,8 @@
 FROM dunglas/frankenphp:alpine
 
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
