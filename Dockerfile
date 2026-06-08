@@ -37,7 +37,8 @@ RUN apt-get update \
         pdo_pgsql \
         xml \
         zip \
-    && a2enmod headers rewrite \
+    && a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork headers rewrite \
     && printf 'Listen 8080\n' > /etc/apache2/ports.conf \
     && printf '%s\n' \
         '<VirtualHost *:8080>' \
