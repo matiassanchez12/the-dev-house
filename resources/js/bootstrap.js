@@ -18,7 +18,6 @@ if (reverbConfig?.key) {
         wsPort: reverbConfig.port,
         wssPort: reverbConfig.port,
         forceTLS: reverbConfig.scheme === 'https',
-        enabledTransfers: ['ws', 'wss'],
+        enabledTransports: ['ws', 'wss'],
     });
 }
-
