@@ -1,4 +1,14 @@
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   postgres:
     image: postgres:17-alpine
     environment:
@@ -14,6 +24,8 @@ services:
       retries: 5
 
   app:
+    env_file:
+      - .env
     build: .
     ports:
       - "10000:8080"
@@ -21,6 +33,7 @@ services:
       SERVICE: web
       RUN_MIGRATIONS: "true"
       APP_ENV: local
+      APP_URL: http://localhost:10000
       APP_DEBUG: "true"
       DB_CONNECTION: pgsql
       DB_HOST: postgres
@@ -35,9 +48,13 @@ services:
       REVERB_APP_KEY: devcollab-local-key
       REVERB_APP_SECRET: devcollab-local-secret
       REVERB_APP_ID: devcollab-app-id
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379
       QUEUE_CONNECTION: database
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   worker:
@@ -58,9 +75,13 @@ services:
       REVERB_APP_KEY: devcollab-local-key
       REVERB_APP_SECRET: devcollab-local-secret
       REVERB_APP_ID: devcollab-app-id
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379
       QUEUE_CONNECTION: database
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   reverb:
@@ -81,6 +102,8 @@ services:
       REVERB_APP_SECRET: devcollab-local-secret
       REVERB_APP_ID: devcollab-app-id
       QUEUE_CONNECTION: database
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
         condition: service_healthy
