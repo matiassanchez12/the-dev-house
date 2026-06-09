@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -12,13 +12,14 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: devcollab
-      POSTGRES_USER: devcollab
-      POSTGRES_PASSWORD: devcollab
+      POSTGRES_DB: "${DB_DATABASE:-devcollab}"
+      POSTGRES_USER: "${DB_USERNAME:-devcollab}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-devcollab}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql:ro'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devcollab"]
+      test: ["CMD-SHELL", "pg_isready -q -d ${DB_DATABASE:-devcollab} -U ${DB_USERNAME:-devcollab}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,29 +29,14 @@ services:
       - .env
     build: .
     ports:
-      - "10000:8080"
+      - "${APP_PORT:-10000}:8080"
     environment:
       SERVICE: web
-      RUN_MIGRATIONS: "true"
-      APP_ENV: local
-      APP_URL: http://localhost:10000
-      APP_DEBUG: "true"
-      DB_CONNECTION: pgsql
+      RUN_MIGRATIONS: "${RUN_MIGRATIONS:-true}"
+      RUN_SEEDERS: "${RUN_SEEDERS:-true}"
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: devcollab
-      DB_USERNAME: devcollab
-      DB_PASSWORD: devcollab
-      BROADCAST_CONNECTION: reverb
-      REVERB_HOST: reverb
-      REVERB_PORT: 8080
-      REVERB_SCHEME: http
-      REVERB_APP_KEY: devcollab-local-key
-      REVERB_APP_SECRET: devcollab-local-secret
-      REVERB_APP_ID: devcollab-app-id
       REDIS_HOST: redis
-      REDIS_URL: redis://redis:6379
-      QUEUE_CONNECTION: database
+      REDIS_URL: "redis://redis:6379"
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,26 +44,14 @@ services:
         condition: service_healthy
 
   worker:
+    env_file:
+      - .env
     build: .
     environment:
       SERVICE: worker
-      APP_ENV: local
-      DB_CONNECTION: pgsql
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: devcollab
-      DB_USERNAME: devcollab
-      DB_PASSWORD: devcollab
-      BROADCAST_CONNECTION: reverb
-      REVERB_HOST: reverb
-      REVERB_PORT: 8080
-      REVERB_SCHEME: http
-      REVERB_APP_KEY: devcollab-local-key
-      REVERB_APP_SECRET: devcollab-local-secret
-      REVERB_APP_ID: devcollab-app-id
       REDIS_HOST: redis
-      REDIS_URL: redis://redis:6379
-      QUEUE_CONNECTION: database
+      REDIS_URL: "redis://redis:6379"
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,25 +59,17 @@ services:
         condition: service_healthy
 
   reverb:
+    env_file:
+      - .env
     build: .
     ports:
-      - "8080:8080"
+      - "${REVERB_PORT:-8080}:8080"
     environment:
       SERVICE: reverb
-      APP_ENV: local
-      DB_CONNECTION: pgsql
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: devcollab
-      DB_USERNAME: devcollab
-      DB_PASSWORD: devcollab
-      REVERB_SERVER_HOST: 0.0.0.0
-      REVERB_APP_KEY: devcollab-local-key
-      REVERB_APP_SECRET: devcollab-local-secret
-      REVERB_APP_ID: devcollab-app-id
-      QUEUE_CONNECTION: database
       REDIS_HOST: redis
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: "redis://redis:6379"
+      REVERB_SERVER_HOST: 0.0.0.0
     depends_on:
       postgres:
         condition: service_healthy

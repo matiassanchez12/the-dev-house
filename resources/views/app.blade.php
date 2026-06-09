@@ -34,6 +34,14 @@
             })();
         </script>
 
+        <!-- Reverb config (runtime, not build-time) -->
+        <script>window.__REVERB_CONFIG__ = @json([
+            'key' => config('reverb.apps.apps.0.key'),
+            'host' => config('reverb.apps.apps.0.options.host'),
+            'port' => (int) config('reverb.apps.apps.0.options.port'),
+            'scheme' => config('reverb.apps.apps.0.options.scheme'),
+        ]);</script>
+
         <!-- Scripts -->
         @routes
         @viteReactRefresh

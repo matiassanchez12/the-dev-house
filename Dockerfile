@@ -6,6 +6,16 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ARG VITE_REVERB_APP_KEY=devcollab-key
+ARG VITE_REVERB_HOST=localhost
+ARG VITE_REVERB_PORT=8080
+ARG VITE_REVERB_SCHEME=http
+ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
+    VITE_REVERB_HOST=$VITE_REVERB_HOST \
+    VITE_REVERB_PORT=$VITE_REVERB_PORT \
+    VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
+
 RUN npm run build
 
 FROM php:8.2-fpm-bookworm AS backend
@@ -37,6 +47,7 @@ RUN apt-get update \
         intl \
         mbstring \
         opcache \
+        pcntl \
         pdo_pgsql \
         xml \
         zip \
