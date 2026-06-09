@@ -8,7 +8,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM php:8.2-apache AS backend
+FROM php:8.2-cli AS backend
 
 WORKDIR /var/www/html
 
@@ -37,18 +37,6 @@ RUN apt-get update \
         pdo_pgsql \
         xml \
         zip \
-    && rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* \
-    && a2enmod mpm_prefork headers rewrite \
-    && printf 'Listen 8080\n' > /etc/apache2/ports.conf \
-    && printf '%s\n' \
-        '<VirtualHost *:8080>' \
-        '    ServerName localhost' \
-        '    DocumentRoot /var/www/html/public' \
-        '    <Directory /var/www/html/public>' \
-        '        AllowOverride All' \
-        '        Require all granted' \
-        '    </Directory>' \
-        '</VirtualHost>' > /etc/apache2/sites-available/000-default.conf \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -64,4 +52,4 @@ COPY --from=frontend /app/public/build ./public/build
 
 EXPOSE 8080
 
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
