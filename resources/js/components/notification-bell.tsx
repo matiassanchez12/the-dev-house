@@ -32,7 +32,7 @@ export default function NotificationBell() {
     useEffect(() => {
         if (!user || typeof window === 'undefined' || !window.Echo) return;
 
-        const channel = window.Echo.private(`App.Models.User.${user.id}`);
+        const channel = window.Echo.private(`user.${user.id}`);
 
         const handler = () => {
             setUnreadCount((current) => current + 1);
@@ -42,7 +42,7 @@ export default function NotificationBell() {
         channel.notification(handler);
 
         return () => {
-            window.Echo.leave(`App.Models.User.${user.id}`);
+            window.Echo.leave(`user.${user.id}`);
         };
     }, [user?.id]);
 

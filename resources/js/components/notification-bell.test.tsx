@@ -74,7 +74,7 @@ describe('NotificationBell', () => {
 
         render(<NotificationBell />);
 
-        expect(privateMock).toHaveBeenCalledWith('App.Models.User.1');
+        expect(privateMock).toHaveBeenCalledWith('user.1');
         expect(notificationMock).toHaveBeenCalledTimes(1);
 
         const callback = notificationMock.mock.calls[0][0] as () => void;

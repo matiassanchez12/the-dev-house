@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,7 +18,9 @@ interface Props {
 
 export function ProjectChat({ projectId, projectSlug, currentUserId, messages }: Props) {
     const [items, setItems] = useState(messages ?? []);
+    const bottomRef = useRef<HTMLDivElement>(null);
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
+    const latestMessageId = items[items.length - 1]?.id;
 
     useEffect(() => {
         setItems(messages ?? []);
@@ -39,6 +41,10 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
             window.Echo.leave(`project.${projectId}`);
         };
     }, [projectId]);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, [latestMessageId]);
 
     if (!messages) return null;
 
@@ -62,7 +68,7 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                 <CardDescription>Conversá con los miembros del equipo en tiempo real</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="max-h-96 space-y-3 overflow-y-auto pr-1">
+                <div className="scrollbar-chat max-h-96 space-y-3 overflow-y-auto pr-1">
                     {items.length === 0 ? (
                         <p className="text-sm text-muted-foreground">Todavía no hay mensajes.</p>
                     ) : items.map((message) => {
@@ -84,6 +90,7 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                             </div>
                         );
                     })}
+                    <div ref={bottomRef} aria-hidden="true" />
                 </div>
 
                 <form onSubmit={submit} className="space-y-3">

@@ -482,7 +482,7 @@ class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertEquals(
-            'App.Models.User.' . $user->id,
+            'user.' . $user->id,
             $user->routeNotificationForBroadcast(new \stdClass()),
         );
     }

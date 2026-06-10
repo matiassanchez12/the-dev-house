@@ -19,5 +19,17 @@ if (reverbConfig?.key) {
         wssPort: reverbConfig.port,
         forceTLS: reverbConfig.scheme === 'https',
         enabledTransports: ['ws', 'wss'],
+        authorizer: (channel) => ({
+            authorize: (socketId, callback) => {
+                window.axios.post('/broadcasting/auth', {
+                    socket_id: socketId,
+                    channel_name: channel.name,
+                }, { withCredentials: true }).then((response) => {
+                    callback(null, response.data);
+                }).catch((error) => {
+                    callback(error, null);
+                });
+            },
+        }),
     });
 }
