@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -13,21 +13,66 @@ interface User {
 }
 
 interface PageProps {
-    auth: { user: User | null };
+    auth?: { user: User | null };
     notifications?: NotificationItem[] | { data: NotificationItem[] };
+    url?: string;
 }
 
 export type { NotificationItem } from '@/components/notification-list';
 
+const unreadTitlePrefix = /^\(\d+\)\s+/;
+
+const stripUnreadPrefix = (title: string) => title.replace(unreadTitlePrefix, '');
+
 export default function NotificationBell() {
     const page = usePage<PageProps>();
-    const user = page.props.auth.user;
+    const user = page.props.auth?.user ?? null;
     const initialUnread = user?.unread_notifications_count ?? 0;
     const [unreadCount, setUnreadCount] = useState(initialUnread);
+    const titleBaseRef = useRef(typeof document === 'undefined' ? '' : stripUnreadPrefix(document.title));
+    const titleIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
 
     useEffect(() => {
         setUnreadCount(initialUnread);
     }, [initialUnread]);
+
+    useEffect(() => {
+        titleBaseRef.current = stripUnreadPrefix(document.title);
+    }, [page.url]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        if (titleIntervalRef.current) {
+            window.clearInterval(titleIntervalRef.current);
+            titleIntervalRef.current = null;
+        }
+
+        if (unreadCount <= 0) {
+            document.title = titleBaseRef.current;
+            return;
+        }
+
+        let showBadge = true;
+        const baseTitle = titleBaseRef.current;
+
+        const renderTitle = () => {
+            document.title = showBadge ? `(${unreadCount}) ${baseTitle}` : baseTitle;
+            showBadge = !showBadge;
+        };
+
+        renderTitle();
+        titleIntervalRef.current = window.setInterval(renderTitle, 1000);
+
+        return () => {
+            if (titleIntervalRef.current) {
+                window.clearInterval(titleIntervalRef.current);
+                titleIntervalRef.current = null;
+            }
+
+            document.title = baseTitle;
+        };
+    }, [unreadCount, page.url]);
 
     useEffect(() => {
         if (!user || typeof window === 'undefined' || !window.Echo) return;
@@ -42,7 +87,9 @@ export default function NotificationBell() {
         channel.notification(handler);
 
         return () => {
-            window.Echo.leave(`user.${user.id}`);
+            if (window.Echo) {
+                window.Echo.leave(`user.${user.id}`);
+            }
         };
     }, [user?.id]);
 
