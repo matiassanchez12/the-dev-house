@@ -3,7 +3,47 @@ set -eu
 
 SERVICE="${SERVICE:-web}"
 PORT="${PORT:-8080}"
+REDIS_CLIENT="${REDIS_CLIENT:-predis}"
 export PORT
+export REDIS_CLIENT
+
+normalize_redis_env() {
+    if [ -z "${REDIS_HOST:-}" ] && [ -n "${REDISHOST:-}" ]; then
+        REDIS_HOST="$REDISHOST"
+        export REDIS_HOST
+    fi
+
+    if [ -z "${REDIS_PORT:-}" ] && [ -n "${REDISPORT:-}" ]; then
+        REDIS_PORT="$REDISPORT"
+        export REDIS_PORT
+    fi
+
+    if [ -z "${REDIS_USERNAME:-}" ] && [ -n "${REDISUSER:-}" ]; then
+        REDIS_USERNAME="$REDISUSER"
+        export REDIS_USERNAME
+    fi
+
+    if [ -z "${REDIS_PASSWORD:-}" ] && [ -n "${REDISPASSWORD:-}" ]; then
+        REDIS_PASSWORD="$REDISPASSWORD"
+        export REDIS_PASSWORD
+    fi
+
+    if [ -z "${REDIS_URL:-}" ] && [ -n "${REDIS_HOST:-}" ]; then
+        redis_port="${REDIS_PORT:-6379}"
+
+        if [ -n "${REDIS_PASSWORD:-}" ]; then
+            if [ -n "${REDIS_USERNAME:-}" ]; then
+                REDIS_URL="redis://${REDIS_USERNAME}:${REDIS_PASSWORD}@${REDIS_HOST}:${redis_port}"
+            else
+                REDIS_URL="redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${redis_port}"
+            fi
+        else
+            REDIS_URL="redis://${REDIS_HOST}:${redis_port}"
+        fi
+
+        export REDIS_URL
+    fi
+}
 
 normalize_redis_env() {
     if [ -z "${REDIS_HOST:-}" ] && [ -n "${REDISHOST:-}" ]; then
