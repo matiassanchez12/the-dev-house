@@ -13,6 +13,8 @@ FROM php:8.2-fpm-bookworm AS backend
 
 WORKDIR /var/www/html
 
+ARG INSTALL_DEV_DEPS=false
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gettext-base \
@@ -24,6 +26,7 @@ RUN apt-get update \
         libonig-dev \
         libpng-dev \
         libpq-dev \
+        libsqlite3-dev \
         libzip-dev \
         libxml2-dev \
         nginx \
@@ -39,9 +42,11 @@ RUN apt-get update \
         mbstring \
         opcache \
         pcntl \
+        pdo_sqlite \
         pdo_pgsql \
         xml \
         zip \
+    && apt-get purge -y libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -49,7 +54,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 COPY . .
 
 RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
-    && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+    && if [ "$INSTALL_DEV_DEPS" = "true" ]; then composer install --no-interaction --prefer-dist --optimize-autoloader; else composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader; fi \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwX storage bootstrap/cache
 

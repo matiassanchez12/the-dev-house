@@ -10,6 +10,7 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate icon" href="/favicon.ico">
         <link rel="apple-touch-icon" href="/favicon.svg">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Fallback SEO Meta Tags (overridden per-page by <Seo />) -->
         <meta name="description" content="The Dev House - Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">

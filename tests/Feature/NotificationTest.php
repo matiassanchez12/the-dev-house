@@ -485,6 +485,47 @@ class NotificationTest extends TestCase
             'user.' . $user->id,
             $user->routeNotificationForBroadcast(new \stdClass()),
         );
+
+        $this->assertEquals(
+            'user.' . $user->id,
+            $user->receivesBroadcastNotificationsOn(new \stdClass()),
+        );
+    }
+
+    public function test_authenticated_user_can_authorize_own_private_notification_channel(): void
+    {
+        $user = User::factory()->create();
+
+        $csrf = 'test-csrf-token';
+
+        $response = $this->actingAs($user)
+            ->withSession(['_token' => $csrf])
+            ->withHeader('X-CSRF-TOKEN', $csrf)
+            ->post('/broadcasting/auth', [
+                'socket_id' => '123.456',
+                'channel_name' => 'private-user.' . $user->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure(['auth']);
+    }
+
+    public function test_user_cannot_authorize_another_users_private_notification_channel(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $csrf = 'test-csrf-token';
+
+        $response = $this->actingAs($user)
+            ->withSession(['_token' => $csrf])
+            ->withHeader('X-CSRF-TOKEN', $csrf)
+            ->post('/broadcasting/auth', [
+                'socket_id' => '123.456',
+                'channel_name' => 'private-user.' . $otherUser->id,
+            ]);
+
+        $response->assertForbidden();
     }
 
     public function test_join_request_received_uses_broadcast_channel(): void
