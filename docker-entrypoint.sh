@@ -3,7 +3,7 @@ set -eu
 
 SERVICE="${SERVICE:-web}"
 PORT="${PORT:-8080}"
-REDIS_CLIENT="${REDIS_CLIENT:-predis}"
+REDIS_CLIENT="predis"
 export PORT
 export REDIS_CLIENT
 
