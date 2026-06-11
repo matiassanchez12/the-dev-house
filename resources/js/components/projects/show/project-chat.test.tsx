@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { ProjectChat } from './project-chat';
@@ -8,13 +8,14 @@ const mockState = vi.hoisted(() => ({
     leave: vi.fn(),
     listen: vi.fn(),
     stopListening: vi.fn(),
+    post: vi.fn(),
 }));
 
 vi.mock('@inertiajs/react', () => ({
     useForm: () => ({
         data: { body: '' },
         setData: vi.fn(),
-        post: vi.fn(),
+        post: mockState.post,
         processing: false,
         errors: {},
         reset: vi.fn(),
@@ -79,6 +80,7 @@ describe('ProjectChat', () => {
         mockState.leave.mockClear();
         mockState.listen.mockClear();
         mockState.stopListening.mockClear();
+        mockState.post.mockClear();
         // @ts-expect-error test cleanup
         delete window.Echo;
     });
@@ -114,5 +116,84 @@ describe('ProjectChat', () => {
         await waitFor(() => {
             expect(mockState.private).toHaveBeenCalledWith('project.1');
         });
+    });
+
+    it('shows the Ctrl + Enter hint text', async () => {
+        const { getByText } = render(
+            <ProjectChat
+                projectId={1}
+                projectSlug="alpha"
+                currentUserId={1}
+                messages={[
+                    {
+                        id: 1,
+                        project_id: 1,
+                        user_id: 1,
+                        body: 'Hola',
+                        type: 'text',
+                        created_at: '2026-06-10T00:00:00.000Z',
+                        updated_at: '2026-06-10T00:00:00.000Z',
+                    },
+                ]}
+            />,
+        );
+
+        expect(getByText('para enviar')).toBeInTheDocument();
+    });
+
+    it('sends the message when Ctrl + Enter is pressed', async () => {
+        const { getByRole } = render(
+            <ProjectChat
+                projectId={1}
+                projectSlug="alpha"
+                currentUserId={1}
+                messages={[
+                    {
+                        id: 1,
+                        project_id: 1,
+                        user_id: 1,
+                        body: 'Hola',
+                        type: 'text',
+                        created_at: '2026-06-10T00:00:00.000Z',
+                        updated_at: '2026-06-10T00:00:00.000Z',
+                    },
+                ]}
+            />,
+        );
+
+        const textarea = getByRole('textbox');
+        fireEvent.change(textarea, { target: { value: 'Test message' } });
+        fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
+
+        await waitFor(() => {
+            expect(mockState.post).toHaveBeenCalled();
+        });
+    });
+
+    it('does not send when Enter is pressed without Ctrl', async () => {
+        const { getByRole } = render(
+            <ProjectChat
+                projectId={1}
+                projectSlug="alpha"
+                currentUserId={1}
+                messages={[
+                    {
+                        id: 1,
+                        project_id: 1,
+                        user_id: 1,
+                        body: 'Hola',
+                        type: 'text',
+                        created_at: '2026-06-10T00:00:00.000Z',
+                        updated_at: '2026-06-10T00:00:00.000Z',
+                    },
+                ]}
+            />,
+        );
+
+        const textarea = getByRole('textbox');
+        fireEvent.change(textarea, { target: { value: 'Test message' } });
+        fireEvent.keyDown(textarea, { key: 'Enter' });
+
+        expect(mockState.post).not.toHaveBeenCalled();
     });
 });

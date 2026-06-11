@@ -49,8 +49,10 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
 
     if (!messages) return null;
 
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
+    const submit = (event?: FormEvent) => {
+        if (event) event.preventDefault();
+
+        if (!data.body.trim()) return;
 
         post(route('projects.messages.store', projectSlug), {
             preserveScroll: true,
@@ -60,6 +62,13 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
             },
             onError: () => toast.error('No se pudo enviar el mensaje'),
         });
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            if (!processing) submit();
+        }
     };
 
     return (
@@ -98,10 +107,23 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                     <Textarea
                         value={data.body}
                         onChange={(event) => setData('body', event.target.value)}
+                        onKeyDown={handleKeyDown}
                         placeholder="Escribí un mensaje..."
                         rows={3}
                     />
-                    <FormError message={errors.body} />
+                    <div className="flex items-center justify-between">
+                        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                                Ctrl
+                            </kbd>
+                            <span>+</span>
+                            <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                                Enter
+                            </kbd>
+                            <span className="ml-1">para enviar</span>
+                        </p>
+                        <FormError message={errors.body} />
+                    </div>
                     <Button type="submit" disabled={processing}>
                         <Send className="size-4" data-icon="inline-start" />
                         {processing ? 'Enviando...' : 'Enviar'}
