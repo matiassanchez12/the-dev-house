@@ -24,6 +24,7 @@ vi.mock('@inertiajs/react', () => ({
 
 vi.mock('lucide-react', () => ({
     Send: () => <span />,
+    Loader2: () => <span />,
 }));
 
 vi.mock('sonner', () => ({

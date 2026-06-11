@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
@@ -103,15 +104,16 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                     <div ref={bottomRef} aria-hidden="true" />
                 </div>
 
-                <form onSubmit={submit} className="space-y-3">
+                <form onSubmit={submit} className="space-y-2">
                     <Textarea
                         value={data.body}
                         onChange={(event) => setData('body', event.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Escribí un mensaje..."
                         rows={3}
+                        className="resize-y transition-all duration-200 min-h-16 max-h-48"
                     />
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-end justify-between gap-3">
                         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
                                 Ctrl
@@ -122,12 +124,29 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                             </kbd>
                             <span className="ml-1">para enviar</span>
                         </p>
-                        <FormError message={errors.body} />
+                        <div className="flex items-center gap-2">
+                            <FormError message={errors.body} />
+                            <Button
+                                type="submit"
+                                variant="cta"
+                                size="default"
+                                disabled={processing}
+                                className="transition-all duration-200 active:scale-95 disabled:opacity-50"
+                            >
+                                {processing ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" data-icon="inline-start" />
+                                        <span>Enviando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="size-4" data-icon="inline-start" />
+                                        <span>Enviar</span>
+                                    </>
+                                )}
+                            </Button>
+                        </div>
                     </div>
-                    <Button type="submit" disabled={processing}>
-                        <Send className="size-4" data-icon="inline-start" />
-                        {processing ? 'Enviando...' : 'Enviar'}
-                    </Button>
                 </form>
             </CardContent>
         </Card>
