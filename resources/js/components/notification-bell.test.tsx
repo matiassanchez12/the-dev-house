@@ -102,7 +102,7 @@ describe('NotificationBell', () => {
         });
 
         await waitFor(() => {
-            expect(reloadMock).toHaveBeenCalledWith({ only: ['notifications'] });
+            expect(reloadMock).toHaveBeenCalledWith({ only: ['auth', 'notifications'] });
         });
 
         expect(screen.getByText('3')).toBeInTheDocument();

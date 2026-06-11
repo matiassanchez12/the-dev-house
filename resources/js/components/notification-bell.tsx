@@ -81,7 +81,7 @@ export default function NotificationBell() {
 
         const handler = () => {
             setUnreadCount((current) => current + 1);
-            router.reload({ only: ['notifications'] });
+            router.reload({ only: ['auth', 'notifications'] });
         };
 
         channel.notification(handler);
