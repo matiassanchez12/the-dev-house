@@ -21,13 +21,14 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
     const bottomRef = useRef<HTMLDivElement>(null);
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
     const latestMessageId = items[items.length - 1]?.id;
+    const hasChatAccess = messages !== undefined;
 
     useEffect(() => {
         setItems(messages ?? []);
     }, [messages]);
 
     useEffect(() => {
-        if (typeof window === 'undefined' || !window.Echo) return;
+        if (!hasChatAccess || typeof window === 'undefined' || !window.Echo) return;
 
         const channel = window.Echo.private(`project.${projectId}`);
         const handler = (message: Message) => {
@@ -38,12 +39,12 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
 
         return () => {
             channel.stopListening('.message.created', handler);
-            window.Echo.leave(`project.${projectId}`);
+            window.Echo?.leave?.(`project.${projectId}`);
         };
-    }, [projectId]);
+    }, [hasChatAccess, projectId]);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        bottomRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'end' });
     }, [latestMessageId]);
 
     if (!messages) return null;
