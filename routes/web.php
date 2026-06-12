@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 
-    // Onboarding
+// Onboarding
     Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
     Route::post('/onboarding/step-1', [OnboardingController::class, 'saveStep1'])->name('onboarding.step-1');
     Route::post('/onboarding/step-2', [OnboardingController::class, 'saveStep2'])->name('onboarding.step-2');
