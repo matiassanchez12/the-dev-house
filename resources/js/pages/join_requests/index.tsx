@@ -1,4 +1,5 @@
 import Seo from '@/components/seo';
+import { useEffect, useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { Check, X, Clock } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
@@ -26,25 +27,53 @@ interface Props {
 
 export default function Index({ auth, receivedRequests, sentRequests }: Props) {
     const { post, processing } = useForm({});
+    const [receivedItems, setReceivedItems] = useState(receivedRequests);
+    const [sentItems, setSentItems] = useState(sentRequests);
+
+    useEffect(() => {
+        setReceivedItems(receivedRequests);
+    }, [receivedRequests]);
+
+    useEffect(() => {
+        setSentItems(sentRequests);
+    }, [sentRequests]);
 
     const handleApprove = (joinRequestId: number) => {
+        const previousReceived = receivedItems;
+        setReceivedItems((current) => current.filter((request) => request.id !== joinRequestId));
+
         post(route('join-requests.approve', joinRequestId), {
             onSuccess: () => toast.success('Solicitud aprobada'),
-            onError: () => toast.error('Error al aprobar la solicitud'),
+            onError: () => {
+                setReceivedItems(previousReceived);
+                toast.error('Error al aprobar la solicitud');
+            },
         });
     };
 
     const handleReject = (joinRequestId: number) => {
+        const previousReceived = receivedItems;
+        setReceivedItems((current) => current.filter((request) => request.id !== joinRequestId));
+
         post(route('join-requests.reject', joinRequestId), {
             onSuccess: () => toast.success('Solicitud rechazada'),
-            onError: () => toast.error('Error al rechazar la solicitud'),
+            onError: () => {
+                setReceivedItems(previousReceived);
+                toast.error('Error al rechazar la solicitud');
+            },
         });
     };
 
     const handleCancel = (joinRequestId: number) => {
+        const previousSent = sentItems;
+        setSentItems((current) => current.filter((request) => request.id !== joinRequestId));
+
         post(route('join-requests.cancel', joinRequestId), {
             onSuccess: () => toast.success('Solicitud cancelada'),
-            onError: () => toast.error('Error al cancelar la solicitud'),
+            onError: () => {
+                setSentItems(previousSent);
+                toast.error('Error al cancelar la solicitud');
+            },
         });
     };
 
@@ -69,13 +98,13 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {receivedRequests.length === 0 ? (
+                                {receivedItems.length === 0 ? (
                                     <p className="text-muted-foreground text-center py-8">
                                         No tenés solicitudes pendientes
                                     </p>
                                 ) : (
                                     <div className="space-y-4">
-                                        {receivedRequests.map((request) => (
+                                        {receivedItems.map((request) => (
                                             <div
                                                 key={request.id}
                                                 className="border rounded-lg p-4 flex justify-between items-center"
@@ -131,13 +160,13 @@ export default function Index({ auth, receivedRequests, sentRequests }: Props) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {sentRequests.length === 0 ? (
+                                {sentItems.length === 0 ? (
                                     <p className="text-muted-foreground text-center py-8">
                                         No enviaste solicitudes
                                     </p>
                                 ) : (
                                     <div className="space-y-4">
-                                        {sentRequests.map((request) => (
+                                        {sentItems.map((request) => (
                                             <div
                                                 key={request.id}
                                                 className="border rounded-lg p-4 flex justify-between items-center"

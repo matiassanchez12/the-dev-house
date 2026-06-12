@@ -38,7 +38,25 @@ vi.mock('@/components/ui/dropdown', () => {
 
 describe('NotificationBell', () => {
     afterEach(() => {
+        vi.useRealTimers();
         vi.clearAllMocks();
+        document.title = 'The Dev House';
+    });
+
+    it('does not render or subscribe when the user is not authenticated', () => {
+        usePageMock.mockReturnValue({
+            url: '/dashboard',
+            props: {
+                auth: {
+                    user: null,
+                },
+            },
+        });
+
+        render(<NotificationBell />);
+
+        expect(screen.queryByLabelText('Notificaciones')).not.toBeInTheDocument();
+        expect(privateMock).not.toHaveBeenCalled();
     });
 
     it('subscribes to the private channel and reloads notifications on broadcast', async () => {
@@ -84,9 +102,109 @@ describe('NotificationBell', () => {
         });
 
         await waitFor(() => {
-            expect(reloadMock).toHaveBeenCalledWith({ only: ['notifications'] });
+            expect(reloadMock).toHaveBeenCalledWith({ only: ['auth', 'notifications'] });
         });
 
         expect(screen.getByText('3')).toBeInTheDocument();
+    });
+
+    it('pulses the document title when there are unread notifications', async () => {
+        vi.useFakeTimers();
+        document.title = 'The Dev House';
+
+        usePageMock.mockReturnValue({
+            url: '/dashboard',
+            props: {
+                auth: {
+                    user: {
+                        id: 1,
+                        name: 'Ada Lovelace',
+                        slug: 'ada-lovelace',
+                        unread_notifications_count: 2,
+                    },
+                },
+            },
+        });
+
+        privateMock.mockReturnValue({
+            notification: notificationMock,
+        });
+
+        Object.defineProperty(globalThis, 'route', {
+            configurable: true,
+            value: vi.fn().mockReturnValue('/notifications'),
+        });
+
+        Object.defineProperty(window, 'Echo', {
+            configurable: true,
+            value: {
+                private: privateMock,
+                leave: leaveMock,
+            },
+        });
+
+        render(<NotificationBell />);
+
+        await waitFor(() => {
+            expect(document.title).toBe('(2) The Dev House');
+        });
+
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+
+        expect(document.title).toBe('The Dev House');
+
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+
+        expect(document.title).toBe('(2) The Dev House');
+    });
+
+    it('restores the original title when unmounted', async () => {
+        vi.useFakeTimers();
+        document.title = 'The Dev House';
+
+        usePageMock.mockReturnValue({
+            url: '/dashboard',
+            props: {
+                auth: {
+                    user: {
+                        id: 1,
+                        name: 'Ada Lovelace',
+                        slug: 'ada-lovelace',
+                        unread_notifications_count: 2,
+                    },
+                },
+            },
+        });
+
+        privateMock.mockReturnValue({
+            notification: notificationMock,
+        });
+
+        Object.defineProperty(globalThis, 'route', {
+            configurable: true,
+            value: vi.fn().mockReturnValue('/notifications'),
+        });
+
+        Object.defineProperty(window, 'Echo', {
+            configurable: true,
+            value: {
+                private: privateMock,
+                leave: leaveMock,
+            },
+        });
+
+        const { unmount } = render(<NotificationBell />);
+
+        await waitFor(() => {
+            expect(document.title).toBe('(2) The Dev House');
+        });
+
+        unmount();
+
+        expect(document.title).toBe('The Dev House');
     });
 });

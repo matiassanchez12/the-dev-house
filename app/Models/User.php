@@ -138,6 +138,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Broadcast notification channel for this user.
+     */
+    public function receivesBroadcastNotificationsOn($notification): string
+    {
+        return 'user.' . $this->id;
+    }
+
+    /**
      * Boot the model.
      */
     protected static function booted(): void

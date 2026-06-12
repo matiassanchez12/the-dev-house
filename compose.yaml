@@ -1,10 +1,5 @@
 services:
     laravel.test:
-        build:
-            context: ./vendor/laravel/sail/runtimes/8.5
-            dockerfile: Dockerfile
-            args:
-                WWWGROUP: '${WWWGROUP}'
         image: sail-8.5/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
@@ -100,25 +95,6 @@ services:
         networks:
             - sail
         command: php artisan reverb:start
-    bootstrap:
-        build:
-            context: './vendor/laravel/sail/runtimes/8.5'
-            dockerfile: Dockerfile
-            args:
-                WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.5/app'
-        environment:
-            WWWUSER: '${WWWUSER}'
-            WWWGROUP: '${WWWGROUP}'
-        volumes:
-            - '.:/var/www/html'
-            - './docker/bootstrap.sh:/docker/bootstrap.sh'
-        networks:
-            - sail
-        depends_on:
-            pgsql:
-                condition: service_healthy
-        entrypoint: ['sh', '/docker/bootstrap.sh']        
 networks:
     sail:
         driver: bridge

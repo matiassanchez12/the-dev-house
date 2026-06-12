@@ -74,6 +74,7 @@ case "$SERVICE" in
         render_nginx_config
         cache_config
         run_database_bootstrap
+        chown -R www-data:www-data storage/logs
 
         if [ "$#" -eq 0 ]; then
             set -- /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

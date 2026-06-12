@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function AppLayout({ children, header }: Props) {
-    const user = usePage().props.auth.user as User | null;
+    const user = (usePage().props.auth?.user as User | null | undefined) ?? null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const unreadNotifications = user?.unread_notifications_count ?? 0;
 
@@ -110,7 +110,7 @@ export default function AppLayout({ children, header }: Props) {
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
                             <ThemeToggle />
-                            {user && <NotificationBell />}
+                            <NotificationBell />
 
                             {user ? (
                                 <div className="relative ms-3">

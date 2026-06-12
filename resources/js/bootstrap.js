@@ -2,6 +2,7 @@ import axios from 'axios';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.withCredentials = true;
 
 const reverbConfig = window.__REVERB_CONFIG__;
 
@@ -24,7 +25,7 @@ if (reverbConfig?.key) {
                 window.axios.post('/broadcasting/auth', {
                     socket_id: socketId,
                     channel_name: channel.name,
-                }, { withCredentials: true }).then((response) => {
+                }).then((response) => {
                     callback(null, response.data);
                 }).catch((error) => {
                     callback(error, null);
