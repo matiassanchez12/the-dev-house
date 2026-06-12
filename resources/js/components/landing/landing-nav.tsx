@@ -119,7 +119,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                     </div>
 
                     <div className="flex lg:hidden items-center gap-2">
-                        <ThemeToggle />
+                        <ThemeToggle className="p-2 rounded-md hover:bg-accent/10 transition-colors" />
                         <button
                             className="p-2 rounded-md hover:bg-accent/10 transition-colors"
                             onClick={toggle}
@@ -168,7 +168,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                             {auth.user ? (
                                 <Link href={route('dashboard')} onClick={close}>
                                     <Button variant="cta" size="lg" className="w-full">
-                                        Ir al Dashboard
+                                        Dashboard
                                     </Button>
                                 </Link>
                             ) : (
