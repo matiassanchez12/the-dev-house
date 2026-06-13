@@ -267,7 +267,11 @@ php artisan test --filter ProjectTest
 DB_CONNECTION, DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD
 SESSION_DRIVER, CACHE_DRIVER, QUEUE_CONNECTION
 BROADCAST_DRIVER (optional, for real-time chat)
+MAIL_MAILER, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
+MAIL_FROM_ADDRESS, MAIL_FROM_NAME
 ```
+
+Production mail delivery should use a real SMTP provider; local Sail can keep using Mailpit/log.
 
 ---
 

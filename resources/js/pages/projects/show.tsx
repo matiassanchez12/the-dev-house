@@ -3,7 +3,7 @@ import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Message, Project as ProjectType, Tech, User } from '@/types';
+import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
     ProjectHero,
     ProjectDescription,
@@ -17,6 +17,7 @@ import {
     ProjectChat,
     ProjectStatusManager,
     ProjectDeleteDialog,
+    ProjectPhasesSection,
 } from '@/components/projects/show';
 
 interface Props {
@@ -31,6 +32,7 @@ interface Props {
         techs: Tech[];
         participants: User[];
         messages?: Message[];
+        phases?: Phase[];
     };
 }
 
@@ -84,6 +86,11 @@ export default function Show({ auth, project }: Props) {
                                 projectSlug={project.slug}
                                 currentUserId={auth.user?.id}
                                 messages={project.messages}
+                            />
+                            <ProjectPhasesSection
+                                projectSlug={project.slug}
+                                phases={project.phases}
+                                isCreator={isCreator}
                             />
                         </div>
 
