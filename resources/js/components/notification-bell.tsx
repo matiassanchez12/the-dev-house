@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -13,39 +13,83 @@ interface User {
 }
 
 interface PageProps {
-    auth: { user: User | null };
+    auth?: { user: User | null };
     notifications?: NotificationItem[] | { data: NotificationItem[] };
+    url?: string;
 }
 
 export type { NotificationItem } from '@/components/notification-list';
 
+const unreadTitlePrefix = /^\(\d+\)\s+/;
+
+const stripUnreadPrefix = (title: string) => title.replace(unreadTitlePrefix, '');
+
 export default function NotificationBell() {
     const page = usePage<PageProps>();
-    const user = page.props.auth.user;
+    const user = page.props.auth?.user ?? null;
     const initialUnread = user?.unread_notifications_count ?? 0;
     const [unreadCount, setUnreadCount] = useState(initialUnread);
+    const titleBaseRef = useRef(typeof document === 'undefined' ? '' : stripUnreadPrefix(document.title));
+    const titleIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
 
     useEffect(() => {
         setUnreadCount(initialUnread);
     }, [initialUnread]);
 
     useEffect(() => {
-        if (!user || typeof window === 'undefined' || !window.Echo) return;
+        titleBaseRef.current = stripUnreadPrefix(document.title);
+    }, [page.url]);
 
-        const channel = window.Echo.private(`App.Models.User.${user.id}`);
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
 
-        const handler = (event: { notification?: NotificationItem }) => {
-            setUnreadCount((current) => current + 1);
-            if (event.notification) {
-                router.reload({ only: ['notifications'] });
-            }
+        if (titleIntervalRef.current) {
+            window.clearInterval(titleIntervalRef.current);
+            titleIntervalRef.current = null;
+        }
+
+        if (unreadCount <= 0) {
+            document.title = titleBaseRef.current;
+            return;
+        }
+
+        let showBadge = true;
+        const baseTitle = titleBaseRef.current;
+
+        const renderTitle = () => {
+            document.title = showBadge ? `(${unreadCount}) ${baseTitle}` : baseTitle;
+            showBadge = !showBadge;
         };
 
-        channel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
+        renderTitle();
+        titleIntervalRef.current = window.setInterval(renderTitle, 1000);
 
         return () => {
-            channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handler);
-            window.Echo.leave(`App.Models.User.${user.id}`);
+            if (titleIntervalRef.current) {
+                window.clearInterval(titleIntervalRef.current);
+                titleIntervalRef.current = null;
+            }
+
+            document.title = baseTitle;
+        };
+    }, [unreadCount, page.url]);
+
+    useEffect(() => {
+        if (!user || typeof window === 'undefined' || !window.Echo) return;
+
+        const channel = window.Echo.private(`user.${user.id}`);
+
+        const handler = () => {
+            setUnreadCount((current) => current + 1);
+            router.reload({ only: ['auth', 'notifications'] });
+        };
+
+        channel.notification(handler);
+
+        return () => {
+            if (window.Echo) {
+                window.Echo.leave(`user.${user.id}`);
+            }
         };
     }, [user?.id]);
 

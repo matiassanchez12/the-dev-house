@@ -4,12 +4,12 @@ namespace App\Notifications;
 
 use App\Models\JoinRequest;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JoinRequestRejected extends Notification implements ShouldBroadcast
+class JoinRequestRejected extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
@@ -27,7 +27,7 @@ class JoinRequestRejected extends Notification implements ShouldBroadcast
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Tu solicitud para {$jr->project->title} no fue aceptada")
+            ->subject("Solicitud no aprobada: {$jr->project->title}")
             ->view('emails.join-request-rejected', ['joinRequest' => $jr]);
     }
 

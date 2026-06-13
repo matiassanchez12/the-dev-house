@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\JoinRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -14,7 +15,7 @@ class ApiResourceTransformer
      * Transform a project model to array with disk-aware image URLs.
      * Creator and participants are scrubbed to safe fields only.
      */
-    public static function project(Model|array $project): array
+    public static function project(Model|array $project, ?JoinRequest $viewerJoinRequest = null): array
     {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
@@ -45,6 +46,14 @@ class ApiResourceTransformer
         if (isset($data['phases']) && is_array($data['phases'])) {
             $data['phases'] = array_map(fn ($phase) => self::phase($phase), $data['phases']);
         }
+        
+        $data['viewerJoinRequest'] = $viewerJoinRequest === null
+            ? null
+            : [
+                'id' => $viewerJoinRequest->id,
+                'status' => $viewerJoinRequest->status,
+                'message' => $viewerJoinRequest->message,
+            ];
 
         return $data;
     }

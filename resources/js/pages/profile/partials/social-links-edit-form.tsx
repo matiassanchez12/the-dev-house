@@ -2,7 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Trash2, Plus } from 'lucide-react';
 import { SocialLink } from '@/types';
 import { getSocialIcon, getSocialLabel, SOCIAL_PLATFORMS } from '@/lib/social-icons';
@@ -38,28 +38,16 @@ export default function SocialLinksEditForm({ socialLinks, className = '' }: Pro
         setData('links', [...data.links, { platform: '', url: '' }]);
     };
 
-    const removeLink = async (index: number) => {
+    const removeLink = (index: number) => {
         const link = data.links[index];
 
         // If it's a saved link, delete it individually
         if (link.id) {
-            try {
-                await fetch(route('social-links.destroy', link.id), {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                        'Accept': 'application/json',
-                    },
-                });
-
-                // Remove from local state
-                const newLinks = [...data.links];
-                newLinks.splice(index, 1);
-                setData('links', newLinks);
-                toast.success('Link eliminado');
-            } catch {
-                toast.error('Error al eliminar el link');
-            }
+            router.delete(route('social-links.destroy', { socialLink: link.id }), {
+                preserveScroll: true,
+                onSuccess: () => toast.success('Link eliminado'),
+                onError: () => toast.error('Error al eliminar el link'),
+            });
         } else {
             // Just remove from local state (unsaved)
             const newLinks = [...data.links];
@@ -81,6 +69,11 @@ export default function SocialLinksEditForm({ socialLinks, className = '' }: Pro
         const validLinks = data.links.filter(
             (link) => link.platform !== '' && link.url !== ''
         );
+
+        console.log('SocialLinks submit', {
+            links: data.links,
+            validLinks,
+        });
 
         if (validLinks.length === 0) {
             // Submit empty array to clear all links

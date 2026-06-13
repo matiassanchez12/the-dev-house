@@ -3,3 +3,10 @@ builder = "dockerfile"
 
 [deploy]
 releaseCommand = "php artisan migrate --force"
+
+[settings]
+PHP_OPCACHE_ENABLED = true
+PHP_OPCACHE_MEMORY = 256
+PHP_OPCACHE_MAX_FILES = 10000
+PHP_MAX_EXECUTION_TIME = 60
+PHP_MEMORY_LIMIT = "256M"

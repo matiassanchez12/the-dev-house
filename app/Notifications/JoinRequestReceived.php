@@ -4,12 +4,12 @@ namespace App\Notifications;
 
 use App\Models\JoinRequest;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JoinRequestReceived extends Notification implements ShouldBroadcast
+class JoinRequestReceived extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
@@ -27,7 +27,7 @@ class JoinRequestReceived extends Notification implements ShouldBroadcast
         $jr = $this->joinRequest;
 
         return (new MailMessage())
-            ->subject("Nueva solicitud para {$jr->project->title}")
+            ->subject("Nueva solicitud: {$jr->project->title}")
             ->view('emails.join-request-received', ['joinRequest' => $jr]);
     }
 

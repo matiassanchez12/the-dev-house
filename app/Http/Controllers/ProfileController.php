@@ -160,7 +160,7 @@ class ProfileController extends Controller
 
         $socialLink->delete();
 
-        return Redirect::route('profile.edit')->with('success', 'Link social eliminado!');
+        return Redirect::route('profile.edit', [], 303)->with('success', 'Link social eliminado!');
     }
 
     /**

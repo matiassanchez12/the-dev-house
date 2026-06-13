@@ -59,6 +59,11 @@ export interface Project {
     phases?: Phase[];
     participants_count?: number;
     messages?: Message[];
+    viewerJoinRequest?: {
+        id: number;
+        status: 'pending' | 'approved' | 'rejected';
+        message?: string;
+    } | null;
 }
 
 export interface JoinRequest {

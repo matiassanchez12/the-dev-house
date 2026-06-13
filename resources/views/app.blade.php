@@ -10,7 +10,6 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate icon" href="/favicon.ico">
         <link rel="apple-touch-icon" href="/favicon.svg">
-
         <!-- Fallback SEO Meta Tags (overridden per-page by <Seo />) -->
         <meta name="description" content="The Dev House - Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
         <meta name="keywords" content="desarrolladores, programacion, proyectos, colaboracion, open source, comunidad, tech, software">
@@ -33,6 +32,16 @@
                 }
             })();
         </script>
+
+        @php
+            $reverbConfig = [
+                'key' => config('reverb.apps.apps.0.key'),
+                'host' => config('reverb.apps.apps.0.options.host'),
+                'port' => (int) config('reverb.apps.apps.0.options.port'),
+                'scheme' => config('reverb.apps.apps.0.options.scheme'),
+            ];
+        @endphp
+        <script>window.__REVERB_CONFIG__ = @json($reverbConfig);</script>
 
         <!-- Scripts -->
         @routes

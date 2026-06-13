@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,14 +19,17 @@ interface Props {
 
 export function ProjectChat({ projectId, projectSlug, currentUserId, messages }: Props) {
     const [items, setItems] = useState(messages ?? []);
+    const bottomRef = useRef<HTMLDivElement>(null);
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
+    const latestMessageId = items[items.length - 1]?.id;
+    const hasChatAccess = messages !== undefined;
 
     useEffect(() => {
         setItems(messages ?? []);
     }, [messages]);
 
     useEffect(() => {
-        if (typeof window === 'undefined' || !window.Echo) return;
+        if (!hasChatAccess || typeof window === 'undefined' || !window.Echo) return;
 
         const channel = window.Echo.private(`project.${projectId}`);
         const handler = (message: Message) => {
@@ -36,14 +40,20 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
 
         return () => {
             channel.stopListening('.message.created', handler);
-            window.Echo.leave(`project.${projectId}`);
+            window.Echo?.leave?.(`project.${projectId}`);
         };
-    }, [projectId]);
+    }, [hasChatAccess, projectId]);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'end' });
+    }, [latestMessageId]);
 
     if (!messages) return null;
 
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
+    const submit = (event?: FormEvent) => {
+        if (event) event.preventDefault();
+
+        if (!data.body.trim()) return;
 
         post(route('projects.messages.store', projectSlug), {
             preserveScroll: true,
@@ -55,6 +65,13 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
         });
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            if (!processing) submit();
+        }
+    };
+
     return (
         <Card className="border-primary/20">
             <CardHeader>
@@ -62,7 +79,7 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                 <CardDescription>Conversá con los miembros del equipo en tiempo real</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="max-h-96 space-y-3 overflow-y-auto pr-1">
+                <div className="scrollbar-chat max-h-96 space-y-3 overflow-y-auto pr-1">
                     {items.length === 0 ? (
                         <p className="text-sm text-muted-foreground">Todavía no hay mensajes.</p>
                     ) : items.map((message) => {
@@ -84,20 +101,52 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                             </div>
                         );
                     })}
+                    <div ref={bottomRef} aria-hidden="true" />
                 </div>
 
-                <form onSubmit={submit} className="space-y-3">
+                <form onSubmit={submit} className="space-y-2">
                     <Textarea
                         value={data.body}
                         onChange={(event) => setData('body', event.target.value)}
+                        onKeyDown={handleKeyDown}
                         placeholder="Escribí un mensaje..."
                         rows={3}
+                        className="resize-y transition-all duration-200 min-h-16 max-h-48"
                     />
-                    <FormError message={errors.body} />
-                    <Button type="submit" disabled={processing}>
-                        <Send className="size-4" data-icon="inline-start" />
-                        {processing ? 'Enviando...' : 'Enviar'}
-                    </Button>
+                    <div className="flex items-end justify-between gap-3">
+                        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                                Ctrl
+                            </kbd>
+                            <span>+</span>
+                            <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                                Enter
+                            </kbd>
+                            <span className="ml-1">para enviar</span>
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <FormError message={errors.body} />
+                            <Button
+                                type="submit"
+                                variant="cta"
+                                size="default"
+                                disabled={processing}
+                                className="transition-all duration-200 active:scale-95 disabled:opacity-50"
+                            >
+                                {processing ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" data-icon="inline-start" />
+                                        <span>Enviando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="size-4" data-icon="inline-start" />
+                                        <span>Enviar</span>
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
                 </form>
             </CardContent>
         </Card>

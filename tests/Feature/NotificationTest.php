@@ -265,6 +265,105 @@ class NotificationTest extends TestCase
         $this->assertStringContainsString($project->title, $mailMessage->subject);
     }
 
+    public function test_join_request_received_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Test Project Gamma',
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero participar',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-received', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Nueva solicitud de acceso', $html);
+        $this->assertStringContainsString('Abrir solicitud', $html);
+        $this->assertStringContainsString(route('projects.show', $project->slug), $html);
+    }
+
+    public function test_join_request_received_mail_uses_dark_theme_shell(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'title' => 'Test Project Dark',
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero participar',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-received', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('background-color:#020617', $html);
+        $this->assertStringContainsString('background-color:#0b1220', $html);
+        $this->assertStringContainsString('background-color:#38bdf8', $html);
+    }
+
+    public function test_join_request_approved_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-approved', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Acceso aprobado', $html);
+        $this->assertStringContainsString('Abrir proyecto', $html);
+        $this->assertStringContainsString(route('projects.show', $project->slug), $html);
+    }
+
+    public function test_join_request_rejected_mail_renders_minimal_tech_layout(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id, 'status' => 'open']);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        $html = view('emails.join-request-rejected', [
+            'joinRequest' => $joinRequest,
+        ])->render();
+
+        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('Solicitud no aprobada', $html);
+        $this->assertStringContainsString('Explorar proyectos', $html);
+        $this->assertStringContainsString(route('projects.index'), $html);
+    }
+
     public function test_authenticated_user_can_view_their_notifications_index(): void
     {
         $user = User::factory()->create();
@@ -383,9 +482,50 @@ class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertEquals(
-            'App.Models.User.' . $user->id,
+            'user.' . $user->id,
             $user->routeNotificationForBroadcast(new \stdClass()),
         );
+
+        $this->assertEquals(
+            'user.' . $user->id,
+            $user->receivesBroadcastNotificationsOn(new \stdClass()),
+        );
+    }
+
+    public function test_authenticated_user_can_authorize_own_private_notification_channel(): void
+    {
+        $user = User::factory()->create();
+
+        $csrf = 'test-csrf-token';
+
+        $response = $this->actingAs($user)
+            ->withSession(['_token' => $csrf])
+            ->withHeader('X-CSRF-TOKEN', $csrf)
+            ->post('/broadcasting/auth', [
+                'socket_id' => '123.456',
+                'channel_name' => 'private-user.' . $user->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure(['auth']);
+    }
+
+    public function test_user_cannot_authorize_another_users_private_notification_channel(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $csrf = 'test-csrf-token';
+
+        $response = $this->actingAs($user)
+            ->withSession(['_token' => $csrf])
+            ->withHeader('X-CSRF-TOKEN', $csrf)
+            ->post('/broadcasting/auth', [
+                'socket_id' => '123.456',
+                'channel_name' => 'private-user.' . $otherUser->id,
+            ]);
+
+        $response->assertForbidden();
     }
 
     public function test_join_request_received_uses_broadcast_channel(): void

@@ -79,15 +79,25 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-8">
-                        {navLinks.map((link) => (
-                            <a
-                                key={link.label}
-                                href={link.href}
-                                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                {link.label}
-                            </a>
-                        ))}
+                        {navLinks.map((link) =>
+                            link.href.startsWith('#') ? (
+                                <a
+                                    key={link.label}
+                                    href={link.href}
+                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {link.label}
+                                </a>
+                            ) : (
+                                <Link
+                                    key={link.label}
+                                    href={link.href}
+                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {link.label}
+                                </Link>
+                            ),
+                        )}
                     </div>
 
                     <div className="hidden lg:flex items-center gap-3">
@@ -109,7 +119,7 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                     </div>
 
                     <div className="flex lg:hidden items-center gap-2">
-                        <ThemeToggle />
+                        <ThemeToggle className="p-2 rounded-md hover:bg-accent/10 transition-colors" />
                         <button
                             className="p-2 rounded-md hover:bg-accent/10 transition-colors"
                             onClick={toggle}
@@ -131,23 +141,34 @@ export default function LandingNav({ auth, className }: LandingNavProps) {
                 <div className="border-t border-border bg-background/95 backdrop-blur-md shadow-lg">
                     <div className="container mx-auto px-4 py-4 flex flex-col">
                         <nav aria-label="Navegación móvil" className="flex flex-col">
-                            {navLinks.map((link) => (
-                                <a
-                                    key={link.label}
-                                    href={link.href}
-                                    onClick={close}
-                                    className="px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground rounded-md"
-                                >
-                                    {link.label}
-                                </a>
-                            ))}
+                            {navLinks.map((link) =>
+                                link.href.startsWith('#') ? (
+                                    <a
+                                        key={link.label}
+                                        href={link.href}
+                                        onClick={close}
+                                        className="px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground rounded-md"
+                                    >
+                                        {link.label}
+                                    </a>
+                                ) : (
+                                    <Link
+                                        key={link.label}
+                                        href={link.href}
+                                        onClick={close}
+                                        className="px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground rounded-md"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ),
+                            )}
                         </nav>
 
                         <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                             {auth.user ? (
                                 <Link href={route('dashboard')} onClick={close}>
                                     <Button variant="cta" size="lg" className="w-full">
-                                        Ir al Dashboard
+                                        Dashboard
                                     </Button>
                                 </Link>
                             ) : (

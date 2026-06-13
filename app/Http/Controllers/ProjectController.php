@@ -6,6 +6,7 @@ use App\Helpers\ApiResourceTransformer;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
+use App\Services\JoinRequestService;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,8 @@ use Inertia\Inertia;
 class ProjectController extends Controller
 {
     public function __construct(
-        private ProjectService $projectService
+        private ProjectService $projectService,
+        private JoinRequestService $joinRequestService,
     ) {}
 
     /**
@@ -100,8 +102,18 @@ class ProjectController extends Controller
             $project->load(['messages.sender']);
         }
 
+        if (Auth::check() && $project->isMember(Auth::user())) {
+            $project->load(['messages.sender']);
+        }
+        $viewerJoinRequest = null;
+
+        if (Auth::check()) {
+            $viewerJoinRequest = $this->joinRequestService
+                ->getViewerFullRequest($project, Auth::user());
+        }
+
         return Inertia::render('projects/show', [
-            'project' => ApiResourceTransformer::project($project),
+            'project' => ApiResourceTransformer::project($project, $viewerJoinRequest),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Project;
+use App\Models\JoinRequest;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -286,6 +287,54 @@ class ProjectTest extends TestCase
             fn ($page) => $page
                 ->where('project.id', $project->id)
                 ->where('project.slug', 'mi-proyecto')
+        );
+    }
+
+    public function test_project_detail_includes_viewer_pending_join_request(): void
+    {
+        $project = Project::factory()->create(['slug' => 'project-with-request']);
+        $viewer = User::factory()->create();
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $viewer->id,
+            'message' => 'I would like to contribute to this project.',
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($viewer)->get('/projects/project-with-request');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('projects/show')
+                ->where('project.viewerJoinRequest.status', 'pending')
+                ->where('project.viewerJoinRequest.id', $joinRequest->id)
+        );
+    }
+
+    public function test_project_detail_includes_viewer_rejected_join_request(): void
+    {
+        $project = Project::factory()->create(['slug' => 'project-rejected']);
+        $viewer = User::factory()->create();
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $viewer->id,
+            'message' => 'I would like to contribute.',
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($viewer)->get('/projects/project-rejected');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('projects/show')
+                ->where('project.viewerJoinRequest.status', 'rejected')
+                ->where('project.viewerJoinRequest.id', $joinRequest->id)
+                ->where('project.viewerJoinRequest.message', 'I would like to contribute.')
         );
     }
 
