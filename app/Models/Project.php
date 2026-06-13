@@ -57,6 +57,14 @@ class Project extends Model
     }
 
     /**
+     * Project phases / milestones.
+     */
+    public function phases(): HasMany
+    {
+        return $this->hasMany(Phase::class)->orderBy('created_at');
+    }
+
+    /**
      * Mensajes del chat del proyecto
      */
     public function messages(): HasMany

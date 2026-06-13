@@ -1,0 +1,91 @@
+<?php
+
+namespace Tests\Feature\Projects;
+
+use App\Models\Phase;
+use App\Models\Project;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class PhaseTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_guest_is_redirected_when_creating_phase(): void
+    {
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+
+        $response = $this->post(route('projects.phases.store', $project), [
+            'title' => 'Discovery',
+        ]);
+
+        $response->assertRedirect('/login');
+    }
+
+    public function test_project_creator_can_create_phase(): void
+    {
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+
+        $response = $this->actingAs($creator)->post(route('projects.phases.store', $project), [
+            'title' => 'Discovery',
+            'description' => 'Validated the idea',
+            'completed_at' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('projects.show', $project));
+        $this->assertDatabaseHas('phases', [
+            'project_id' => $project->id,
+            'title' => 'Discovery',
+            'description' => 'Validated the idea',
+        ]);
+    }
+
+    public function test_project_member_cannot_create_phase(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+        $project->participants()->attach($member->id, ['role' => 'developer', 'joined_at' => now()]);
+
+        $response = $this->actingAs($member)->post(route('projects.phases.store', $project), [
+            'title' => 'Discovery',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_project_creator_can_update_phase(): void
+    {
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+        $phase = Phase::factory()->create(['project_id' => $project->id, 'title' => 'Discovery']);
+
+        $response = $this->actingAs($creator)->put(route('projects.phases.update', [$project, $phase]), [
+            'title' => 'Delivery',
+            'description' => 'Shipped the MVP',
+            'completed_at' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('projects.show', $project));
+        $this->assertDatabaseHas('phases', [
+            'id' => $phase->id,
+            'title' => 'Delivery',
+            'description' => 'Shipped the MVP',
+        ]);
+    }
+
+    public function test_project_creator_can_delete_phase(): void
+    {
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+        $phase = Phase::factory()->create(['project_id' => $project->id]);
+
+        $response = $this->actingAs($creator)->delete(route('projects.phases.destroy', [$project, $phase]));
+
+        $response->assertRedirect(route('projects.show', $project));
+        $this->assertDatabaseMissing('phases', ['id' => $phase->id]);
+    }
+}
