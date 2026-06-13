@@ -19,6 +19,7 @@ interface LandingNavProps {
 const navLinks = [
     { label: 'Características', href: '#features' },
     { label: 'Proyectos', href: '/projects' },
+    { label: 'Logros', href: route('milestones.index') },
     { label: 'Developers', href: '/users' },
     { label: 'Cómo empezar', href: '/how-start' },
 ];

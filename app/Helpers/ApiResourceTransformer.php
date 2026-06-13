@@ -56,6 +56,10 @@ class ApiResourceTransformer
     {
         $data = $phase instanceof Model ? $phase->toArray() : $phase;
 
+        if (isset($data['project'])) {
+            $data['project'] = self::project($data['project']);
+        }
+
         return array_intersect_key($data, array_flip([
             'id',
             'title',
@@ -63,6 +67,7 @@ class ApiResourceTransformer
             'completed_at',
             'created_at',
             'updated_at',
+            'project',
         ]));
     }
 

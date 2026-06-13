@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\PublicMilestoneController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectMessageController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::get('/privacy', [PublicPageController::class, 'privacy'])->name('privacy'
 
 // Rutas públicas para ver proyectos
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/milestones', [PublicMilestoneController::class, 'index'])->name('milestones.index');
 
 // Rutas protegidas para CRUD (ANTES de {project:slug} para que no las capture)
 Route::middleware('auth')->group(function () {
