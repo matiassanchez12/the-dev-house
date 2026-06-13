@@ -14,7 +14,7 @@ import {
     ProjectTechsCard,
     ProjectLinksCard,
     ProjectJoinForm,
-    ProjectChat,
+    ProjectChatSummary,
     ProjectStatusManager,
     ProjectDeleteDialog,
     ProjectPhasesSection,
@@ -33,6 +33,7 @@ interface Props {
         participants: User[];
         messages?: Message[];
         phases?: Phase[];
+        messages_count?: number;
     };
 }
 
@@ -81,16 +82,15 @@ export default function Show({ auth, project }: Props) {
                             <ProjectVision vision={project.vision} />
                             <ProjectGallery images={project.images ?? []} title={project.title} />
                             <ProjectParticipants participants={project.participants ?? []} />
-                            <ProjectChat
-                                projectId={project.id}
-                                projectSlug={project.slug}
-                                currentUserId={auth.user?.id}
-                                messages={project.messages}
-                            />
                             <ProjectPhasesSection
                                 projectSlug={project.slug}
                                 phases={project.phases}
-                                isCreator={isCreator}
+                                viewerRole={project.viewer_role}
+                            />
+                            <ProjectChatSummary
+                                projectSlug={project.slug}
+                                messagesCount={project.messages_count}
+                                messages={project.messages}
                             />
                         </div>
 

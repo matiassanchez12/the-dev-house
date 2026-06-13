@@ -14,6 +14,7 @@ use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\PublicMilestoneController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectMessageController;
+use App\Http\Controllers\ProjectChatController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page
@@ -52,6 +53,7 @@ Route::middleware('auth')->group(function () {
     // Project Status
     Route::patch('/projects/{project:slug}/status', [ProjectStatusController::class, 'update'])->name('projects.status.update');
     Route::post('/projects/{project:slug}/messages', [ProjectMessageController::class, 'store'])->name('projects.messages.store');
+    Route::get('/projects/{project:slug}/chat', [ProjectChatController::class, 'index'])->name('projects.chat');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

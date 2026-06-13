@@ -58,6 +58,7 @@ export interface Project {
     techs?: Tech[];
     phases?: Phase[];
     participants_count?: number;
+    messages_count?: number;
     messages?: Message[];
     viewerJoinRequest?: {
         id: number;
