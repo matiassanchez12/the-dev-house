@@ -84,7 +84,7 @@ export default function AppLayout({ children, header }: Props) {
     const logoHref = user ? route('dashboard') : '/';
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="flex min-h-screen flex-col bg-background">
             <nav className="border-b border-border bg-card">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
@@ -305,7 +305,7 @@ export default function AppLayout({ children, header }: Props) {
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="min-h-0 flex-1">{children}</main>
         </div>
     );
 }
