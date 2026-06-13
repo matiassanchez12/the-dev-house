@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { CheckCircle2, PencilLine, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FormError } from '@/components/ui/form-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,24 +30,27 @@ function formatDate(value: string | null | undefined): string {
 
 export function ProjectPhaseItem({ phase, projectSlug, isCreator }: ProjectPhaseItemProps) {
     const [isEditing, setIsEditing] = useState(false);
-    const { data, setData, patch, delete: destroy, processing, errors, reset } = useForm({
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const { data, setData, post, processing, errors, reset } = useForm({
+        _method: 'put',
         title: phase.title,
         description: phase.description ?? '',
         completed_at: phase.completed_at ? phase.completed_at.slice(0, 10) : '',
     });
 
     function handleDelete() {
-        if (!window.confirm('¿Eliminar este hito?')) return;
-
-        destroy(route('projects.phases.destroy', [projectSlug, phase.id]), {
+        router.delete(route('projects.phases.destroy', [projectSlug, phase.id]), {
             preserveScroll: true,
+            onSuccess: () => {
+                setIsDeleteDialogOpen(false);
+            },
         });
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        patch(route('projects.phases.update', [projectSlug, phase.id]), {
+        post(route('projects.phases.update', [projectSlug, phase.id]), {
             preserveScroll: true,
             onSuccess: () => {
                 setIsEditing(false);
@@ -148,12 +152,31 @@ export function ProjectPhaseItem({ phase, projectSlug, isCreator }: ProjectPhase
                         <PencilLine className="size-4" data-icon="inline-start" />
                         Editar
                     </Button>
-                    <Button type="button" variant="destructive" size="sm" onClick={handleDelete}>
+                    <Button type="button" variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
                         <Trash2 className="size-4" data-icon="inline-start" />
                         Eliminar
                     </Button>
                 </CardFooter>
             )}
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Eliminar hito</DialogTitle>
+                        <DialogDescription>
+                            ¿Estás seguro de que querés eliminar &quot;{phase.title}&quot;? Esta acción no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Eliminar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }
