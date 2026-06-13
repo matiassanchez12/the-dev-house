@@ -8,5 +8,6 @@ export { ProjectTechsCard } from './project-techs-card';
 export { ProjectLinksCard } from './project-links-card';
 export { ProjectJoinForm } from './project-join-form';
 export { ProjectChat } from './project-chat';
+export { ProjectPhasesSection } from './project-phases-section';
 export { ProjectDeleteDialog } from './project-delete-dialog';
 export { ProjectStatusManager } from './project-status-manager';

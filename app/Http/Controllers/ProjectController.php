@@ -96,20 +96,22 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load(['creator.techs', 'techs', 'participants']);
+        $project->load(['creator.techs', 'techs', 'participants', 'phases']);
+        $viewer = Auth::user();
+        $viewerRole = $this->projectService->viewerRole($project, $viewer);
 
-        if (Auth::check() && $project->isMember(Auth::user())) {
+        if (Auth::check() && $project->isMember($viewer)) {
             $project->load(['messages.sender']);
         }
         $viewerJoinRequest = null;
 
-        if (Auth::check()) {
+        if ($viewer !== null) {
             $viewerJoinRequest = $this->joinRequestService
-                ->getViewerFullRequest($project, Auth::user());
+                ->getViewerFullRequest($project, $viewer);
         }
 
         return Inertia::render('projects/show', [
-            'project' => ApiResourceTransformer::project($project, $viewerJoinRequest),
+            'project' => ApiResourceTransformer::project($project, $viewerJoinRequest, $viewerRole),
         ]);
     }
 

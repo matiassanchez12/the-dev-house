@@ -30,6 +30,19 @@ export interface ProjectImage {
     url: string;
 }
 
+export interface Phase {
+    id: number;
+    project_id: number;
+    title: string;
+    description?: string | null;
+    completed_at?: string | null;
+    created_at: string;
+    updated_at: string;
+    project?: Project;
+}
+
+export type ProjectViewerRole = 'guest' | 'creator' | 'member';
+
 export interface Project {
     id: number;
     user_id: number;
@@ -47,6 +60,7 @@ export interface Project {
     techs?: Tech[];
     participants_count?: number;
     messages?: Message[];
+    viewer_role?: ProjectViewerRole;
     viewerJoinRequest?: {
         id: number;
         status: 'pending' | 'approved' | 'rejected';
