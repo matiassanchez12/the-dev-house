@@ -3,7 +3,7 @@ import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Message, Project as ProjectType, Tech, User } from '@/types';
+import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
     ProjectHero,
     ProjectDescription,
@@ -17,6 +17,7 @@ import {
     ProjectChatSummary,
     ProjectStatusManager,
     ProjectDeleteDialog,
+    ProjectPhasesSection,
 } from '@/components/projects/show';
 
 interface Props {
@@ -32,6 +33,7 @@ interface Props {
         participants: User[];
         messages?: Message[];
         messages_count?: number;
+        phases?: Phase[];
     };
 }
 
@@ -80,6 +82,11 @@ export default function Show({ auth, project }: Props) {
                             <ProjectVision vision={project.vision} />
                             <ProjectGallery images={project.images ?? []} title={project.title} />
                             <ProjectParticipants participants={project.participants ?? []} />
+                            <ProjectPhasesSection
+                                projectSlug={project.slug}
+                                phases={project.phases}
+                                isCreator={isCreator}
+                            />
                         </div>
 
                         <div className="flex flex-col gap-6">

@@ -96,8 +96,11 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load(['creator.techs', 'techs', 'participants']);
-        $project->loadCount('messages');
+        $project->load(['creator.techs', 'techs', 'participants', 'phases']);
+
+        if (Auth::check() && $project->isMember(Auth::user())) {
+            $project->load(['messages.sender']);
+        }
 
         if (Auth::check() && $project->isMember(Auth::user())) {
             $project->load(['messages.sender']);

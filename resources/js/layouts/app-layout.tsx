@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, UserRound, UsersRound } from 'lucide-react';
+import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, Sparkles, UserRound, UsersRound } from 'lucide-react';
 import { User } from '@/types';
 
 interface Props {
@@ -29,6 +29,13 @@ export default function AppLayout({ children, header }: Props) {
             description: 'Explorá proyectos activos',
             icon: FolderKanban,
             active: route().current('projects.*'),
+        },
+        {
+            href: route('milestones.index'),
+            label: 'Logros',
+            description: 'Revisá hitos recientes',
+            icon: Sparkles,
+            active: route().current('milestones.*'),
         },
         {
             href: route('users.index'),
