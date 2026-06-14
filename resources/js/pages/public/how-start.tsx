@@ -98,7 +98,6 @@ export default function HowStart({ auth }: Props) {
                                         Matias Sanchez
                                     </a>
                                     <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
-                                        Full Stack Developer +5 YOE<br />
                                         Founder de The Dev House
                                     </p>
                                 </div>

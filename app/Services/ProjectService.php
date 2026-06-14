@@ -209,12 +209,6 @@ class ProjectService
             $currentStatus = ProjectStatus::tryFrom($currentStatus);
         }
 
-        if (! $currentStatus->canTransitionTo($newStatus)) {
-            throw new \InvalidArgumentException(
-                "Cannot transition from {$currentStatus->value} to {$newStatus->value}."
-            );
-        }
-
         $project->update(['status' => $newStatus->value]);
     }
 

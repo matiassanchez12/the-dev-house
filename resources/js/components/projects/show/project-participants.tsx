@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getInitials, avatarUrl } from '@/components/projects/project-utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { avatarUrl, getInitials } from '@/components/projects/project-utils';
 import { User } from '@/types';
 
 interface ProjectParticipantsProps {
@@ -26,8 +27,9 @@ export function ProjectParticipants({ participants }: ProjectParticipantsProps) 
                 <div className="flex flex-wrap gap-2">
                     {visible.map((participant) => {
                         const initials = getInitials(participant.name);
-                        return (
-                            <Avatar key={participant.id} className="size-8">
+
+                        const avatar = (
+                            <Avatar className="size-8 transition-opacity hover:opacity-90">
                                 <AvatarImage
                                     src={avatarUrl(participant.avatar) ?? undefined}
                                     alt={participant.name}
@@ -36,6 +38,21 @@ export function ProjectParticipants({ participants }: ProjectParticipantsProps) 
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>
+                        );
+
+                        return (
+                            participant.slug ? (
+                                <Link
+                                    key={participant.id}
+                                    href={route('users.show', participant.slug)}
+                                    className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    aria-label={`Ver perfil de ${participant.name}`}
+                                >
+                                    {avatar}
+                                </Link>
+                            ) : (
+                                <div key={participant.id}>{avatar}</div>
+                            )
                         );
                     })}
                     {remaining > 0 && (
