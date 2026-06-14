@@ -8,10 +8,10 @@ import { Tech } from '@/types';
 import { toast } from 'sonner';
 import { avatarUrl } from '@/components/projects/project-utils';
 
-interface UserTech extends Tech {
+interface UserTech extends Omit<Tech, 'pivot'> {
     pivot: {
         years_experience: number | null;
-        proficiency: number | null;
+        proficiency: string | null;
     };
 }
 
@@ -25,7 +25,6 @@ interface ProfileFormData {
     bio: string;
     avatar: File | null;
     techs: TechFormEntry[];
-    _method: 'post';
 }
 
 interface Props {
@@ -67,17 +66,14 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         'master': 'Experto',
     };
 
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm<ProfileFormData>({
+    const { data, setData, post, processing, errors, recentlySuccessful, transform } = useForm<ProfileFormData>({
         bio: user.bio ?? '',
         avatar: null as File | null,
         techs: userTechs.map((ut) => ({
             id: ut.id,
             years_experience: ut.pivot?.years_experience ?? 0,
-            proficiency: typeof ut.pivot?.proficiency === 'string'
-                ? ut.pivot.proficiency
-                : (ut.pivot?.proficiency ? proficiencyMap[ut.pivot.proficiency] : 'intermediate'),
+            proficiency: ut.pivot?.proficiency ?? 'intermediate',
         })),
-        _method: 'post' as const,
     });
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +110,12 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        transform((formData) => ({
+            ...formData,
+            techs: JSON.stringify(formData.techs),
+        }));
+
         post(route('profile.update-complete'), {
             forceFormData: true,
             preserveScroll: true,

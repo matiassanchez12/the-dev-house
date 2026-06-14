@@ -186,6 +186,81 @@ class ProfileTest extends TestCase
     }
 
     /**
+     * TEST: User can remove one tech and keep the remaining selection
+     */
+    public function test_user_can_remove_one_tech_from_complete_profile(): void
+    {
+        $user = User::factory()->create();
+        $tech1 = \App\Models\Tech::factory()->create();
+        $tech2 = \App\Models\Tech::factory()->create();
+
+        $user->techs()->attach($tech1->id, [
+            'years_experience' => 3,
+            'proficiency' => 'expert',
+        ]);
+        $user->techs()->attach($tech2->id, [
+            'years_experience' => 1,
+            'proficiency' => 'intermediate',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->post('/profile/complete', [
+                'techs' => json_encode([
+                    [
+                        'id' => $tech2->id,
+                        'years_experience' => 1,
+                        'proficiency' => 'intermediate',
+                    ],
+                ]),
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $this->assertDatabaseMissing('user_tech', [
+            'user_id' => $user->id,
+            'tech_id' => $tech1->id,
+        ]);
+
+        $this->assertDatabaseHas('user_tech', [
+            'user_id' => $user->id,
+            'tech_id' => $tech2->id,
+            'years_experience' => 1,
+        ]);
+    }
+
+    /**
+     * TEST: User can clear all techs from complete profile
+     */
+    public function test_user_can_clear_all_techs(): void
+    {
+        $user = User::factory()->create();
+        $tech = \App\Models\Tech::factory()->create();
+
+        $user->techs()->attach($tech->id, [
+            'years_experience' => 4,
+            'proficiency' => 'expert',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->post('/profile/complete', [
+                'techs' => '[]',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $this->assertDatabaseMissing('user_tech', [
+            'user_id' => $user->id,
+            'tech_id' => $tech->id,
+        ]);
+    }
+
+    /**
      * TEST: User can update complete profile (bio + avatar + techs)
      */
     public function test_user_can_update_complete_profile(): void
