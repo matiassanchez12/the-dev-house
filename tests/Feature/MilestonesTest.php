@@ -53,12 +53,13 @@ class MilestonesTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('public/milestones')
-            ->has('milestones.data', 2)
+            ->component('milestones', false)
+            ->has('milestones.data', 3)
             ->where('milestones.data.0.title', 'Newest milestone')
             ->where('milestones.data.0.project.title', 'Second Project')
             ->where('milestones.data.0.project.creator.name', 'Project Creator')
             ->where('milestones.data.1.title', 'Old milestone')
+            ->where('milestones.data.2.title', 'Pending milestone')
         );
     }
 }

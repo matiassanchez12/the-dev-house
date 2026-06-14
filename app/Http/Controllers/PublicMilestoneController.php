@@ -12,13 +12,12 @@ class PublicMilestoneController extends Controller
     {
         $milestones = Phase::query()
             ->with(['project.creator'])
-            ->whereNotNull('completed_at')
             ->orderByDesc('completed_at')
             ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
 
-        return Inertia::render('public/milestones', [
+        return Inertia::render('milestones', [
             'auth' => ['user' => auth()->user()],
             'milestones' => [
                 'data' => $milestones->getCollection()

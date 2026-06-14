@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useCallback, useState, type FormEvent } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { Send } from 'lucide-react';
