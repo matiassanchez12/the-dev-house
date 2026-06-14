@@ -28,19 +28,21 @@ class PhaseTest extends TestCase
     {
         $creator = User::factory()->create();
         $project = Project::factory()->create(['user_id' => $creator->id]);
+        $completedAt = '2026-06-06';
 
         $response = $this->actingAs($creator)->post(route('projects.phases.store', $project), [
             'title' => 'Discovery',
             'description' => 'Validated the idea',
-            'completed_at' => now()->toDateString(),
+            'completed_at' => $completedAt,
         ]);
 
         $response->assertRedirect(route('projects.show', $project));
-        $this->assertDatabaseHas('phases', [
-            'project_id' => $project->id,
-            'title' => 'Discovery',
-            'description' => 'Validated the idea',
-        ]);
+
+        $phase = Phase::query()->where('project_id', $project->id)->firstOrFail();
+
+        $this->assertSame($completedAt, $phase->completed_at?->toDateString());
+        $this->assertSame('Discovery', $phase->title);
+        $this->assertSame('Validated the idea', $phase->description);
     }
 
     public function test_project_member_cannot_create_phase(): void
@@ -62,19 +64,21 @@ class PhaseTest extends TestCase
         $creator = User::factory()->create();
         $project = Project::factory()->create(['user_id' => $creator->id]);
         $phase = Phase::factory()->create(['project_id' => $project->id, 'title' => 'Discovery']);
+        $completedAt = '2026-06-07';
 
         $response = $this->actingAs($creator)->put(route('projects.phases.update', [$project, $phase]), [
             'title' => 'Delivery',
             'description' => 'Shipped the MVP',
-            'completed_at' => now()->toDateString(),
+            'completed_at' => $completedAt,
         ]);
 
         $response->assertRedirect(route('projects.show', $project));
-        $this->assertDatabaseHas('phases', [
-            'id' => $phase->id,
-            'title' => 'Delivery',
-            'description' => 'Shipped the MVP',
-        ]);
+
+        $phase->refresh();
+
+        $this->assertSame($completedAt, $phase->completed_at?->toDateString());
+        $this->assertSame('Delivery', $phase->title);
+        $this->assertSame('Shipped the MVP', $phase->description);
     }
 
     public function test_project_creator_can_delete_phase(): void

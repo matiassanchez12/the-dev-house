@@ -41,6 +41,8 @@ export interface Phase {
     project?: Project;
 }
 
+export type ProjectViewerRole = 'guest' | 'creator' | 'member';
+
 export interface Project {
     id: number;
     user_id: number;
@@ -60,6 +62,7 @@ export interface Project {
     participants_count?: number;
     messages_count?: number;
     messages?: Message[];
+    viewer_role?: ProjectViewerRole;
     viewerJoinRequest?: {
         id: number;
         status: 'pending' | 'approved' | 'rejected';

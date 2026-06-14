@@ -15,6 +15,7 @@ import {
     ProjectLinksCard,
     ProjectJoinForm,
     ProjectChatSummary,
+    ProjectPhasesSection,
     ProjectStatusManager,
     ProjectDeleteDialog,
     ProjectPhasesSection,
@@ -28,17 +29,19 @@ interface Props {
         } | null;
     };
     project: ProjectType & {
+        viewer_role?: 'guest' | 'creator' | 'member';
         creator: User;
         techs: Tech[];
         participants: User[];
         messages?: Message[];
-        messages_count?: number;
         phases?: Phase[];
+        messages_count?: number;
     };
 }
 
 export default function Show({ auth, project }: Props) {
-    const isCreator = auth.user?.id === project.user_id;
+    const viewerRole = project.viewer_role ?? 'guest';
+    const isCreator = viewerRole === 'creator';
     const isParticipant = useMemo(
         () => project.participants?.some((p) => p.id === auth.user?.id) ?? false,
         [project.participants, auth.user?.id],
@@ -85,7 +88,7 @@ export default function Show({ auth, project }: Props) {
                             <ProjectPhasesSection
                                 projectSlug={project.slug}
                                 phases={project.phases}
-                                isCreator={isCreator}
+                                viewerRole={viewerRole}
                             />
                         </div>
 

@@ -67,6 +67,7 @@ class ShowTest extends TestCase
         $this->assertCount(1, $props['project']['participants']);
         $this->assertCount(1, $props['project']['phases']);
         $this->assertEquals('Discovery', $props['project']['phases'][0]['title']);
+        $this->assertSame('guest', $props['project']['viewer_role']);
     }
 
     /**
@@ -171,5 +172,55 @@ class ShowTest extends TestCase
             'body' => 'Ya estoy listo para revisar el backlog',
             'type' => 'text',
         ]);
+    }
+
+    /**
+     * Test: Project creator payload resolves creator viewer role
+     *
+     * Scenario: The project creator opens their project
+     * Expected: The payload exposes creator as viewer role
+     */
+    public function test_project_detail_sets_viewer_role_for_creator(): void
+    {
+        $creator = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'slug' => 'creator-project',
+            'status' => 'open',
+        ]);
+
+        $response = $this->actingAs($creator)->get(route('projects.show', $project));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('project.viewer_role', 'creator')
+        );
+    }
+
+    /**
+     * Test: Project participant payload resolves member viewer role
+     *
+     * Scenario: An approved participant opens a project
+     * Expected: The payload exposes member as viewer role
+     */
+    public function test_project_detail_sets_viewer_role_for_member(): void
+    {
+        $creator = User::factory()->create();
+        $participant = User::factory()->create();
+
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'slug' => 'member-project',
+            'status' => 'open',
+        ]);
+
+        $project->participants()->attach($participant->id, ['role' => 'developer', 'joined_at' => now()]);
+
+        $response = $this->actingAs($participant)->get(route('projects.show', $project));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('project.viewer_role', 'member')
+        );
     }
 }
