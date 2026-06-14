@@ -57,10 +57,6 @@ export function MilestoneCard({ milestone }: Props) {
                 ) : (
                     <p className="text-sm text-muted-foreground">Sin descripción</p>
                 )}
-
-                <Badge variant="secondary" className="w-fit">
-                    {milestone.project.creator?.name ?? 'Proyecto de la comunidad'}
-                </Badge>
             </CardContent>
 
             <CardFooter className="justify-end border-t border-border/50 bg-muted/20 pt-4">

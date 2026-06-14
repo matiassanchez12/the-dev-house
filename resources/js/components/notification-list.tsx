@@ -55,7 +55,7 @@ export function NotificationList({ limit, emptyText = 'Sin notificaciones' }: No
                 return (
                     <li key={n.id}>
                         <Link
-                            href={route('projects.show', n.data.project_slug)}
+                            href={route('join-requests.index')}
                             onClick={() => {
                                 if (!n.read_at) {
                                     router.patch(route('notifications.read', n.id), {

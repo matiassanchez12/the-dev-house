@@ -31,18 +31,18 @@ export default function AppLayout({ children, header }: Props) {
             active: route().current('projects.*'),
         },
         {
-            href: route('milestones.index'),
-            label: 'Logros',
-            description: 'Revisá hitos recientes',
-            icon: Sparkles,
-            active: route().current('milestones.*'),
-        },
-        {
             href: route('users.index'),
             label: 'Developers',
             description: 'Encontrá perfiles y skills',
             icon: UsersRound,
             active: route().current('users.*'),
+        },
+        {
+            href: route('milestones.index'),
+            label: 'Logros',
+            description: 'Revisá hitos recientes',
+            icon: Sparkles,
+            active: route().current('milestones.*'),
         },
     ];
 
