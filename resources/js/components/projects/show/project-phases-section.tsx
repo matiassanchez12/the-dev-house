@@ -33,7 +33,9 @@ export function ProjectPhasesSection({ projectSlug, phases = [], viewerRole }: P
                         Logros
                         <Badge variant="secondary">{phases.length}</Badge>
                     </h3>
-                    <p className="text-sm text-muted-foreground">Seguimiento de avances y entregables cerrados</p>
+                    <p className="text-sm text-muted-foreground">
+                        Seguimiento de avances y entregables cerrados
+                    </p>
                 </div>
             </div>
 

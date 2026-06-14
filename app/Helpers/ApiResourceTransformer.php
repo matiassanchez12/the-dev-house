@@ -54,6 +54,7 @@ class ApiResourceTransformer
         if ($viewerRole !== null) {
             $data['viewer_role'] = $viewerRole;
         }
+      
         $data['viewerJoinRequest'] = $viewerJoinRequest === null
             ? null
             : [

@@ -18,6 +18,7 @@ import {
     ProjectPhasesSection,
     ProjectStatusManager,
     ProjectDeleteDialog,
+    ProjectPhasesSection,
 } from '@/components/projects/show';
 
 interface Props {
