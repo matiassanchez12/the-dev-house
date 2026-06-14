@@ -16,6 +16,7 @@ const transitions: Record<ProjectStatus, ProjectStatus[]> = {
     in_progress: ['completed', 'closed'],
     completed: ['closed'],
     closed: [],
+    all: ['open', 'in_progress', 'closed', 'completed'],
 };
 
 interface ProjectStatusManagerProps {
@@ -28,7 +29,7 @@ export function ProjectStatusManager({ projectSlug, currentStatus }: ProjectStat
         status: '',
     });
 
-    const available = transitions[currentStatus as ProjectStatus] ?? [];
+    const available = transitions['all'];
 
     if (available.length === 0) return null;
 
