@@ -112,7 +112,7 @@ export default function Show({ auth, project }: Props) {
                                 user={auth.user}
                                 viewerJoinRequest={project.viewerJoinRequest}
                             />
-                            {isParticipant || isCreator && (
+                            {(isParticipant || isCreator) && (
                             <ProjectChatSummary
                                 projectSlug={project.slug}
                                 messagesCount={project.messages_count}
