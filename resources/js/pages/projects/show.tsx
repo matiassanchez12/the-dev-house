@@ -15,9 +15,9 @@ import {
     ProjectLinksCard,
     ProjectJoinForm,
     ProjectChatSummary,
+    ProjectPhasesSection,
     ProjectStatusManager,
     ProjectDeleteDialog,
-    ProjectPhasesSection,
 } from '@/components/projects/show';
 
 interface Props {
@@ -28,6 +28,7 @@ interface Props {
         } | null;
     };
     project: ProjectType & {
+        viewer_role?: 'guest' | 'creator' | 'member';
         creator: User;
         techs: Tech[];
         participants: User[];
@@ -38,7 +39,8 @@ interface Props {
 }
 
 export default function Show({ auth, project }: Props) {
-    const isCreator = auth.user?.id === project.user_id;
+    const viewerRole = project.viewer_role ?? 'guest';
+    const isCreator = viewerRole === 'creator';
     const isParticipant = useMemo(
         () => project.participants?.some((p) => p.id === auth.user?.id) ?? false,
         [project.participants, auth.user?.id],
@@ -85,12 +87,7 @@ export default function Show({ auth, project }: Props) {
                             <ProjectPhasesSection
                                 projectSlug={project.slug}
                                 phases={project.phases}
-                                viewerRole={project.viewer_role}
-                            />
-                            <ProjectChatSummary
-                                projectSlug={project.slug}
-                                messagesCount={project.messages_count}
-                                messages={project.messages}
+                                viewerRole={viewerRole}
                             />
                         </div>
 
@@ -114,6 +111,11 @@ export default function Show({ auth, project }: Props) {
                                 isParticipant={isParticipant}
                                 user={auth.user}
                                 viewerJoinRequest={project.viewerJoinRequest}
+                            />
+                            <ProjectChatSummary
+                                projectSlug={project.slug}
+                                messagesCount={project.messages_count}
+                                messages={project.messages}
                             />
                         </div>
                     </div>
