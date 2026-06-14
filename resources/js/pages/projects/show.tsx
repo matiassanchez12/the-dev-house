@@ -89,6 +89,11 @@ export default function Show({ auth, project }: Props) {
                                 phases={project.phases}
                                 viewerRole={viewerRole}
                             />
+                            <ProjectPhasesSection
+                                projectSlug={project.slug}
+                                phases={project.phases}
+                                viewerRole={viewerRole}
+                            />
                         </div>
 
                         <div className="flex flex-col gap-6">

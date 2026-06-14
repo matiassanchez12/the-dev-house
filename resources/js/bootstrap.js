@@ -12,44 +12,31 @@ if (xsrfToken) {
 
 const reverbConfig = window.__REVERB_CONFIG__;
 
-console.log('[Reverb] Config:', reverbConfig);
-
 if (reverbConfig?.key) {
-    try {
-        const Echo = (await import('laravel-echo')).default;
-        const Pusher = (await import('pusher-js')).default;
+    const Echo = (await import('laravel-echo')).default;
+    const Pusher = (await import('pusher-js')).default;
 
-        window.Pusher = Pusher;
+    window.Pusher = Pusher;
 
-        window.Echo = new Echo({
-            broadcaster: 'reverb',
-            key: reverbConfig.key,
-            wsHost: reverbConfig.host,
-            wsPort: reverbConfig.port,
-            wssPort: reverbConfig.port,
-            forceTLS: reverbConfig.scheme === 'https',
-            enabledTransports: ['ws', 'wss'],
-            authorizer: (channel) => ({
-                authorize: (socketId, callback) => {
-                    console.log('[Reverb] Authorizing channel:', channel.name);
-                    window.axios.post('/broadcasting/auth', {
-                        socket_id: socketId,
-                        channel_name: channel.name,
-                    }).then((response) => {
-                        console.log('[Reverb] Auth success:', response.data);
-                        callback(null, response.data);
-                    }).catch((error) => {
-                        console.error('[Reverb] Auth error:', error.response?.data || error.message);
-                        callback(error, null);
-                    });
-                },
-            }),
-        });
-
-        console.log('[Reverb] Echo initialized successfully');
-    } catch (error) {
-        console.error('[Reverb] Failed to initialize Echo:', error);
-    }
-} else {
-    console.warn('[Reverb] No config found, skipping Echo initialization');
+    window.Echo = new Echo({
+        broadcaster: 'reverb',
+        key: reverbConfig.key,
+        wsHost: reverbConfig.host,
+        wsPort: reverbConfig.port,
+        wssPort: reverbConfig.port,
+        forceTLS: reverbConfig.scheme === 'https',
+        enabledTransports: ['ws', 'wss'],
+        authorizer: (channel) => ({
+            authorize: (socketId, callback) => {
+                window.axios.post('/broadcasting/auth', {
+                    socket_id: socketId,
+                    channel_name: channel.name,
+                }).then((response) => {
+                    callback(null, response.data);
+                }).catch((error) => {
+                    callback(error, null);
+                });
+            },
+        }),
+    });
 }

@@ -103,9 +103,12 @@ class ProjectController extends Controller
         if (Auth::check() && $project->isMember($viewer)) {
             $project->load(['messages.sender']);
         }
-        $viewerJoinRequest = $viewer === null
-            ? null
-            : $this->joinRequestService->getViewerFullRequest($project, $viewer);
+        $viewerJoinRequest = null;
+
+        if ($viewer !== null) {
+            $viewerJoinRequest = $this->joinRequestService
+                ->getViewerFullRequest($project, $viewer);
+        }
 
         return Inertia::render('projects/show', [
             'project' => ApiResourceTransformer::project($project, $viewerJoinRequest, $viewerRole),

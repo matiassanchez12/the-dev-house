@@ -70,24 +70,8 @@ vi.mock('@/components/ui/form-error', () => ({
 
 describe('ProjectChat', () => {
     beforeEach(() => {
-        messageHandler = undefined;
-        Object.defineProperty(globalThis, 'route', {
-            configurable: true,
-            value: vi.fn((name: string, projectSlug: string) => {
-                if (name === 'projects.messages.store') {
-                    return `/projects/${projectSlug}/messages`;
-                }
-
-                return `/projects/${projectSlug}/chat`;
-            }),
-        });
         mockState.private.mockReturnValue({
-            listen: mockState.listen.mockImplementation((_event, handler) => {
-                messageHandler = handler;
-                return {
-                    stopListening: mockState.stopListening,
-                };
-            }),
+            listen: mockState.listen,
             stopListening: mockState.stopListening,
         });
 

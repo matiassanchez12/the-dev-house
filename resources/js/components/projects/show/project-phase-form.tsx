@@ -6,12 +6,14 @@ import { FormError } from '@/components/ui/form-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { PhaseDatePicker } from './phase-date-picker';
 
 interface ProjectPhaseFormProps {
     projectSlug: string;
+    onSuccess?: () => void;
 }
 
-export function ProjectPhaseForm({ projectSlug }: ProjectPhaseFormProps) {
+export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
@@ -25,12 +27,13 @@ export function ProjectPhaseForm({ projectSlug }: ProjectPhaseFormProps) {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
+                onSuccess?.();
             },
         });
     }
 
     return (
-            <Card className="border-primary/20 bg-card/70 shadow-sm">
+        <Card className="border-primary/20 bg-card/70 shadow-sm">
             <CardHeader>
                 <CardTitle className="text-base">Registrar logro</CardTitle>
                 <CardDescription>Sumá un avance ya cerrado al proyecto</CardDescription>
@@ -63,11 +66,10 @@ export function ProjectPhaseForm({ projectSlug }: ProjectPhaseFormProps) {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="phase-completed-at">Fecha de cierre</Label>
-                        <Input
+                        <PhaseDatePicker
                             id="phase-completed-at"
-                            type="date"
                             value={data.completed_at}
-                            onChange={(event) => setData('completed_at', event.target.value)}
+                            onChange={(value) => setData('completed_at', value)}
                         />
                         <FormError message={errors.completed_at} />
                     </div>

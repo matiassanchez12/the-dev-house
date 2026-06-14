@@ -164,7 +164,7 @@ class ShowTest extends TestCase
             'body' => 'Ya estoy listo para revisar el backlog',
         ]);
 
-        $response->assertRedirect(route('projects.show', $project));
+        $response->assertRedirect(route('projects.chat', $project));
 
         $this->assertDatabaseHas('messages', [
             'project_id' => $project->id,
