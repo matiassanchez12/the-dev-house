@@ -4,6 +4,12 @@ window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.withCredentials = true;
 
+// Read XSRF token from cookies and set it as a header for CSRF protection
+const xsrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='));
+if (xsrfToken) {
+    window.axios.defaults.headers.common['X-XSRF-TOKEN'] = decodeURIComponent(xsrfToken.split('=')[1]);
+}
+
 const reverbConfig = window.__REVERB_CONFIG__;
 
 if (reverbConfig?.key) {

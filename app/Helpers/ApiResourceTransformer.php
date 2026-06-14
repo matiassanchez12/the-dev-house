@@ -67,6 +67,28 @@ class ApiResourceTransformer
     }
 
     /**
+     * Transform a phase to a safe array.
+     */
+    public static function phase(Model|array $phase): array
+    {
+        $data = $phase instanceof Model ? $phase->toArray() : $phase;
+
+        if (isset($data['project'])) {
+            $data['project'] = self::project($data['project']);
+        }
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'title',
+            'description',
+            'completed_at',
+            'created_at',
+            'updated_at',
+            'project',
+        ]));
+    }
+
+    /**
      * Transform a message to a safe array with sender details.
      */
     public static function message(Model|array $message): array
@@ -76,6 +98,7 @@ class ApiResourceTransformer
         if (isset($data['sender'])) {
             $data['sender'] = self::user($data['sender']);
         }
+
         return $data;
     }
 

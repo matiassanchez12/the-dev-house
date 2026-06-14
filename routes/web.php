@@ -9,9 +9,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
+use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\PublicMilestoneController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectMessageController;
+use App\Http\Controllers\ProjectChatController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page
@@ -31,6 +34,7 @@ Route::get('/privacy', [PublicPageController::class, 'privacy'])->name('privacy'
 
 // Rutas públicas para ver proyectos
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/milestones', [PublicMilestoneController::class, 'index'])->name('milestones.index');
 
 // Rutas protegidas para CRUD (ANTES de {project:slug} para que no las capture)
 Route::middleware('auth')->group(function () {
@@ -40,9 +44,16 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{project:slug}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project:slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
+    Route::scopeBindings()->group(function () {
+        Route::post('/projects/{project:slug}/phases', [PhaseController::class, 'store'])->name('projects.phases.store');
+        Route::put('/projects/{project:slug}/phases/{phase}', [PhaseController::class, 'update'])->name('projects.phases.update');
+        Route::delete('/projects/{project:slug}/phases/{phase}', [PhaseController::class, 'destroy'])->name('projects.phases.destroy');
+    });
+
     // Project Status
     Route::patch('/projects/{project:slug}/status', [ProjectStatusController::class, 'update'])->name('projects.status.update');
     Route::post('/projects/{project:slug}/messages', [ProjectMessageController::class, 'store'])->name('projects.messages.store');
+    Route::get('/projects/{project:slug}/chat', [ProjectChatController::class, 'index'])->name('projects.chat');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

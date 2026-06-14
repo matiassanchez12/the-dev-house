@@ -3,7 +3,7 @@ import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Message, Project as ProjectType, Tech, User } from '@/types';
+import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
     ProjectHero,
     ProjectDescription,
@@ -14,7 +14,7 @@ import {
     ProjectTechsCard,
     ProjectLinksCard,
     ProjectJoinForm,
-    ProjectChat,
+    ProjectChatSummary,
     ProjectPhasesSection,
     ProjectStatusManager,
     ProjectDeleteDialog,
@@ -33,6 +33,8 @@ interface Props {
         techs: Tech[];
         participants: User[];
         messages?: Message[];
+        phases?: Phase[];
+        messages_count?: number;
     };
 }
 
@@ -82,11 +84,10 @@ export default function Show({ auth, project }: Props) {
                             <ProjectVision vision={project.vision} />
                             <ProjectGallery images={project.images ?? []} title={project.title} />
                             <ProjectParticipants participants={project.participants ?? []} />
-                            <ProjectChat
-                                projectId={project.id}
+                            <ProjectPhasesSection
                                 projectSlug={project.slug}
-                                currentUserId={auth.user?.id}
-                                messages={project.messages}
+                                phases={project.phases}
+                                viewerRole={viewerRole}
                             />
                             <ProjectPhasesSection
                                 projectSlug={project.slug}
@@ -115,6 +116,11 @@ export default function Show({ auth, project }: Props) {
                                 isParticipant={isParticipant}
                                 user={auth.user}
                                 viewerJoinRequest={project.viewerJoinRequest}
+                            />
+                            <ProjectChatSummary
+                                projectSlug={project.slug}
+                                messagesCount={project.messages_count}
+                                messages={project.messages}
                             />
                         </div>
                     </div>

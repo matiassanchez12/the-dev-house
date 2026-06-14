@@ -22,6 +22,6 @@ class ProjectMessageController extends Controller
 
         MessageCreated::dispatch($message);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.chat', $project);
     }
 }

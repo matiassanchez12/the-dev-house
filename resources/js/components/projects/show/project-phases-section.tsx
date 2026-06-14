@@ -4,34 +4,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Separator } from '@/components/ui/separator';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
-import type { Phase } from '@/types';
-import { ProjectPhaseForm } from './project-phase-form';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import type { Phase, ProjectViewerRole } from '@/types';
+import { ProjectPhaseDrawer } from './project-phase-drawer';
 import { ProjectPhaseItem } from './project-phase-item';
-
-type ProjectViewerRole = 'guest' | 'creator' | 'member';
 
 interface ProjectPhasesSectionProps {
     projectSlug: string;
     phases?: Phase[];
     viewerRole?: ProjectViewerRole;
-    isCreator?: boolean;
 }
 
-export function ProjectPhasesSection({
-    projectSlug,
-    phases = [],
-    viewerRole,
-    isCreator,
-}: ProjectPhasesSectionProps) {
+export function ProjectPhasesSection({ projectSlug, phases = [], viewerRole }: ProjectPhasesSectionProps) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
-    const resolvedViewerRole = viewerRole ?? (isCreator ? 'creator' : 'guest');
+    const [editingPhase, setEditingPhase] = useState<Phase | null>(null);
+    const resolvedViewerRole = viewerRole ?? 'guest';
     const canManage = resolvedViewerRole === 'creator';
 
     if (resolvedViewerRole === 'guest' && phases.length === 0) {
@@ -55,21 +42,33 @@ export function ProjectPhasesSection({
             <Separator />
 
             {canManage && (
-                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                    <SheetTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                            <Plus className="size-4" data-icon="inline-start" />
-                            Registrar logro
-                        </Button>
-                    </SheetTrigger>
+                <Sheet open={isSheetOpen || editingPhase !== null} onOpenChange={(open) => { setIsSheetOpen(open); if (!open) setEditingPhase(null); }}>
+                    <SheetTrigger
+                        render={
+                            <Button variant="outline" className="w-full">
+                                <Plus className="size-4" data-icon="inline-start" />
+                                Registrar logro
+                            </Button>
+                        }
+                    />
                     <SheetContent side="right" className="w-full sm:max-w-md">
-                        <SheetHeader>
-                            <SheetTitle>Registrar logro</SheetTitle>
-                        </SheetHeader>
-                        <div className="mt-4">
-                            <ProjectPhaseForm
+                        <div className="flex h-full flex-col p-4">
+                            <SheetHeader className="px-0 pt-0 pb-4">
+                                <SheetTitle>{editingPhase ? 'Editar logro' : 'Registrar logro'}</SheetTitle>
+                            </SheetHeader>
+                            <ProjectPhaseDrawer
                                 projectSlug={projectSlug}
-                                onSuccess={() => setIsSheetOpen(false)}
+                                open={isSheetOpen || editingPhase !== null}
+                                onOpenChange={(open) => {
+                                    setIsSheetOpen(open);
+                                    if (!open) setEditingPhase(null);
+                                }}
+                                phaseId={editingPhase?.id}
+                                initialValues={editingPhase ? {
+                                    title: editingPhase.title,
+                                    description: editingPhase.description ?? '',
+                                    completed_at: editingPhase.completed_at ? editingPhase.completed_at.slice(0, 10) : '',
+                                } : undefined}
                             />
                         </div>
                     </SheetContent>
@@ -87,9 +86,7 @@ export function ProjectPhasesSection({
                                     <Sparkles />
                                 </EmptyMedia>
                                 <EmptyTitle>Todavía no registraste logros</EmptyTitle>
-                                <EmptyDescription>
-                                    Cuando cierres un logro, va a aparecer acá.
-                                </EmptyDescription>
+                                <EmptyDescription>Cuando cierres un logro, va a aparecer acá.</EmptyDescription>
                             </EmptyHeader>
                             <EmptyContent />
                         </Empty>
@@ -100,9 +97,7 @@ export function ProjectPhasesSection({
                                     <Sparkles />
                                 </EmptyMedia>
                                 <EmptyTitle>Aún no hay hitos disponibles</EmptyTitle>
-                                <EmptyDescription>
-                                    Tu líder todavía no creó ningún hito u objetivo.
-                                </EmptyDescription>
+                                <EmptyDescription>Tu líder todavía no creó ningún hito u objetivo.</EmptyDescription>
                             </EmptyHeader>
                             <EmptyContent />
                         </Empty>
@@ -114,6 +109,10 @@ export function ProjectPhasesSection({
                             phase={phase}
                             projectSlug={projectSlug}
                             canManage={canManage}
+                            onEdit={() => {
+                                setEditingPhase(phase);
+                                setIsSheetOpen(true);
+                            }}
                         />
                     ))
                 )}

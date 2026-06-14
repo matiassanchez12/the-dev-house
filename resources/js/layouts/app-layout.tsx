@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, UserRound, UsersRound } from 'lucide-react';
+import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, Sparkles, UserRound, UsersRound } from 'lucide-react';
 import { User } from '@/types';
 
 interface Props {
@@ -29,6 +29,13 @@ export default function AppLayout({ children, header }: Props) {
             description: 'Explorá proyectos activos',
             icon: FolderKanban,
             active: route().current('projects.*'),
+        },
+        {
+            href: route('milestones.index'),
+            label: 'Logros',
+            description: 'Revisá hitos recientes',
+            icon: Sparkles,
+            active: route().current('milestones.*'),
         },
         {
             href: route('users.index'),
@@ -84,7 +91,7 @@ export default function AppLayout({ children, header }: Props) {
     const logoHref = user ? route('dashboard') : '/';
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="flex min-h-screen flex-col bg-background">
             <nav className="border-b border-border bg-card">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
@@ -305,7 +312,7 @@ export default function AppLayout({ children, header }: Props) {
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="min-h-0 flex-1">{children}</main>
         </div>
     );
 }

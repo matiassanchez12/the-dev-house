@@ -58,7 +58,9 @@ export interface Project {
     updated_at: string;
     creator?: User;
     techs?: Tech[];
+    phases?: Phase[];
     participants_count?: number;
+    messages_count?: number;
     messages?: Message[];
     viewer_role?: ProjectViewerRole;
     viewerJoinRequest?: {
