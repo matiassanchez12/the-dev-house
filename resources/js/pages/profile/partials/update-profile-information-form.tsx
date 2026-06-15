@@ -1,5 +1,4 @@
-import InputError from '@/components/input-error';
-import InputLabel from '@/components/input-label';
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Transition } from '@headlessui/react';
@@ -51,25 +50,19 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Nombre" />
-
+                <Field id="name" label="Nombre" error={errors.name}>
                     <Input
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         required
-                        isFocused
+                        autoFocus
                         autoComplete="name"
                     />
+                </Field>
 
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Correo electrónico" />
-
+                <Field id="email" label="Correo electrónico" error={errors.email}>
                     <Input
                         id="email"
                         type="email"
@@ -79,9 +72,7 @@ export default function UpdateProfileInformation({
                         required
                         autoComplete="username"
                     />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
+                </Field>
 
                 {mustVerifyEmail && emailVerifiedAt === null && (
                     <div>

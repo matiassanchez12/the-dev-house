@@ -6,19 +6,20 @@ import { ReactNode } from 'react';
 interface FieldProps {
   id: string;
   label?: string;
+  labelClassName?: string;
   error?: string;
   className?: string;
   children: ReactNode;
 }
 
-export function Field({ id, label, error, className, children }: FieldProps) {
+export function Field({ id, label, labelClassName, error, className, children }: FieldProps) {
   const errorId = `${id}-error`;
   const describedBy = error ? errorId : undefined;
 
   return (
     <div className={cn('space-y-2', className)} data-invalid={error ? 'true' : undefined}>
       {label && (
-        <Label htmlFor={id} className="text-sm font-medium">
+        <Label htmlFor={id} className={cn('text-sm font-medium', labelClassName)}>
           {label}
         </Label>
       )}

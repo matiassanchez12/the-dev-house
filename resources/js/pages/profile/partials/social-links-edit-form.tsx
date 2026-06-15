@@ -1,4 +1,4 @@
-import InputError from '@/components/input-error';
+import { FormError } from '@/components/ui/form-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -151,7 +151,7 @@ export default function SocialLinksEditForm({ socialLinks, className = '' }: Pro
                     ))}
                 </div>
 
-                <InputError message={errors.links} className="mt-2" />
+                <FormError message={errors.links} className="mt-2" />
 
                 {/* Submit Button */}
                 <div className="flex items-center gap-4">
