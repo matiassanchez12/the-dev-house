@@ -1,49 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { UserTech } from '@/types';
+import {
+    groupTechsByProficiency,
+} from '@/lib/tech-proficiency';
 
 interface TechShowcaseProps {
     techs: UserTech[];
-}
-
-const PROFICIENCY_LABELS: Record<string, string> = {
-    basic: 'Principiante',
-    intermediate: 'Básico',
-    advanced: 'Intermedio',
-    expert: 'Avanzado',
-    master: 'Experto',
-};
-
-const proficiencyLevels = [
-    { min: 6, label: 'Experto', badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
-    { min: 4, label: 'Avanzado', badgeClass: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    { min: 2, label: 'Intermedio', badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-    { min: 0, label: 'Principiante', badgeClass: 'bg-muted text-foreground' },
-];
-
-function getProficiencyLevel(tech: UserTech) {
-    if (tech.proficiency && PROFICIENCY_LABELS[tech.proficiency]) {
-        return {
-            label: PROFICIENCY_LABELS[tech.proficiency],
-            badgeClass: proficiencyLevels.find((l) => l.label === PROFICIENCY_LABELS[tech.proficiency])?.badgeClass ?? 'bg-muted text-foreground',
-        };
-    }
-    if (tech.years === null) return proficiencyLevels[proficiencyLevels.length - 1];
-    return proficiencyLevels.find((c) => (tech.years ?? 0) >= c.min) ?? proficiencyLevels[proficiencyLevels.length - 1];
-}
-
-function groupTechsByProficiency(techs: UserTech[]) {
-    const groups: Record<string, UserTech[]> = {};
-    for (const level of proficiencyLevels) {
-        groups[level.label] = [];
-    }
-    for (const tech of techs) {
-        const level = getProficiencyLevel(tech);
-        groups[level.label].push(tech);
-    }
-    return proficiencyLevels
-        .map((level) => ({ ...level, techs: groups[level.label] }))
-        .filter((group) => group.techs.length > 0);
 }
 
 function SectionLabel({ children }: { children: string }) {
@@ -72,7 +35,7 @@ export function TechShowcase({ techs }: TechShowcaseProps) {
                                 : null;
 
                             return (
-                                <Badge key={tech.id} variant="secondary">
+                                <Badge key={tech.id} variant="secondary" className={group.badgeClass}>
                                     {tech.name}
                                     {yearsLabel && (
                                         <span className="ms-1 opacity-70">
