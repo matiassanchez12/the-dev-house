@@ -115,6 +115,7 @@ class UserService
 
         $techs = $user->techs
             ->sortByDesc(fn ($tech) => $tech->pivot->years_experience)
+            ->values()
             ->map(fn ($tech) => [
                 'id' => $tech->id,
                 'name' => $tech->name,
