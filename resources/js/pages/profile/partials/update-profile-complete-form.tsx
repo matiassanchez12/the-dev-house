@@ -7,18 +7,25 @@ import { useRef, useState } from 'react';
 import { Tech } from '@/types';
 import { toast } from 'sonner';
 import { avatarUrl } from '@/components/projects/project-utils';
+import {
+    DEFAULT_TECH_PROFICIENCY,
+    getTechProficiencyLabel,
+    getTechProficiencySliderValue,
+    getTechProficiencyFromSlider,
+    type TechProficiency,
+} from '@/lib/tech-proficiency';
 
 interface UserTech extends Omit<Tech, 'pivot'> {
     pivot: {
         years_experience: number | null;
-        proficiency: string | null;
+        proficiency: TechProficiency | null;
     };
 }
 
 interface TechFormEntry {
     id: number;
     years_experience: number;
-    proficiency: string;
+    proficiency: TechProficiency;
 }
 
 interface ProfileFormData {
@@ -41,38 +48,13 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     const avatarInput = useRef<HTMLInputElement>(null);
 
     // Convert proficiency number to string for the form
-    const proficiencyMap: Record<number, string> = {
-        1: 'basic',
-        2: 'intermediate',
-        3: 'advanced',
-        4: 'expert',
-        5: 'master',
-    };
-
-    // Reverse map: string to number for range slider display
-    const stringToNumber: Record<string, number> = {
-        'basic': 1,
-        'intermediate': 2,
-        'advanced': 3,
-        'expert': 4,
-        'master': 5,
-    };
-
-    const proficiencyLabels: Record<string, string> = {
-        'basic': 'Principiante',
-        'intermediate': 'Básico',
-        'advanced': 'Intermedio',
-        'expert': 'Avanzado',
-        'master': 'Experto',
-    };
-
     const { data, setData, post, processing, errors, recentlySuccessful, transform } = useForm<ProfileFormData>({
         bio: user.bio ?? '',
         avatar: null as File | null,
         techs: userTechs.map((ut) => ({
             id: ut.id,
             years_experience: ut.pivot?.years_experience ?? 0,
-            proficiency: ut.pivot?.proficiency ?? 'intermediate',
+            proficiency: ut.pivot?.proficiency ?? DEFAULT_TECH_PROFICIENCY,
         })),
     });
 
@@ -94,7 +76,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
         if (checked) {
             setData('techs', [
                 ...data.techs,
-                { id: techId, years_experience: 0, proficiency: 'intermediate' },
+                { id: techId, years_experience: 0, proficiency: DEFAULT_TECH_PROFICIENCY },
             ]);
         } else {
             setData('techs', data.techs.filter((t) => t.id !== techId));
@@ -102,10 +84,26 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     };
 
     const handleTechUpdate = (techId: number, field: 'years_experience' | 'proficiency', value: string | number) => {
-        const finalValue = field === 'proficiency' && typeof value === 'number'
-            ? proficiencyMap[value]
-            : (field === 'years_experience' ? Number(value) : value);
-        setData('techs', data.techs.map((t) => (t.id === techId ? { ...t, [field]: finalValue } : t)));
+        setData(
+            'techs',
+            data.techs.map((tech) => {
+                if (tech.id !== techId) return tech;
+
+                if (field === 'proficiency') {
+                    return {
+                        ...tech,
+                        proficiency: typeof value === 'number'
+                            ? getTechProficiencyFromSlider(value)
+                            : tech.proficiency,
+                    };
+                }
+
+                return {
+                    ...tech,
+                    years_experience: Number(value),
+                };
+            }),
+        );
     };
 
     const submit = (e: React.FormEvent) => {
@@ -275,7 +273,7 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                                                         </div>
                                                         {isSelected && (
                                                             <span className="text-xs text-primary">
-                                                                {proficiencyLabels[userTech.proficiency]}
+                                                                {getTechProficiencyLabel(userTech.proficiency) ?? getTechProficiencyLabel(DEFAULT_TECH_PROFICIENCY)}
                                                             </span>
                                                         )}
                                                     </label>
@@ -301,13 +299,13 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                                                             </div>
                                                             <div>
                                                                 <label className="text-xs text-muted-foreground block mb-1">
-                                                                    Nivel: {proficiencyLabels[userTech.proficiency]}
+                                                                    Nivel: {getTechProficiencyLabel(userTech.proficiency) ?? getTechProficiencyLabel(DEFAULT_TECH_PROFICIENCY)}
                                                                 </label>
                                                                 <input
                                                                     type="range"
                                                                     min="1"
                                                                     max="5"
-                                                                    value={stringToNumber[userTech.proficiency] || 3}
+                                                                    value={getTechProficiencySliderValue(userTech.proficiency)}
                                                                     onChange={(e) =>
                                                                         handleTechUpdate(tech.id, 'proficiency', parseInt(e.target.value))
                                                                     }
