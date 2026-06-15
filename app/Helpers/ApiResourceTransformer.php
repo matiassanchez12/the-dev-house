@@ -15,7 +15,11 @@ class ApiResourceTransformer
      * Transform a project model to array with disk-aware image URLs.
      * Creator and participants are scrubbed to safe fields only.
      */
-    public static function project(Model|array $project, ?JoinRequest $viewerJoinRequest = null): array
+    public static function project(
+        Model|array $project,
+        ?JoinRequest $viewerJoinRequest = null,
+        ?string $viewerRole = null,
+    ): array
     {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
@@ -42,7 +46,15 @@ class ApiResourceTransformer
         if (isset($data['messages']) && is_array($data['messages'])) {
             $data['messages'] = array_map(fn ($message) => self::message($message), $data['messages']);
         }
-        
+
+        if (isset($data['phases']) && is_array($data['phases'])) {
+            $data['phases'] = array_map(fn ($phase) => self::phase($phase), $data['phases']);
+        }
+
+        if ($viewerRole !== null) {
+            $data['viewer_role'] = $viewerRole;
+        }
+
         $data['viewerJoinRequest'] = $viewerJoinRequest === null
             ? null
             : [
@@ -55,6 +67,28 @@ class ApiResourceTransformer
     }
 
     /**
+     * Transform a phase to a safe array.
+     */
+    public static function phase(Model|array $phase): array
+    {
+        $data = $phase instanceof Model ? $phase->toArray() : $phase;
+
+        if (isset($data['project'])) {
+            $data['project'] = self::project($data['project']);
+        }
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'title',
+            'description',
+            'completed_at',
+            'created_at',
+            'updated_at',
+            'project',
+        ]));
+    }
+
+    /**
      * Transform a message to a safe array with sender details.
      */
     public static function message(Model|array $message): array
@@ -64,6 +98,7 @@ class ApiResourceTransformer
         if (isset($data['sender'])) {
             $data['sender'] = self::user($data['sender']);
         }
+
         return $data;
     }
 

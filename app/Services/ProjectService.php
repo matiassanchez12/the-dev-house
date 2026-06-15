@@ -11,6 +11,27 @@ use Illuminate\Support\Str;
 
 class ProjectService
 {
+    public function viewerRole(Project $project, ?User $viewer): string
+    {
+        if ($viewer === null) {
+            return 'guest';
+        }
+
+        if ($project->user_id === $viewer->id) {
+            return 'creator';
+        }
+
+        if ($project->relationLoaded('participants')) {
+            return $project->participants->contains('id', $viewer->id)
+                ? 'member'
+                : 'guest';
+        }
+
+        return $project->participants()->whereKey($viewer->id)->exists()
+            ? 'member'
+            : 'guest';
+    }
+
     /**
      * Generate a unique URL-safe slug from a title.
      */
@@ -186,12 +207,6 @@ class ProjectService
 
         if (! $currentStatus instanceof ProjectStatus) {
             $currentStatus = ProjectStatus::tryFrom($currentStatus);
-        }
-
-        if (! $currentStatus->canTransitionTo($newStatus)) {
-            throw new \InvalidArgumentException(
-                "Cannot transition from {$currentStatus->value} to {$newStatus->value}."
-            );
         }
 
         $project->update(['status' => $newStatus->value]);

@@ -4,6 +4,7 @@ import ApplicationLogo from "../application-logo";
 const footerLinks = {
     platform: [
         { label: "Proyectos", href: route('projects.index') },
+        { label: "Logros", href: route('milestones.index') },
         { label: "Developers", href: route('users.index') },
         { label: "Cómo empezar", href: route('how-start') },
     ],

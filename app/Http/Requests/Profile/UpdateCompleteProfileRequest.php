@@ -18,6 +18,26 @@ class UpdateCompleteProfileRequest extends FormRequest
     }
 
     /**
+     * Prepare incoming data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $techs = $this->input('techs');
+
+        if (! is_string($techs)) {
+            return;
+        }
+
+        $decoded = json_decode($techs, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $this->merge([
+                'techs' => $decoded,
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>

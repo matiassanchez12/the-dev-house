@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useCallback, useState, type FormEvent } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { Send } from 'lucide-react';
@@ -9,20 +9,57 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { FormError } from '@/components/ui/form-error';
 import type { Message } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface Props {
     projectId: number;
     projectSlug: string;
     currentUserId?: number;
     messages?: Message[];
+    className?: string;
+    contentClassName?: string;
+    messagesClassName?: string;
 }
 
-export function ProjectChat({ projectId, projectSlug, currentUserId, messages }: Props) {
+export function ProjectChat({
+    projectId,
+    projectSlug,
+    currentUserId,
+    messages,
+    className,
+    contentClassName,
+    messagesClassName,
+}: Props) {
     const [items, setItems] = useState(messages ?? []);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const shouldAutoScrollRef = useRef(true);
+    const forceScrollRef = useRef(false);
+    const [hasNewMessages, setHasNewMessages] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
     const latestMessageId = items[items.length - 1]?.id;
     const hasChatAccess = messages !== undefined;
+
+    const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+        bottomRef.current?.scrollIntoView?.({ behavior, block: 'end' });
+        shouldAutoScrollRef.current = true;
+        setHasNewMessages(false);
+    }, []);
+
+    const handleScroll = () => {
+        const el = scrollContainerRef.current;
+
+        if (!el) return;
+
+        const threshold = 50;
+        const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+
+        shouldAutoScrollRef.current = isAtBottom;
+
+        if (isAtBottom) {
+            setHasNewMessages(false);
+        }
+    };
 
     useEffect(() => {
         setItems(messages ?? []);
@@ -33,7 +70,17 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
 
         const channel = window.Echo.private(`project.${projectId}`);
         const handler = (message: Message) => {
-            setItems((current) => (current.some((item) => item.id === message.id) ? current : [...current, message]));
+            setItems((current) => {
+                if (current.some((item) => item.id === message.id)) {
+                    return current;
+                }
+
+                if (!shouldAutoScrollRef.current) {
+                    setHasNewMessages(true);
+                }
+
+                return [...current, message];
+            });
         };
 
         channel.listen('.message.created', handler);
@@ -45,8 +92,18 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
     }, [hasChatAccess, projectId]);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'end' });
-    }, [latestMessageId]);
+        if (!latestMessageId) return;
+
+        if (forceScrollRef.current) {
+            scrollToBottom('auto');
+            forceScrollRef.current = false;
+            return;
+        }
+
+        if (shouldAutoScrollRef.current) {
+            scrollToBottom('smooth');
+        }
+    }, [latestMessageId, scrollToBottom]);
 
     if (!messages) return null;
 
@@ -55,10 +112,13 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
 
         if (!data.body.trim()) return;
 
+        forceScrollRef.current = true;
+
         post(route('projects.messages.store', projectSlug), {
             preserveScroll: true,
             onSuccess: () => {
                 reset('body');
+                scrollToBottom('auto');
                 toast.success('Mensaje enviado');
             },
             onError: () => toast.error('No se pudo enviar el mensaje'),
@@ -73,13 +133,13 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
     };
 
     return (
-        <Card className="border-primary/20">
-            <CardHeader>
+        <Card className={cn('border-primary/20 overflow-hidden', className)}>
+            <CardHeader className="shrink-0">
                 <CardTitle>Chat del proyecto</CardTitle>
                 <CardDescription>Conversá con los miembros del equipo en tiempo real</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="scrollbar-chat max-h-96 space-y-3 overflow-y-auto pr-1">
+            <CardContent className={cn('min-h-0 flex flex-1 flex-col space-y-4', contentClassName)}>
+                <div ref={scrollContainerRef} onScroll={handleScroll} className={cn('scrollbar-chat min-h-0 flex-1 space-y-3 overflow-y-auto pr-1', messagesClassName)}>
                     {items.length === 0 ? (
                         <p className="text-sm text-muted-foreground">Todavía no hay mensajes.</p>
                     ) : items.map((message) => {
@@ -98,13 +158,21 @@ export function ProjectChat({ projectId, projectSlug, currentUserId, messages }:
                                     </div>
                                     <p className="text-sm whitespace-pre-wrap">{message.body}</p>
                                 </div>
-                            </div>
-                        );
-                    })}
+                                </div>
+                            );
+                        })}
                     <div ref={bottomRef} aria-hidden="true" />
                 </div>
 
-                <form onSubmit={submit} className="space-y-2">
+                {hasNewMessages ? (
+                    <div className="flex justify-end">
+                        <Button type="button" variant="outline" size="sm" onClick={() => scrollToBottom('smooth')}>
+                            Ver nuevos mensajes
+                        </Button>
+                    </div>
+                ) : null}
+
+                <form onSubmit={submit} className="shrink-0 space-y-2">
                     <Textarea
                         value={data.body}
                         onChange={(event) => setData('body', event.target.value)}

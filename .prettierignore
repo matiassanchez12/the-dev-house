@@ -1,0 +1,7 @@
+node_modules
+vendor
+storage
+bootstrap/cache
+public/build
+resources/js/ziggy.js
+package-lock.json
