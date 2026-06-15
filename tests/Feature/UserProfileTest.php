@@ -269,4 +269,35 @@ class UserProfileTest extends TestCase
                 ->where('user.techs', [])
         );
     }
+
+    /**
+     * Test: Profile renders with intermediate proficiency techs
+     *
+     * Scenario: User has tech with intermediate proficiency
+     * Expected: Backend sends intermediate proficiency value in Inertia props
+     */
+    public function test_profile_sends_intermediate_proficiency(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $tech = Tech::factory()->create(['name' => 'Vue']);
+
+        $user->techs()->attach($tech->id, [
+            'years_experience' => 2,
+            'proficiency' => 'intermediate',
+        ]);
+
+        // Act
+        $response = $this->get("/users/{$user->slug}");
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('user.techs', 1)
+                ->where('user.techs.0.name', 'Vue')
+                ->where('user.techs.0.proficiency', 'intermediate')
+                ->where('user.techs.0.years', 2)
+        );
+    }
 }
