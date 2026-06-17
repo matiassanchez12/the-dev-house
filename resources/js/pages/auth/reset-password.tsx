@@ -1,7 +1,6 @@
-import InputLabel from '@/components/input-label';
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { useForm } from '@inertiajs/react';
@@ -27,9 +26,7 @@ export default function ResetPassword({ token, email }) {
             <Seo title="Restablecer contraseña" description="Establecé una nueva contraseña para tu cuenta de The Dev House." />
 
             <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
+                <Field id="email" label="Email" error={errors.email}>
                     <Input
                         id="email"
                         type="email"
@@ -40,13 +37,9 @@ export default function ResetPassword({ token, email }) {
                         placeholder="email@example.com"
                         onChange={(e) => setData('email', e.target.value)}
                     />
+                </Field>
 
-                    <FormError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                <Field id="password" label="Password" error={errors.password} className="mt-4">
                     <Input
                         id="password"
                         type="password"
@@ -54,20 +47,13 @@ export default function ResetPassword({ token, email }) {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        isFocused
+                        autoFocus
                         placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />
+                </Field>
 
-                    <FormError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
+                <Field id="password_confirmation" label="Confirm Password" error={errors.password_confirmation} className="mt-4">
                     <Input
                         type="password"
                         id="password_confirmation"
@@ -80,12 +66,7 @@ export default function ResetPassword({ token, email }) {
                             setData('password_confirmation', e.target.value)
                         }
                     />
-
-                    <FormError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
+                </Field>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Button type="submit" className="ms-4" disabled={processing}>

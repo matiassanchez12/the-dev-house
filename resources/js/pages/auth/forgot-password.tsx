@@ -1,6 +1,6 @@
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { useForm } from '@inertiajs/react';
@@ -33,18 +33,18 @@ export default function ForgotPassword({ status }) {
             )}
 
             <form onSubmit={submit}>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused
-                    placeholder="email@example.com"
-                    onChange={(e) => setData('email', e.target.value)}
-                />
-
-                <FormError message={errors.email} className="mt-2" />
+                <Field id="email" label="Email" error={errors.email}>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={data.email}
+                        className="mt-1 block w-full"
+                        autoFocus
+                        placeholder="email@example.com"
+                        onChange={(e) => setData('email', e.target.value)}
+                    />
+                </Field>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Button type="submit" className="ms-4" disabled={processing}>
