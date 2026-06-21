@@ -2,6 +2,10 @@
 
 ## Status: PASSED WITH WARNINGS
 
+## Verdict
+
+**PASS WITH WARNINGS**
+
 ## Verification Summary
 
 ### Evidence Used
