@@ -5,9 +5,11 @@ import OnboardingLayout from '@/layouts/onboarding';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Field } from '@/components/ui/field';
+import { FormError } from '@/components/ui/form-error';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import InputError from '@/components/input-error';
 import { User, Tech, Platform, SocialLink } from '@/types';
 import { avatarUrl } from '@/components/projects/project-utils';
 
@@ -264,6 +266,11 @@ export default function OnboardingIndex() {
             ([key]) => key === prefix || key.startsWith(`${prefix}.`)
         );
 
+    const techsErrorId = 'techs-error';
+    const joinRequestsErrorId = 'join-requests-error';
+    const techsError = stepErrors('techs')[0]?.[1];
+    const joinRequestsError = stepErrors('join_requests')[0]?.[1];
+
     return (
         <>
             <Seo title="Welcome to The Dev House" description="Completá tu perfil en The Dev House: seleccioná tus tecnologías, escribí tu bio, agregá redes sociales y descubrí proyectos recomendados." />
@@ -289,9 +296,7 @@ export default function OnboardingIndex() {
                         {/* Step 1: Tech Selection */}
                         {currentStep === 1 && (
                             <div className="space-y-6">
-                                {stepErrors('techs').map(([key, msg]) => (
-                                    <InputError key={key} message={msg} />
-                                ))}
+                                {techsError && <FormError id={techsErrorId} message={techsError} />}
 
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {allTechs.map((tech) => {
@@ -301,6 +306,9 @@ export default function OnboardingIndex() {
                                                 key={tech.id}
                                                 type="button"
                                                 onClick={() => toggleTech(tech)}
+                                                aria-pressed={isSelected}
+                                                aria-invalid={Boolean(techsError)}
+                                                aria-describedby={techsError ? techsErrorId : undefined}
                                                 className={`p-3 rounded-lg border text-left transition-colors ${
                                                     isSelected
                                                         ? 'border-primary bg-primary/10'
@@ -328,27 +336,33 @@ export default function OnboardingIndex() {
                                                 <span className="text-sm text-foreground">
                                                     {tech.name}
                                                 </span>
-                                                <select
-                                                    value={tech.proficiency}
-                                                    onChange={(e) =>
-                                                        updateTechProficiency(
-                                                            tech.id,
-                                                            parseInt(e.target.value)
-                                                        )
-                                                    }
-                                                    className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                                                <Field
+                                                    id={`tech-${tech.id}-proficiency`}
+                                                    label={`${tech.name} nivel de experiencia`}
+                                                    labelClassName="sr-only"
                                                 >
-                                                    {Object.entries(PROFICIENCY_MAP).map(
-                                                        ([level, label]) => (
-                                                            <option
-                                                                key={level}
-                                                                value={parseInt(level)}
-                                                            >
-                                                                {label}
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
+                                                    <select
+                                                        value={tech.proficiency}
+                                                        onChange={(e) =>
+                                                            updateTechProficiency(
+                                                                tech.id,
+                                                                parseInt(e.target.value)
+                                                            )
+                                                        }
+                                                        className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                                                    >
+                                                        {Object.entries(PROFICIENCY_MAP).map(
+                                                            ([level, label]) => (
+                                                                <option
+                                                                    key={level}
+                                                                    value={parseInt(level)}
+                                                                >
+                                                                    {label}
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </select>
+                                                </Field>
                                             </div>
                                         ))}
                                     </div>
@@ -359,18 +373,19 @@ export default function OnboardingIndex() {
                         {/* Step 2: Bio */}
                         {currentStep === 2 && (
                             <div className="space-y-3">
-                                <Textarea
-                                    value={bio}
-                                    onChange={(e) => setBio(e.target.value)}
-                                    maxLength={1000}
-                                    placeholder="Cuéntanos sobre vos, tu experiencia y qué te apasiona..."
-                                    rows={5}
-                                    className="w-full"
-                                />
+                                <Field id="bio" label="Biografía" labelClassName="sr-only" error={errors.bio}>
+                                    <Textarea
+                                        value={bio}
+                                        onChange={(e) => setBio(e.target.value)}
+                                        maxLength={1000}
+                                        placeholder="Cuéntanos sobre vos, tu experiencia y qué te apasiona..."
+                                        rows={5}
+                                        className="w-full"
+                                    />
+                                </Field>
                                 <div className="text-right text-sm text-muted-foreground">
                                     {bio.length}/1000
                                 </div>
-                                {errors.bio && <InputError message={errors.bio} />}
                             </div>
                         )}
 
@@ -378,14 +393,10 @@ export default function OnboardingIndex() {
                         {currentStep === 3 && (
                             <div className="space-y-4">
                                 {/* General social links errors */}
-                                {errors.links && (
-                                    <InputError message={errors.links} className="mb-2" />
-                                )}
+                                {errors.links && <FormError id="links-error" message={errors.links} className="mb-2" />}
                                 {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => {
-                                    // Find any error for this platform's URL (e.g. "links.0.url", "links.1.url")
-                                    const urlError = Object.entries(errors).find(
-                                        ([key]) => key.includes('.url') && key.startsWith('links.')
-                                    )?.[1];
+                                    const platformIndex = Object.keys(PLATFORM_LABELS).indexOf(platform);
+                                    const urlError = errors[`links.${platformIndex}.url`];
 
                                     return (
                                         <div key={platform} className="flex items-center gap-3">
@@ -393,19 +404,26 @@ export default function OnboardingIndex() {
                                                 {PLATFORM_ICONS[platform]}
                                             </div>
                                             <div className="flex-1">
-                                                <input
-                                                    type="url"
-                                                    value={socialLinks[platform]}
-                                                    onChange={(e) =>
-                                                        setSocialLinks((prev) => ({
-                                                            ...prev,
-                                                            [platform]: e.target.value,
-                                                        }))
-                                                    }
-                                                    placeholder={`https://...`}
-                                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                                />
-                                                {urlError && <InputError message={urlError} className="mt-1" />}
+                                                <Field
+                                                    id={`social-${platform}`}
+                                                    label={`${PLATFORM_LABELS[platform]} URL`}
+                                                    labelClassName="sr-only"
+                                                    error={urlError}
+                                                >
+                                                    <Input
+                                                        type="url"
+                                                        value={socialLinks[platform]}
+                                                        onChange={(e) =>
+                                                            setSocialLinks((prev) => ({
+                                                                ...prev,
+                                                                [platform]: e.target.value,
+                                                            }))
+                                                        }
+                                                        placeholder={`https://...`}
+                                                        aria-invalid={Boolean(urlError || errors.links)}
+                                                        aria-describedby={errors.links ? 'links-error' : undefined}
+                                                    />
+                                                </Field>
                                             </div>
                                             <span className="text-sm text-muted-foreground w-24 flex-shrink-0">
                                                 {PLATFORM_LABELS[platform]}
@@ -467,21 +485,20 @@ export default function OnboardingIndex() {
                                         )}
                                     </div>
                                     <div>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) setAvatarFile(file);
-                                            }}
-                                            className="text-sm text-muted-foreground"
-                                        />
+                                        <Field id="avatar" label="Avatar" labelClassName="sr-only" error={errors.avatar}>
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) setAvatarFile(file);
+                                                }}
+                                                className="text-sm text-muted-foreground"
+                                            />
+                                        </Field>
                                         <p className="text-xs text-muted-foreground mt-1">
                                             Máximo 2MB
                                         </p>
-                                        {errors.avatar && (
-                                            <InputError message={errors.avatar} className="mt-2" />
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -490,9 +507,7 @@ export default function OnboardingIndex() {
                         {/* Step 5: Recommendations */}
                         {currentStep === 5 && (
                             <div className="space-y-4">
-                                {stepErrors('join_requests').map(([key, msg]) => (
-                                    <InputError key={key} message={msg} />
-                                ))}
+                                {joinRequestsError && <FormError id={joinRequestsErrorId} message={joinRequestsError} />}
                                 {loadingRecommendations ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         Cargando proyectos recomendados...
@@ -512,6 +527,8 @@ export default function OnboardingIndex() {
                                                 checked={selectedProjects.includes(project.id)}
                                                 onChange={() => toggleProject(project.id)}
                                                 className="mt-1"
+                                                aria-invalid={Boolean(joinRequestsError)}
+                                                aria-describedby={joinRequestsError ? joinRequestsErrorId : undefined}
                                             />
                                             <label
                                                 htmlFor={`project-${project.id}`}
