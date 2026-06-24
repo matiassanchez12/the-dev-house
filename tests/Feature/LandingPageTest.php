@@ -48,6 +48,46 @@ class LandingPageTest extends TestCase
         );
     }
 
+    public function test_landing_page_includes_projects_regardless_of_status(): void
+    {
+        $user = User::factory()->create();
+
+        Project::factory()->create([
+            'user_id' => $user->id,
+            'status' => 'open',
+            'title' => 'Open Project',
+            'created_at' => now()->subDays(2),
+        ]);
+
+        Project::factory()->create([
+            'user_id' => $user->id,
+            'status' => 'completed',
+            'title' => 'Completed Project',
+            'created_at' => now()->subDay(),
+        ]);
+
+        Project::factory()->create([
+            'user_id' => $user->id,
+            'status' => 'closed',
+            'title' => 'Closed Project',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('landing')
+            ->where('projects.total', 3)
+            ->has('projects.data', 3)
+            ->where('projects.data.0.title', 'Closed Project')
+            ->where('projects.data.0.status', 'closed')
+            ->where('projects.data.1.title', 'Completed Project')
+            ->where('projects.data.1.status', 'completed')
+            ->where('projects.data.2.title', 'Open Project')
+            ->where('projects.data.2.status', 'open')
+        );
+    }
+
     public function test_landing_page_returns_zero_counts_when_empty(): void
     {
         $response = $this->get('/');
