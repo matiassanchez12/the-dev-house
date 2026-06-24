@@ -21,9 +21,7 @@ class LandingController extends Controller
      */
     public function __invoke(Request $request)
     {
-        // Obtener proyectos destacados (los últimos 6)
         $projects = Project::with(['creator', 'techs'])
-            ->where('status', 'open')
             ->latest()
             ->limit(6)
             ->get();
@@ -36,7 +34,7 @@ class LandingController extends Controller
             'collaboration_count' => DB::table('project_participants')->count(),
             'projects' => [
                 'data' => ApiResourceTransformer::projects($projects),
-                'total' => Project::where('status', 'open')->count(),
+                'total' => Project::count(),
             ],
             'techs' => Tech::orderBy('name')->take(5)->get()->toArray(),
         ]);
