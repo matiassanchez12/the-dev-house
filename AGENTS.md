@@ -150,13 +150,13 @@ php artisan test --coverage
 
 ### Git Workflow
 
-- **Branches**: Create from `main`. Descriptive names: `feat/join-requests`, `fix/project-slug-validation`.
+- **Branches**: Create `feat/*` and `fix/*` branches from `development`. Descriptive names: `feat/join-requests`, `fix/project-slug-validation`.
 - **Commits**: Atomic, conventional commits:
   - `feat: add join request system`
   - `test: add ProjectController::index tests`
   - `fix: validate techs array is non-empty`
   - `refactor: extract tech selection hook`
-- **PRs**: Must pass all tests. Include description of what changed and why.
+- **PRs**: Normal feature/fix PRs target `development`. `master` is the promotion/release branch fed from `development`. Include description of what changed and why.
 
 ## Architecture Decisions
 

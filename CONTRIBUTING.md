@@ -7,7 +7,7 @@ Thank you for wanting to contribute to this project. This guide covers everythin
 1. Fork the repository and clone your fork.
 2. Set up the project (see [README.md](./README.md)).
 3. Run `php artisan test` — all tests must pass before you start.
-4. Create a branch from `main` with a descriptive name: `feat/feature-name` or `fix/issue-description`.
+4. Create a `feat/*` or `fix/*` branch from `development` with a descriptive name.
 5. Write tests FIRST, then implement your change.
 6. Run all tests and ensure they pass.
 7. Push your branch and open a Pull Request.
@@ -66,6 +66,11 @@ php artisan test --filter ProjectTest
 - `refactor/description` — code improvements
 - `test/description` — adding or fixing tests
 
+**Branch flow:**
+- `feat/*` and `fix/*` branches are created from `development`.
+- Normal feature/fix Pull Requests target `development`.
+- `master` is the promotion/release branch fed from `development`.
+
 **Commit messages** (conventional commits):
 ```
 feat: add join request system
@@ -84,7 +89,7 @@ Each commit should be atomic — one logical change per commit.
 - [ ] Code follows project conventions (see [DOCS.md](./DOCS.md))
 - [ ] No debug code, `console.log`, or commented-out code
 - [ ] Commit messages follow conventional commits format
-- [ ] Branch is up to date with `main`
+- [ ] Branch is up to date with `development`
 
 ### PR Description
 
@@ -99,7 +104,7 @@ Include:
 1. CI must pass (automated tests and linting).
 2. At least one maintainer review is required.
 3. Address review feedback with new commits — do not force-push unless asked.
-4. Once approved, the PR will be merged into `main`.
+4. Once approved, the PR will be merged into `development`.
 
 ## Need Help?
 
