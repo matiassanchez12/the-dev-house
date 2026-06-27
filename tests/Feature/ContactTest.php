@@ -2,21 +2,30 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ContactFeedbackSubmitted;
 use App\Models\ContactMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class ContactTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_contact_store_creates_message(): void
+    public function test_contact_store_creates_feedback_and_sends_email(): void
     {
+        Mail::fake();
+
         $response = $this->post('/contact', [
             'name' => 'Juan Pérez',
             'email' => 'juan@example.com',
-            'reason' => 'colaboracion',
-            'message' => 'Quiero colaborar con un proyecto.',
+            'satisfaction' => '4',
+            'understood_purpose' => 'yes',
+            'would_join_project' => 'maybe',
+            'missing_feature' => 'Me faltó ver proyectos con filtros más claros por experiencia.',
+            'tech_stack' => 'Laravel, React y TypeScript',
+            'preferred_project_type' => 'real',
+            'improvements' => 'Mejoraría el onboarding y la claridad de los proyectos recomendados.',
         ]);
 
         $response->assertSessionHas('success');
@@ -25,9 +34,18 @@ class ContactTest extends TestCase
         $this->assertDatabaseHas('contact_messages', [
             'name' => 'Juan Pérez',
             'email' => 'juan@example.com',
-            'reason' => 'colaboracion',
-            'message' => 'Quiero colaborar con un proyecto.',
+            'satisfaction' => 4,
+            'understood_purpose' => 'yes',
+            'would_join_project' => 'maybe',
+            'missing_feature' => 'Me faltó ver proyectos con filtros más claros por experiencia.',
+            'tech_stack' => 'Laravel, React y TypeScript',
+            'preferred_project_type' => 'real',
+            'improvements' => 'Mejoraría el onboarding y la claridad de los proyectos recomendados.',
         ]);
+
+        Mail::assertSent(ContactFeedbackSubmitted::class, function (ContactFeedbackSubmitted $mail): bool {
+            return $mail->hasTo(config('contact.feedback_recipient.address'));
+        });
     }
 
     public function test_contact_store_validates_name(): void
@@ -54,28 +72,45 @@ class ContactTest extends TestCase
         $response->assertSessionHasErrors('email');
     }
 
-    public function test_contact_store_validates_reason(): void
+    public function test_contact_store_validates_satisfaction(): void
     {
         $response = $this->post('/contact', [
             'name' => 'Juan',
             'email' => 'juan@example.com',
-            'reason' => '',
-            'message' => 'Quiero colaborar con un proyecto.',
+            'satisfaction' => '7',
+            'understood_purpose' => 'yes',
+            'would_join_project' => 'yes',
+            'missing_feature' => 'Me faltó un listado más claro de proyectos para sumarme.',
+            'tech_stack' => 'Laravel',
+            'preferred_project_type' => 'real',
+            'improvements' => 'Mejoraría la estructura de la landing y las recomendaciones.',
         ]);
 
-        $response->assertSessionHasErrors('reason');
+        $response->assertSessionHasErrors('satisfaction');
     }
 
-    public function test_contact_store_validates_message_length(): void
+    public function test_contact_store_validates_feedback_questions(): void
     {
         $response = $this->post('/contact', [
             'name' => 'Juan',
             'email' => 'juan@example.com',
-            'reason' => 'colaboracion',
-            'message' => 'Corto',
+            'satisfaction' => '4',
+            'understood_purpose' => 'tal vez',
+            'would_join_project' => 'quizas',
+            'missing_feature' => 'Corto',
+            'tech_stack' => '',
+            'preferred_project_type' => 'client-work',
+            'improvements' => 'Breve',
         ]);
 
-        $response->assertSessionHasErrors('message');
+        $response->assertSessionHasErrors([
+            'understood_purpose',
+            'would_join_project',
+            'missing_feature',
+            'tech_stack',
+            'preferred_project_type',
+            'improvements',
+        ]);
     }
 
     public function test_contact_store_persists_in_database(): void
@@ -83,8 +118,13 @@ class ContactTest extends TestCase
         $this->post('/contact', [
             'name' => 'María García',
             'email' => 'maria@test.com',
-            'reason' => 'consulta',
-            'message' => 'Tengo una consulta sobre la plataforma.',
+            'satisfaction' => '5',
+            'understood_purpose' => 'yes',
+            'would_join_project' => 'yes',
+            'missing_feature' => 'Me faltó ver un filtro por nivel de seniority y dedicación.',
+            'tech_stack' => 'Vue, Laravel y PostgreSQL',
+            'preferred_project_type' => 'portfolio',
+            'improvements' => 'Sumaría mejores filtros y una explicación más clara del valor para nuevos usuarios.',
         ]);
 
         $this->assertEquals(1, ContactMessage::count());
@@ -92,7 +132,12 @@ class ContactTest extends TestCase
         $message = ContactMessage::first();
         $this->assertEquals('María García', $message->name);
         $this->assertEquals('maria@test.com', $message->email);
-        $this->assertEquals('consulta', $message->reason);
-        $this->assertEquals('Tengo una consulta sobre la plataforma.', $message->message);
+        $this->assertEquals(5, $message->satisfaction);
+        $this->assertEquals('yes', $message->understood_purpose);
+        $this->assertEquals('yes', $message->would_join_project);
+        $this->assertEquals('Me faltó ver un filtro por nivel de seniority y dedicación.', $message->missing_feature);
+        $this->assertEquals('Vue, Laravel y PostgreSQL', $message->tech_stack);
+        $this->assertEquals('portfolio', $message->preferred_project_type);
+        $this->assertEquals('Sumaría mejores filtros y una explicación más clara del valor para nuevos usuarios.', $message->improvements);
     }
 }
