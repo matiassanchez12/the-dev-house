@@ -6,7 +6,9 @@ use App\Helpers\ApiResourceTransformer;
 use App\Http\Requests\JoinRequest\StoreJoinRequestRequest;
 use App\Models\JoinRequest;
 use App\Models\Project;
+use App\Services\Exceptions\AlreadyParticipantException;
 use App\Services\Exceptions\DuplicateJoinRequestException;
+use App\Services\Exceptions\ProjectNotAcceptingRequestsException;
 use App\Services\Exceptions\SelfJoinException;
 use App\Services\JoinRequestService;
 use Illuminate\Http\Request;
@@ -51,6 +53,14 @@ class JoinRequestController extends Controller
         } catch (SelfJoinException) {
             return back()->withErrors([
                 'message' => 'No puedes unirte a tu propio proyecto',
+            ]);
+        } catch (AlreadyParticipantException) {
+            return back()->withErrors([
+                'message' => 'Ya sos participante de este proyecto',
+            ]);
+        } catch (ProjectNotAcceptingRequestsException) {
+            return back()->withErrors([
+                'message' => 'Este proyecto no acepta nuevas solicitudes',
             ]);
         }
 

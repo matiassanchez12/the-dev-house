@@ -51,7 +51,7 @@ export interface Project {
     description: string;
     vision?: string | null;
     images?: ProjectImage[] | null;
-    status: 'open' | 'closed' | 'completed';
+    status: 'open' | 'in_progress' | 'closed' | 'completed';
     repository_url?: string | null;
     demo_url?: string | null;
     created_at: string;
@@ -133,7 +133,7 @@ export interface UserProject {
     id: number;
     title: string;
     slug: string;
-    status: 'open' | 'closed' | 'completed';
+    status: 'open' | 'in_progress' | 'closed' | 'completed';
     images: ProjectImage[] | null;
     description: string;
     creator: {
