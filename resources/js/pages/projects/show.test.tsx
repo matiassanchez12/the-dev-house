@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Show from './show';
 
-// Stub AppLayout so children render in isolation.
 vi.mock('@/layouts/app-layout', () => ({
     default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
@@ -16,8 +15,6 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 
-// The global `route` helper is referenced only inside the creator-only branch,
-// but stub it so nothing blows up if the page ever calls it.
 beforeEach(() => {
     Object.defineProperty(globalThis, 'route', {
         configurable: true,
@@ -25,8 +22,6 @@ beforeEach(() => {
     });
 });
 
-// Capture the props the page wires into ProjectJoinForm and render a marker so
-// we can assert the visible behaviour without pulling in the real form.
 let capturedJoinFormProps: { isOpen: boolean; isParticipant: boolean; isCreator: boolean } | undefined;
 
 vi.mock('@/components/projects/show', () => ({
@@ -44,11 +39,7 @@ vi.mock('@/components/projects/show', () => ({
     ProjectDeleteDialog: () => <div />,
     ProjectJoinForm: (props: { isOpen: boolean; isParticipant: boolean; isCreator: boolean }) => {
         capturedJoinFormProps = props;
-        return (
-            <div>
-                {props.isOpen ? <span>JOIN_FORM_OPEN</span> : <span>JOIN_FORM_CLOSED</span>}
-            </div>
-        );
+        return <div>{props.isOpen ? <span>JOIN_FORM_OPEN</span> : <span>JOIN_FORM_CLOSED</span>}</div>;
     },
 }));
 
@@ -74,36 +65,17 @@ describe('Project show page wiring', () => {
     it('renders the join UI for an in_progress project so guests can request to join', () => {
         capturedJoinFormProps = undefined;
 
-        render(
-            <Show
-                auth={{ user: { id: 1, name: 'Ada' } }}
-                project={baseProject({ status: 'in_progress' })}
-            />,
-        );
+        render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
 
-        // The join form is mounted (not hidden) for in_progress.
         expect(screen.getByText('JOIN_FORM_OPEN')).toBeInTheDocument();
-        // And the page computes isOpen=true for that status.
         expect(capturedJoinFormProps).toBeDefined();
         expect(capturedJoinFormProps?.isOpen).toBe(true);
     });
 
     it('does not render the join UI for a completed project', () => {
-        // Sanity: completed projects must not accept requests even though the
-        // component is still mounted by the page.
-        const { rerender } = render(
-            <Show
-                auth={{ user: { id: 1, name: 'Ada' } }}
-                project={baseProject({ status: 'in_progress' })}
-            />,
-        );
+        const { rerender } = render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
 
-        rerender(
-            <Show
-                auth={{ user: { id: 1, name: 'Ada' } }}
-                project={baseProject({ status: 'completed' })}
-            />,
-        );
+        rerender(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'completed' })} />);
 
         expect(screen.getByText('JOIN_FORM_CLOSED')).toBeInTheDocument();
         expect(capturedJoinFormProps?.isOpen).toBe(false);

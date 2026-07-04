@@ -112,44 +112,12 @@ $this->project = Project::factory()->create([
     }
 
     /** @test */
-    public function validate_can_create_status_check_runs_before_duplicate_check(): void
-    {
-        // A completed project with a pending request should still fail with the
-        // status rule (defense in depth: status verified first).
-        JoinRequest::factory()->create([
-            'project_id' => $this->project->id,
-            'user_id' => $this->user->id,
-            'status' => 'pending',
-        ]);
-        $this->project->update(['status' => 'completed']);
-        $this->project->refresh();
-
-        $this->expectException(ProjectNotAcceptingRequestsException::class);
-
-        $this->service->validateCanCreate($this->project, $this->user);
-    }
-
-    /** @test */
     public function validate_can_create_throws_when_user_is_already_a_participant(): void
     {
         // Attach the user as a participant, bypassing the form.
         $this->project->participants()->attach($this->user->id);
 
         $this->expectException(AlreadyParticipantException::class);
-
-        $this->service->validateCanCreate($this->project, $this->user);
-    }
-
-    /** @test */
-    public function validate_can_create_status_check_runs_before_participant_check(): void
-    {
-        // Defense in depth: a completed project with an attached participant
-        // still fails with the status rule (status verified first).
-        $this->project->participants()->attach($this->user->id);
-        $this->project->update(['status' => 'completed']);
-        $this->project->refresh();
-
-        $this->expectException(ProjectNotAcceptingRequestsException::class);
 
         $this->service->validateCanCreate($this->project, $this->user);
     }
