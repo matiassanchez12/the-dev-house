@@ -6,7 +6,6 @@ export function HeroWordmark({ className }: HeroWordmarkProps) {
             className={`font-mono text-center text-2xl md:text-3xl lg:text-4xl font-bold leading-tight ${className ?? ''}`}
         >
             <div className="mt-1 text-sm md:text-base font-normal text-muted-foreground opacity-60">
-                // donde los devs construyen juntos
             </div>
         </div>
     );
