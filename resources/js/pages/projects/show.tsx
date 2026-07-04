@@ -106,7 +106,7 @@ export default function Show({ auth, project }: Props) {
                             />
                             <ProjectJoinForm
                                 projectId={project.id}
-                                isOpen={project.status === 'open'}
+                                isOpen={project.status === 'open' || project.status === 'in_progress'}
                                 isCreator={isCreator}
                                 isParticipant={isParticipant}
                                 user={auth.user}
