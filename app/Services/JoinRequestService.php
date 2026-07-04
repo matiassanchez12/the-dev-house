@@ -8,7 +8,9 @@ use App\Models\User;
 use App\Notifications\JoinRequestApproved;
 use App\Notifications\JoinRequestReceived;
 use App\Notifications\JoinRequestRejected;
+use App\Services\Exceptions\AlreadyParticipantException;
 use App\Services\Exceptions\DuplicateJoinRequestException;
+use App\Services\Exceptions\ProjectNotAcceptingRequestsException;
 use App\Services\Exceptions\SelfJoinException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -48,11 +50,32 @@ class JoinRequestService
     /**
      * Validate that a user can create a join request for a project.
      *
+     * @throws ProjectNotAcceptingRequestsException
      * @throws DuplicateJoinRequestException
      * @throws SelfJoinException
      */
     public function validateCanCreate(Project $project, User $user): void
     {
+        // Business rule: join requests are only allowed while the project
+        // is open or in progress. Once it moves to completed/closed, no
+        // new requests can be created (also blocks direct POSTs).
+        if (! $project->status->acceptsJoinRequests()) {
+            throw new ProjectNotAcceptingRequestsException();
+        }
+
+        // Check for self-join
+        if ($project->user_id === $user->id) {
+            throw new SelfJoinException();
+        }
+
+        // Business rule: an existing participant cannot create another join
+        // request. Enforced server-side so a direct POST to
+        // /projects/{project}/join-requests is blocked even when the UI hides
+        // the form for participants.
+        if ($project->participants()->where('user_id', $user->id)->exists()) {
+            throw new AlreadyParticipantException();
+        }
+
         // Check for existing pending request
         $existing = JoinRequest::where('project_id', $project->id)
             ->where('user_id', $user->id)
@@ -61,11 +84,6 @@ class JoinRequestService
 
         if ($existing) {
             throw new DuplicateJoinRequestException();
-        }
-
-        // Check for self-join
-        if ($project->user_id === $user->id) {
-            throw new SelfJoinException();
         }
     }
 
