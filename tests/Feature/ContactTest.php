@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Mail\ContactFeedbackSubmitted;
 use App\Models\ContactMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -12,7 +11,7 @@ class ContactTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_contact_store_creates_feedback_and_sends_email(): void
+    public function test_contact_store_creates_feedback_without_sending_email(): void
     {
         Mail::fake();
 
@@ -43,9 +42,7 @@ class ContactTest extends TestCase
             'improvements' => 'Mejoraría el onboarding y la claridad de los proyectos recomendados.',
         ]);
 
-        Mail::assertSent(ContactFeedbackSubmitted::class, function (ContactFeedbackSubmitted $mail): bool {
-            return $mail->hasTo(config('contact.feedback_recipient.address'));
-        });
+        Mail::assertNothingSent();
     }
 
     public function test_contact_store_validates_name(): void
