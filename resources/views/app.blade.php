@@ -1,24 +1,43 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        @php
+            $appName = config('app.name', 'The Dev House');
+            $appUrl = rtrim(config('app.url', url('/')), '/');
+            $currentPath = ltrim(request()->path(), '/');
+            $currentUrl = $currentPath === '' ? $appUrl . '/' : $appUrl . '/' . $currentPath;
+            $ogImage = $appUrl . '/og.jpg';
+            $seoDescription = 'The Dev House — Una plataforma colaborativa para desarrolladores. Crea proyectos, únete a equipos y construye software juntos.';
+        @endphp
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'The Dev House') }}</title>
+        <title inertia>{{ $appName }}</title>
 
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate icon" href="/favicon.ico">
         <link rel="apple-touch-icon" href="/favicon.svg">
         <!-- Fallback SEO Meta Tags (overridden per-page by <Seo />) -->
-        <meta name="description" content="The Dev House - Una plataforma colaborativa para desarrolladores. Crea proyectos, unete a equipos y construye software juntos.">
+        <meta name="description" content="{{ $seoDescription }}">
         <meta name="keywords" content="desarrolladores, programacion, proyectos, colaboracion, open source, comunidad, tech, software">
         <meta name="author" content="Matias Sanchez">
         <meta name="robots" content="index, follow">
         <meta property="og:locale" content="es_ES">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="{{ $appName }}">
+        <meta property="og:title" content="{{ $appName }}">
+        <meta property="og:description" content="{{ $seoDescription }}">
+        <meta property="og:url" content="{{ $currentUrl }}">
+        <meta property="og:image" content="{{ $ogImage }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $appName }}">
+        <meta name="twitter:description" content="{{ $seoDescription }}">
+        <meta name="twitter:image" content="{{ $ogImage }}">
 
         <!-- Canonical URL (fallback when no per-page canonical) -->
-        <link rel="canonical" href="{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/{{ request()->path() }}">
+        <link rel="canonical" href="{{ $currentUrl }}">
 
         <!-- Prevent dark-mode FOUC — apply .dark class BEFORE CSS renders -->
         <script>
@@ -57,10 +76,10 @@
         {
           "@@context": "https://schema.org",
           "@@type": "Organization",
-          "name": "The Dev House",
-          "url": "{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}",
+          "name": "{{ $appName }}",
+          "url": "{{ $appUrl }}",
           "description": "Una plataforma colaborativa para desarrolladores",
-          "logo": "{{ config('app.url', 'https://the-dev-house-1.onrender.com') }}/favicon.svg",
+          "logo": "{{ $appUrl }}/favicon.svg",
           "sameAs": [
             "https://github.com/matiassanchez12/the-dev-house"
           ],
