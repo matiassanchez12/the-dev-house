@@ -28,4 +28,13 @@ enum ProjectStatus: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    /**
+     * A project accepts new join requests while it is open or in progress.
+     * Once it reaches completed/closed, no new requests are allowed.
+     */
+    public function acceptsJoinRequests(): bool
+    {
+        return $this === self::Open || $this === self::InProgress;
+    }
 }

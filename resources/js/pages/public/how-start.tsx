@@ -90,7 +90,7 @@ export default function HowStart({ auth }: Props) {
                                         Publicado por
                                     </span>
                                     <a
-                                        href="https://the-dev-house-1.onrender.com/users/matias-sanchez"
+                                        href="https://the-dev-house.up.railway.app/users/matias-sanchez"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="block font-display font-semibold text-foreground hover:text-accent-foreground transition-colors leading-tight"
@@ -182,7 +182,7 @@ export default function HowStart({ auth }: Props) {
                                 Recursos para el camino
                             </h2>
                             <p className="text-muted-foreground max-w-xl mx-auto">
-                Próximamente: videos, imágenes y gráficos que ilustran cada etapa del proceso de creación de software.
+                                Próximamente: videos, imágenes y gráficos que ilustran cada etapa del proceso de creación de software.
                             </p>
                         </div>
 

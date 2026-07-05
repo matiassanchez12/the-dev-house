@@ -7,7 +7,9 @@ use App\Models\Project;
 use App\Models\Tech;
 use App\Models\User;
 use App\Services\JoinRequestService;
+use App\Services\Exceptions\AlreadyParticipantException;
 use App\Services\Exceptions\DuplicateJoinRequestException;
+use App\Services\Exceptions\ProjectNotAcceptingRequestsException;
 use App\Services\Exceptions\SelfJoinException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -34,8 +36,9 @@ class JoinRequestServiceTest extends TestCase
         $techs = Tech::factory()->count(2)->create();
         $this->techIds = $techs->pluck('id')->toArray();
 
-        $this->project = Project::factory()->create([
+$this->project = Project::factory()->create([
             'user_id' => $this->projectOwner->id,
+            'status' => 'open',
         ]);
         $this->project->techs()->attach($this->techIds);
     }
@@ -72,6 +75,51 @@ class JoinRequestServiceTest extends TestCase
         $this->service->validateCanCreate($this->project, $this->user);
 
         $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function validate_can_create_passes_when_project_is_in_progress(): void
+    {
+        $this->project->update(['status' => 'in_progress']);
+        $this->project->refresh();
+
+        // Should not throw
+        $this->service->validateCanCreate($this->project, $this->user);
+
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function validate_can_create_throws_when_project_is_completed(): void
+    {
+        $this->project->update(['status' => 'completed']);
+        $this->project->refresh();
+
+        $this->expectException(ProjectNotAcceptingRequestsException::class);
+
+        $this->service->validateCanCreate($this->project, $this->user);
+    }
+
+    /** @test */
+    public function validate_can_create_throws_when_project_is_closed(): void
+    {
+        $this->project->update(['status' => 'closed']);
+        $this->project->refresh();
+
+        $this->expectException(ProjectNotAcceptingRequestsException::class);
+
+        $this->service->validateCanCreate($this->project, $this->user);
+    }
+
+    /** @test */
+    public function validate_can_create_throws_when_user_is_already_a_participant(): void
+    {
+        // Attach the user as a participant, bypassing the form.
+        $this->project->participants()->attach($this->user->id);
+
+        $this->expectException(AlreadyParticipantException::class);
+
+        $this->service->validateCanCreate($this->project, $this->user);
     }
 
     // === create tests ===

@@ -1,16 +1,6 @@
-import { Sparkles } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-
 export function HeroHeadline() {
     return (
         <div className="text-center max-w-3xl mx-auto">
-            <div className="mb-6">
-                <Badge variant="secondary" className="gap-1.5 text-sm">
-                    <Sparkles className="size-3.5" />
-                    Donde los desarrolladores construyen juntos
-                </Badge>
-            </div>
-
             <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight">
                 Encontrá devs con tu mismo tech stack
                 <br />

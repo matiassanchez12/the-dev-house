@@ -132,6 +132,47 @@ describe('ProjectJoinForm', () => {
         expect(container.innerHTML).toBe('');
     });
 
+    it('shows the not-accepting-requests state when the project no longer accepts join requests', () => {
+        render(
+            <ProjectJoinForm
+                projectId={1}
+                isOpen={false}
+                isCreator={false}
+                isParticipant={false}
+                user={{
+                    id: 1,
+                    name: 'Ada Lovelace',
+                    email: 'ada@example.com',
+                    created_at: '2026-06-07T00:00:00.000Z',
+                    updated_at: '2026-06-07T00:00:00.000Z',
+                }}
+            />,
+        );
+
+        expect(screen.getByText('Este proyecto no acepta nuevas solicitudes')).toBeInTheDocument();
+        expect(screen.queryByText('Enviar Solicitud')).not.toBeInTheDocument();
+    });
+
+    it('renders the join form when the project can accept requests', () => {
+        render(
+            <ProjectJoinForm
+                projectId={1}
+                isOpen
+                isCreator={false}
+                isParticipant={false}
+                user={{
+                    id: 1,
+                    name: 'Ada Lovelace',
+                    email: 'ada@example.com',
+                    created_at: '2026-06-07T00:00:00.000Z',
+                    updated_at: '2026-06-07T00:00:00.000Z',
+                }}
+            />,
+        );
+
+        expect(screen.getByText('Enviar Solicitud')).toBeInTheDocument();
+    });
+
     it('cancels the pending join request from the replacement state', async () => {
         const user = userEvent.setup();
 

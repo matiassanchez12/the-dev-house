@@ -35,12 +35,13 @@ export default function Landing({ auth, projects, project_count, collaboration_c
                 {/* Hero */}
                 <LandingHero auth={auth} techs={techs} />
 
-                {/* Stats */}
+                {/* Stats
                 <LandingStats
                     user_count={users.length}
                     project_count={project_count}
                     collaboration_count={collaboration_count}
                 />
+                */}
 
                 {/* Manifesto */}
                 <LandingManifesto />

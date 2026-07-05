@@ -352,4 +352,100 @@ class JoinRequestTest extends TestCase
             $this->project->participants()->where('user_id', $this->applicant->id)->count()
         );
     }
+
+    /**
+     * TEST 13: Se puede enviar solicitud a un proyecto en progreso
+     */
+    public function test_user_can_send_join_request_to_in_progress_project(): void
+    {
+        // Arrange
+        $this->project->update(['status' => 'in_progress']);
+        $requestData = [
+            'message' => 'Hola, me interesa sumarme mientras avanzan.',
+        ];
+
+        // Act
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), $requestData);
+
+        // Assert
+        $response->assertRedirect(route('projects.show', $this->project));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('join_requests', [
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    /**
+     * TEST 14: No se puede enviar solicitud a un proyecto completado (POST directo bloqueado)
+     */
+    public function test_user_cannot_send_join_request_to_completed_project(): void
+    {
+        // Arrange
+        $this->project->update(['status' => 'completed']);
+
+        // Act
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), [
+                'message' => 'Quiero unirme igual.',
+            ]);
+
+        // Assert
+        $response->assertSessionHasErrors('message');
+        $this->assertDatabaseMissing('join_requests', [
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+        ]);
+    }
+
+    /**
+     * TEST 15: No se puede enviar solicitud a un proyecto cerrado (POST directo bloqueado)
+     */
+    public function test_user_cannot_send_join_request_to_closed_project(): void
+    {
+        // Arrange
+        $this->project->update(['status' => 'closed']);
+
+        // Act
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), [
+                'message' => 'Quiero unirme igual.',
+            ]);
+
+        // Assert
+        $response->assertSessionHasErrors('message');
+        $this->assertDatabaseMissing('join_requests', [
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+        ]);
+    }
+
+    /**
+     * TEST 16: Un participante existente no puede crear otra solicitud (POST directo bloqueado)
+     *
+     * Closes the backend bypass: an attacker that is already a participant
+     * cannot POST /projects/{project}/join-requests directly to spawn a new
+     * pending request + notify the creator.
+     */
+    public function test_existing_participant_cannot_send_join_request_directly(): void
+    {
+        // Arrange: the applicant was already accepted as a participant
+        $this->project->participants()->attach($this->applicant->id);
+
+        // Act
+        $response = $this->actingAs($this->applicant)
+            ->post(route('join-requests.store', $this->project), [
+                'message' => 'Intento enviar otra solicitud igual.',
+            ]);
+
+        // Assert
+        $response->assertSessionHasErrors('message');
+        $this->assertDatabaseMissing('join_requests', [
+            'project_id' => $this->project->id,
+            'user_id' => $this->applicant->id,
+        ]);
+    }
 }
