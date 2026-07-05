@@ -1,5 +1,4 @@
-import InputError from '@/components/input-error';
-import InputLabel from '@/components/input-label';
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Transition } from '@headlessui/react';
@@ -62,12 +61,7 @@ export default function UpdatePasswordForm({ className = '' }) {
             </header>
 
             <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value="Contraseña Actual"
-                    />
-
+                <Field id="current_password" label="Contraseña Actual" error={errors.current_password}>
                     <Input
                         id="current_password"
                         ref={currentPasswordInput}
@@ -79,16 +73,9 @@ export default function UpdatePasswordForm({ className = '' }) {
                         className="mt-1 block w-full"
                         autoComplete="current-password"
                     />
+                </Field>
 
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="Nueva Contraseña" />
-
+                <Field id="password" label="Nueva Contraseña" error={errors.password}>
                     <Input
                         id="password"
                         ref={passwordInput}
@@ -98,16 +85,9 @@ export default function UpdatePasswordForm({ className = '' }) {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
+                </Field>
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirmar Contraseña"
-                    />
-
+                <Field id="password_confirmation" label="Confirmar Contraseña" error={errors.password_confirmation}>
                     <Input
                         id="password_confirmation"
                         value={data.password_confirmation}
@@ -118,12 +98,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
+                </Field>
 
                 <div className="flex items-center gap-4">
                     <Button type="submit" disabled={processing}>Guardar</Button>

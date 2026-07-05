@@ -330,12 +330,13 @@ redis-server
 
 ## 🤝 Contribuir
 
-1. Leer [DOCS.md](./DOCS.md) completo
-2. Crear branch desde `main`
-3. Escribir tests PRIMERO (TDD)
-4. Implementar feature
-5. Asegurarse que todos los tests pasan
-6. Crear PR con descripción clara
+1. Leer [DOCS.md](./DOCS.md) completo.
+2. Crear una rama `feat/*` o `fix/*` desde `development`.
+3. Escribir tests PRIMERO (TDD).
+4. Implementar la feature o fix.
+5. Asegurarse de que todos los tests pasan.
+6. Abrir el Pull Request hacia `development`.
+7. `master` es la rama de promoción/release alimentada desde `development`.
 
 ---
 

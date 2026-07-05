@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { FormError } from '@/components/ui/form-error';
 import { toast } from 'sonner';
 import type { JoinRequest, User } from '@/types';
-import InputError from '@/components/input-error';
 
 interface ProjectJoinFormProps {
     projectId: number;
@@ -157,9 +157,7 @@ export function ProjectJoinForm({ projectId, isOpen, isCreator, isParticipant, u
                             rows={4}
                             required
                         />
-                        {errors.message && (
-                            <InputError className="mt-2" message={errors.message} />
-                        )}
+                        <FormError message={errors.message} className="mt-2" />
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>
                         <Send className="size-4" data-icon="inline-start" />

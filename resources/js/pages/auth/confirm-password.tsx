@@ -1,7 +1,6 @@
-import InputLabel from '@/components/input-label';
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { useForm } from '@inertiajs/react';
@@ -29,22 +28,18 @@ export default function ConfirmPassword() {
             </div>
 
             <form onSubmit={submit}>
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                <Field id="password" label="Password" error={errors.password} className="mt-4">
                     <Input
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
-                        isFocused
+                        autoFocus
                         placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
-                    <FormError message={errors.password} className="mt-2" />
-                </div>
+                </Field>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Button type="submit" className="ms-4" disabled={processing}>
