@@ -1,7 +1,6 @@
-import InputLabel from '@/components/input-label';
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormError } from '@/components/ui/form-error';
 import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { Link, useForm } from '@inertiajs/react';
@@ -27,27 +26,21 @@ export default function Register() {
             <Seo title="Crear cuenta" description="Registrate en The Dev House y empezá a colaborar en proyectos, conectá con desarrolladores y construí software en comunidad." />
 
             <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
+                <Field id="name" label="Name" error={errors.name}>
                     <Input
                         id="name"
                         name="name"
                         value={data.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
-                        isFocused
+                        autoFocus
                         placeholder="Tu nombre"
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
+                </Field>
 
-                    <FormError message={errors.name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
+                <Field id="email" label="Email" error={errors.email} className="mt-4">
                     <Input
                         id="email"
                         type="email"
@@ -59,13 +52,9 @@ export default function Register() {
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
+                </Field>
 
-                    <FormError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                <Field id="password" label="Password" error={errors.password} className="mt-4">
                     <Input
                         id="password"
                         type="password"
@@ -77,16 +66,9 @@ export default function Register() {
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
+                </Field>
 
-                    <FormError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
+                <Field id="password_confirmation" label="Confirm Password" error={errors.password_confirmation} className="mt-4">
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -100,12 +82,7 @@ export default function Register() {
                         }
                         required
                     />
-
-                    <FormError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
+                </Field>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Link

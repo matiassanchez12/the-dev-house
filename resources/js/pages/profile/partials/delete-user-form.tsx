@@ -1,6 +1,5 @@
+import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
-import InputError from '@/components/input-error';
-import InputLabel from '@/components/input-label';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/react';
@@ -81,30 +80,21 @@ export default function DeleteUserForm({ className = '' }) {
                         </p>
 
                         <div className="mt-6">
-                            <InputLabel
-                                htmlFor="password"
-                                value="Contraseña"
-                                className="sr-only"
-                            />
-
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                ref={passwordInput}
-                                value={data.password}
-                                onChange={(e) =>
-                                    setData('password', e.target.value)
-                                }
-                                className="mt-1 block w-3/4"
-                                isFocused
-                                placeholder="Contraseña"
-                            />
-
-                            <InputError
-                                message={errors.password}
-                                className="mt-2"
-                            />
+                            <Field id="password" label="Contraseña" labelClassName="sr-only" error={errors.password}>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    ref={passwordInput}
+                                    value={data.password}
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
+                                    className="mt-1 block w-3/4"
+                                    autoFocus
+                                    placeholder="Contraseña"
+                                />
+                            </Field>
                         </div>
 
                         <div className="mt-6 flex justify-end">
