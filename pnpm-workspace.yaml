@@ -1,6 +1,6 @@
 allowBuilds:
   esbuild: set this to true or false
   msgpackr-extract: set this to true or false
-  msw: set this to true or false
+  msw: true
 minimumReleaseAgeExclude:
   - shadcn@4.10.0

@@ -12,6 +12,7 @@
 /.vscode
 /.zed
 /.agents
+/.pnpm-store
 /.claude
 /auth.json
 /node_modules
