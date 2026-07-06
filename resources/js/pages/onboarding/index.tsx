@@ -1,6 +1,7 @@
 import Seo from '@/components/seo';
 import { router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import OnboardingLayout from '@/layouts/onboarding';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +11,18 @@ import { FormError } from '@/components/ui/form-error';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { User, Tech, Platform, SocialLink } from '@/types';
 import { avatarUrl } from '@/components/projects/project-utils';
+
+const MAX_SELECTED_TECHS = 3;
 
 interface OnboardingProps {
     auth: {
@@ -63,6 +74,7 @@ export default function OnboardingIndex() {
 
     const [currentStep, setCurrentStep] = useState(1);
     const [processing, setProcessing] = useState(false);
+    const [confirmingSkip, setConfirmingSkip] = useState(false);
 
     // Step 1: Tech selection
     const [selectedTechs, setSelectedTechs] = useState<SelectedTech[]>(() => {
@@ -79,6 +91,10 @@ export default function OnboardingIndex() {
             const exists = prev.find((t) => t.id === tech.id);
             if (exists) {
                 return prev.filter((t) => t.id !== tech.id);
+            }
+            if (prev.length >= MAX_SELECTED_TECHS) {
+                toast.error(`Podés elegir hasta ${MAX_SELECTED_TECHS} tecnologías.`);
+                return prev;
             }
             return [...prev, { id: tech.id, name: tech.name, slug: tech.slug, proficiency: 3 }];
         });
@@ -148,21 +164,40 @@ export default function OnboardingIndex() {
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+    const [loadRecommendationsError, setLoadRecommendationsError] = useState(false);
+    const [recommendationsAttempt, setRecommendationsAttempt] = useState(0);
 
     useEffect(() => {
-        if (currentStep === 5 && recommendations.length === 0) {
-            setLoadingRecommendations(true);
-            fetch('/onboarding/recommendations')
-                .then((res) => res.json())
-                .then((data) => {
-                    setRecommendations(data.projects || []);
-                    setLoadingRecommendations(false);
-                })
-                .catch(() => {
-                    setLoadingRecommendations(false);
-                });
+        if (currentStep !== 5) {
+            return;
         }
-    }, [currentStep]);
+        if (recommendations.length > 0 || loadRecommendationsError) {
+            return;
+        }
+        setLoadingRecommendations(true);
+        setLoadRecommendationsError(false);
+        fetch('/onboarding/recommendations')
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                setRecommendations(data.projects || []);
+                setLoadingRecommendations(false);
+            })
+            .catch(() => {
+                setLoadingRecommendations(false);
+                setLoadRecommendationsError(true);
+            });
+    }, [currentStep, recommendationsAttempt]);
+
+    const retryRecommendations = () => {
+        setLoadRecommendationsError(false);
+        setRecommendations([]);
+        setRecommendationsAttempt((prev) => prev + 1);
+    };
 
     const toggleProject = (projectId: number) => {
         setSelectedProjects((prev) =>
@@ -183,6 +218,7 @@ export default function OnboardingIndex() {
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(2),
+                    onError: () => toast.error('No pudimos guardar tu stack. Revisá tu conexión e intentá de nuevo.'),
                     onFinish: () => setProcessing(false),
                 }
             );
@@ -194,6 +230,7 @@ export default function OnboardingIndex() {
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(3),
+                    onError: () => toast.error('No pudimos guardar tu objetivo. Revisá tu conexión e intentá de nuevo.'),
                     onFinish: () => setProcessing(false),
                 }
             );
@@ -214,6 +251,7 @@ export default function OnboardingIndex() {
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(4),
+                    onError: () => toast.error('No pudimos guardar tus links. Revisá tu conexión e intentá de nuevo.'),
                     onFinish: () => setProcessing(false),
                 }
             );
@@ -230,6 +268,7 @@ export default function OnboardingIndex() {
                 forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => setCurrentStep(5),
+                onError: () => toast.error('No pudimos subir tu foto. Revisá tu conexión e intentá de nuevo.'),
                 onFinish: () => setProcessing(false),
             });
         } else if (currentStep === 5) {
@@ -239,6 +278,7 @@ export default function OnboardingIndex() {
                 { join_requests: selectedProjects },
                 {
                     preserveScroll: true,
+                    onError: () => toast.error('No pudimos guardar tu selección. Revisá tu conexión e intentá de nuevo.'),
                     onFinish: () => setProcessing(false),
                 }
             );
@@ -252,13 +292,28 @@ export default function OnboardingIndex() {
         }
     };
 
-    const handleSkip = () => {
+    const requestSkip = () => {
+        if (processing) return;
+        setConfirmingSkip(true);
+    };
+
+    const confirmSkip = () => {
         if (processing) return;
         setProcessing(true);
+        setConfirmingSkip(false);
         router.post('/onboarding/skip', {}, {
             preserveScroll: true,
+            onError: () => {
+                setProcessing(false);
+                toast.error('No pudimos finalizar el onboarding. Revisá tu conexión e intentá de nuevo.');
+            },
             onFinish: () => setProcessing(false),
         });
+    };
+
+    const cancelSkip = () => {
+        if (processing) return;
+        setConfirmingSkip(false);
     };
 
     const stepErrors = (prefix: string) =>
@@ -273,23 +328,23 @@ export default function OnboardingIndex() {
 
     return (
         <>
-            <Seo title="Welcome to The Dev House" description="Completá tu perfil en The Dev House: seleccioná tus tecnologías, escribí tu bio, agregá redes sociales y descubrí proyectos recomendados." />
-            <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps}>
+            <Seo title="Configurá tu perfil inicial" description="Completá lo mínimo para que otros developers entiendan tu stack, tu nivel y qué tipo de proyectos querés construir." />
+            <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps} onSkipRequest={requestSkip}>
                 <Card>
                     <CardHeader>
                         <CardTitle>
-                            {currentStep === 1 && '¿En qué tecnologías trabajas?'}
-                            {currentStep === 2 && 'Cuéntanos sobre ti'}
-                            {currentStep === 3 && 'Tus redes sociales'}
-                            {currentStep === 4 && '¿Cómo te ves?'}
-                            {currentStep === 5 && 'Proyectos recomendados'}
+                            {currentStep === 1 && 'Elegí tu stack principal'}
+                            {currentStep === 2 && 'Contá qué querés construir'}
+                            {currentStep === 3 && 'Sumá tus links profesionales'}
+                            {currentStep === 4 && 'Agregá una foto si querés'}
+                            {currentStep === 5 && 'Elegí proyectos para explorar'}
                         </CardTitle>
                         <CardDescription>
-                            {currentStep === 1 && 'Seleccioná tus tecnologías y nivel de experiencia'}
-                            {currentStep === 2 && 'Escribí una breve bio para que otros te conozcan'}
-                            {currentStep === 3 && 'Compartí tus perfiles profesionales (opcional)'}
-                            {currentStep === 4 && 'Subí una foto de perfil (opcional)'}
-                            {currentStep === 5 && 'Encontrá proyectos que coincidan con tus skills'}
+                            {currentStep === 1 && `Este es el único paso obligatorio: elegí hasta ${MAX_SELECTED_TECHS} tecnologías que mejor te representen.`}
+                            {currentStep === 2 && 'Opcional: una frase clara alcanza para que otros entiendan tu objetivo.'}
+                            {currentStep === 3 && 'Opcional: GitHub o LinkedIn ayudan a validar tu trabajo sin pedirte más datos.'}
+                            {currentStep === 4 && 'Opcional: podés dejarlo para después desde tu perfil.'}
+                            {currentStep === 5 && 'Opcional: marcá proyectos que te interesen o finalizá ahora.'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -298,9 +353,14 @@ export default function OnboardingIndex() {
                             <div className="space-y-6">
                                 {techsError && <FormError id={techsErrorId} message={techsError} />}
 
+                                <p className="text-sm text-muted-foreground">
+                                    {selectedTechs.length} de {MAX_SELECTED_TECHS} elegidas
+                                </p>
+
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {allTechs.map((tech) => {
                                         const isSelected = selectedTechs.some((t) => t.id === tech.id);
+                                        const atCap = !isSelected && selectedTechs.length >= MAX_SELECTED_TECHS;
                                         return (
                                             <button
                                                 key={tech.id}
@@ -309,10 +369,13 @@ export default function OnboardingIndex() {
                                                 aria-pressed={isSelected}
                                                 aria-invalid={Boolean(techsError)}
                                                 aria-describedby={techsError ? techsErrorId : undefined}
+                                                disabled={atCap}
                                                 className={`p-3 rounded-lg border text-left transition-colors ${
                                                     isSelected
                                                         ? 'border-primary bg-primary/10'
-                                                        : 'border-border hover:border-primary/50'
+                                                        : atCap
+                                                          ? 'border-border opacity-50 cursor-not-allowed'
+                                                          : 'border-border hover:border-primary/50'
                                                 }`}
                                             >
                                                 <span className="text-sm font-medium text-foreground">
@@ -326,8 +389,11 @@ export default function OnboardingIndex() {
                                 {selectedTechs.length > 0 && (
                                     <div className="space-y-3">
                                         <label className="text-sm font-medium text-foreground">
-                                            Nivel de experiencia
+                                            Nivel actual en cada tecnología
                                         </label>
+                                        <p className="text-sm text-muted-foreground">
+                                            Usamos este dato para mostrarte proyectos acordes a tu momento, no para excluirte.
+                                        </p>
                                         {selectedTechs.map((tech) => (
                                             <div
                                                 key={tech.id}
@@ -373,16 +439,19 @@ export default function OnboardingIndex() {
                         {/* Step 2: Bio */}
                         {currentStep === 2 && (
                             <div className="space-y-3">
-                                <Field id="bio" label="Biografía" labelClassName="sr-only" error={errors.bio}>
+                                <Field id="bio" label="Objetivo o bio breve" error={errors.bio}>
                                     <Textarea
                                         value={bio}
                                         onChange={(e) => setBio(e.target.value)}
                                         maxLength={1000}
-                                        placeholder="Cuéntanos sobre vos, tu experiencia y qué te apasiona..."
+                                        placeholder="Ej: Quiero practicar React y Laravel construyendo productos reales para mi portfolio."
                                         rows={5}
                                         className="w-full"
                                     />
                                 </Field>
+                                <p className="text-sm text-muted-foreground">
+                                    Si no sabés qué poner ahora, podés avanzar y editarlo después.
+                                </p>
                                 <div className="text-right text-sm text-muted-foreground">
                                     {bio.length}/1000
                                 </div>
@@ -394,6 +463,9 @@ export default function OnboardingIndex() {
                             <div className="space-y-4">
                                 {/* General social links errors */}
                                 {errors.links && <FormError id="links-error" message={errors.links} className="mb-2" />}
+                                <p className="text-sm text-muted-foreground">
+                                    Agregá solo los perfiles que ya tengas listos. GitHub o LinkedIn suelen ser suficientes para empezar.
+                                </p>
                                 {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => {
                                     const platformIndex = Object.keys(PLATFORM_LABELS).indexOf(platform);
                                     const urlError = errors[`links.${platformIndex}.url`];
@@ -497,7 +569,7 @@ export default function OnboardingIndex() {
                                             />
                                         </Field>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            Máximo 2MB
+                                            Máximo 2MB. Este paso es opcional.
                                         </p>
                                     </div>
                                 </div>
@@ -512,9 +584,18 @@ export default function OnboardingIndex() {
                                     <div className="text-center py-8 text-muted-foreground">
                                         Cargando proyectos recomendados...
                                     </div>
+                                ) : loadRecommendationsError ? (
+                                    <div className="text-center py-8 space-y-3">
+                                        <p className="text-muted-foreground">
+                                            No pudimos cargar las recomendaciones. Revisá tu conexión.
+                                        </p>
+                                        <Button type="button" variant="outline" onClick={retryRecommendations}>
+                                            Reintentar
+                                        </Button>
+                                    </div>
                                 ) : recommendations.length === 0 ? (
                                     <div className="text-center py-8 text-muted-foreground">
-                                        No hay proyectos recomendados por ahora
+                                        No hay proyectos recomendados por ahora. Podés finalizar y explorar más tarde.
                                     </div>
                                 ) : (
                                     recommendations.map((project) => (
@@ -575,21 +656,35 @@ export default function OnboardingIndex() {
                                 Atrás
                             </Button>
 
-                            <div className="flex items-center gap-2">
-                                <Button variant="ghost" onClick={handleSkip} disabled={processing}>
-                                    Saltar
-                                </Button>
-                                <Button onClick={handleNext} disabled={processing}>
-                                    {processing
-                                        ? 'Guardando...'
-                                        : currentStep === 5
-                                          ? 'Finalizar'
-                                          : 'Siguiente'}
-                                </Button>
-                            </div>
+                            <Button onClick={handleNext} disabled={processing}>
+                                {processing
+                                    ? 'Guardando...'
+                                    : currentStep === 5
+                                      ? 'Finalizar'
+                                      : 'Siguiente'}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
+
+                <Dialog open={confirmingSkip} onOpenChange={setConfirmingSkip}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>¿Finalizar el onboarding ahora?</DialogTitle>
+                            <DialogDescription>
+                                Vas a salir del wizard y tu perfil quedará marcado como completo. Si más adelante querés volver, tendrás que pedirle a un administrador que lo reinicie.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button type="button" variant="secondary" onClick={cancelSkip} disabled={processing}>
+                                Cancelar
+                            </Button>
+                            <Button type="button" variant="destructive" onClick={confirmSkip} disabled={processing}>
+                                Sí, finalizar
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </OnboardingLayout>
         </>
     );
