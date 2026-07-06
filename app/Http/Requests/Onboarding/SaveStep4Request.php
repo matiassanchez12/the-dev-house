@@ -45,4 +45,15 @@ class SaveStep4Request extends FormRequest
             'join_requests.*.integer' => 'Cada ID de proyecto debe ser un número entero.',
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'join_requests' => 'solicitudes a proyectos',
+            'join_requests.*' => 'proyecto',
+        ];
+    }
 }

@@ -43,4 +43,14 @@ class SaveStep3Request extends FormRequest
             'avatar.max' => 'El avatar no puede exceder 2MB.',
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'avatar' => 'avatar',
+        ];
+    }
 }

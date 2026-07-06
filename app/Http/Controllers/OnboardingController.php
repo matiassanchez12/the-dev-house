@@ -54,7 +54,7 @@ class OnboardingController extends Controller
 
     public function saveStepSocialLinks(SaveStepSocialLinksRequest $request)
     {
-        $this->onboardingService->saveSocialLinks(Auth::user(), $request->validated()['links']);
+        $this->onboardingService->saveSocialLinks(Auth::user(), $request->validated()['links'] ?? []);
 
         return redirect()->route('onboarding.index');
     }

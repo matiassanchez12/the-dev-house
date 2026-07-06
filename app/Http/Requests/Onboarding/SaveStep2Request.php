@@ -43,4 +43,14 @@ class SaveStep2Request extends FormRequest
             'bio.string' => 'La bio debe ser un texto.',
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'bio' => 'objetivo o bio breve',
+        ];
+    }
 }
