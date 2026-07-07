@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Profile\UpdateCompleteProfileRequest;
 use App\Http\Requests\Profile\UpdateSocialLinksRequest;
+use App\Http\Requests\Profile\UpdatePrivacyRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\SocialLink;
 use App\Services\ProfileService;
+use App\Services\UserPrivacyService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +20,8 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     public function __construct(
-        private ProfileService $profileService
+        private ProfileService $profileService,
+        private UserPrivacyService $userPrivacyService,
     ) {}
 
     /**
@@ -181,5 +184,20 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Update the user's privacy preferences and contact phone.
+     *
+     * Phone is editable ONLY from this endpoint (issue #142) — never on signup
+     * or via the public profile update path. Privacy defaults are privacy-first:
+     * show_email=false, show_phone=false. Discovery defaults to true.
+     */
+    public function updatePrivacy(UpdatePrivacyRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $this->userPrivacyService->update($user, $request->validated());
+
+        return Redirect::route('profile.edit')->with('success', 'Preferencias de privacidad actualizadas!');
     }
 }

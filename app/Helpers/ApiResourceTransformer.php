@@ -104,6 +104,14 @@ class ApiResourceTransformer
 
     /**
      * Transform a user model to array with safe fields and disk-aware avatar URLs.
+     *
+     * Privacy rules (issue #142):
+     * - `email` is included ONLY when the user has `show_email = true` on their
+     *   privacy settings. Phone is NEVER included in the public transformer
+     *   output — even when `show_phone = true` — because phone is too sensitive
+     *   for the public profile listing. It is exposed only via the dedicated
+     *   privacy/edit endpoints for the owner.
+     * - Callers should eager-load `privacySetting` to avoid N+1.
      */
     public static function user(Model|array $user): array
     {
@@ -137,6 +145,21 @@ class ApiResourceTransformer
 
         if (isset($data['pivot'])) {
             $safe['pivot'] = $data['pivot'];
+        }
+
+        // Opt-in email exposure for users with show_email = true.
+        // Resolve the privacy setting from the Model if available; arrays
+        // (e.g. eager-loaded pivot) fall back to "no email" which is the
+        // privacy-first default.
+        $showEmail = false;
+        if ($user instanceof Model) {
+            $showEmail = (bool) ($user->privacySetting?->show_email ?? false);
+        } elseif (isset($data['privacySetting']) && is_array($data['privacySetting'])) {
+            $showEmail = (bool) ($data['privacySetting']['show_email'] ?? false);
+        }
+
+        if ($showEmail && ! empty($data['email'])) {
+            $safe['email'] = $data['email'];
         }
 
         return $safe;

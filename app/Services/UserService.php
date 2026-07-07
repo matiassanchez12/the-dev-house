@@ -32,7 +32,14 @@ class UserService
             ->withCount(['participatingProjects as joined_projects_count'])
             ->with(['techs' => function ($q) {
                 $q->select('techs.id', 'name', 'slug');
-            }]);
+            }])
+            // Privacy (issue #142): users who opted out of discovery are excluded
+            // from the directory. Users without a privacy settings row are
+            // included by default (back-compat) — the column default is true.
+            ->where(function ($q) {
+                $q->whereHas('privacySetting', fn ($sub) => $sub->where('is_discoverable', true))
+                  ->orWhereDoesntHave('privacySetting');
+            });
 
         if (! empty($filters['q'])) {
             $query->where('name', 'LIKE', '%' . $filters['q'] . '%');
@@ -63,6 +70,7 @@ class UserService
             'participatingProjects.creator.techs',
             'participatingProjects.techs',
             'participatingProjects.participants',
+            'privacySetting',
             'techs',
             'socialLinks',
         ]);
@@ -129,7 +137,9 @@ class UserService
             'name' => $user->name,
             'bio' => $user->bio,
             'avatar' => $user->avatar,
+            'email' => $user->email,
             'created_at' => $user->created_at?->toISOString(),
+            'privacySetting' => $user->privacySetting?->toArray(),
             'socialLinks' => $user->socialLinks->map(fn ($link) => [
                 'id' => $link->id,
                 'platform' => $link->platform,
