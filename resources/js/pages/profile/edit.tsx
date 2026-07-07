@@ -4,8 +4,9 @@ import DeleteUserForm from './partials/delete-user-form';
 import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
 import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
+import UpdatePrivacyForm from './partials/update-privacy-form';
 import SocialLinksEditForm from './partials/social-links-edit-form';
-import { SocialLink } from '@/types';
+import { PrivacySetting, SocialLink } from '@/types';
 
 import { usePage } from '@inertiajs/react';
 
@@ -16,10 +17,12 @@ interface Props {
     email: string;
     emailVerifiedAt: string | null;
     userTechs: unknown[];
+    phone: string | null;
+    privacySetting: PrivacySetting;
     socialLinks?: SocialLink[];
 }
 
-export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, socialLinks }: Props) {
+export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, phone, privacySetting, socialLinks }: Props) {
     const { techs } = usePage().props as { techs: unknown[] };
     return (
         <AppLayout
@@ -51,6 +54,15 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
                             userTechs={userTechs}
                             allTechs={techs}
                             className="max-w-3xl"
+                        />
+                    </div>
+
+                    {/* Privacidad y contacto */}
+                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
+                        <UpdatePrivacyForm
+                            phone={phone}
+                            privacySetting={privacySetting}
+                            className="max-w-xl"
                         />
                     </div>
 

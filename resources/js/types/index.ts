@@ -105,6 +105,17 @@ export interface SocialLink {
     _destroy?: boolean;
 }
 
+export interface PrivacySetting {
+    id: number;
+    user_id: number;
+    show_email: boolean;
+    show_phone: boolean;
+    is_discoverable: boolean;
+    show_activity: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface ProjectParticipant {
     id: number;
     project_id: number;
