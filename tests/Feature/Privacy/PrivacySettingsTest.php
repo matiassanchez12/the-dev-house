@@ -73,7 +73,18 @@ class PrivacySettingsTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('profile.privacy.update'), [
-            'phone' => str_repeat('1', 600),
+            'phone' => str_repeat('1', 31),
+        ]);
+
+        $response->assertSessionHasErrors('phone');
+    }
+
+    public function test_phone_validation_rejects_invalid_format(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('profile.privacy.update'), [
+            'phone' => 'abc@@@',
         ]);
 
         $response->assertSessionHasErrors('phone');
@@ -106,5 +117,18 @@ class PrivacySettingsTest extends TestCase
         $this->assertNotNull($aliceSettings);
         $this->assertTrue($aliceSettings->show_email);
         $this->assertNull($bobSettings);
+    }
+
+    public function test_profile_edit_receives_phone_and_privacy_setting(): void
+    {
+        $user = User::factory()->create(['phone' => '+541112345678']);
+        $user->privacySetting()->create(['show_email' => true]);
+
+        $response = $this->actingAs($user)->get(route('profile.edit'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->where('phone', '+541112345678')
+            ->where('privacySetting.show_email', true)
+        );
     }
 }

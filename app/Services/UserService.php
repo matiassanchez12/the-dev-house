@@ -4,18 +4,26 @@ namespace App\Services;
 
 use App\Models\Tech;
 use App\Models\User;
+use App\Models\UserPrivacySetting;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserService
 {
     /**
-     * Get all users with their associated techs.
-     * This method retrieves all users from the database and eager loads their related techs to minimize database queries when accessing user tech information.
-     * @return \Illuminate\Database\Eloquent\Collection Returns a collection of User models, each with their associated techs loaded.
+     * Get users suitable for public landing-page display.
+     *
+     * Users who opted out of discovery must not appear in public listings.
      */
-    public function getAllUsers(): \Illuminate\Database\Eloquent\Collection
+    public function getAllUsers(): Collection
     {
-        return User::with('techs')->get();
+        return User::query()
+            ->with('techs')
+            ->where(function ($q) {
+                $q->whereHas('privacySetting', fn ($sub) => $sub->where('is_discoverable', true))
+                    ->orWhereDoesntHave('privacySetting');
+            })
+            ->get();
     }
 
     /**
@@ -75,6 +83,11 @@ class UserService
             'socialLinks',
         ]);
 
+        $privacy = $user->privacySetting;
+        $showEmail = (bool) ($privacy?->show_email ?? UserPrivacySetting::DEFAULTS['show_email']);
+        $showPhone = (bool) ($privacy?->show_phone ?? UserPrivacySetting::DEFAULTS['show_phone']);
+        $showActivity = (bool) ($privacy?->show_activity ?? UserPrivacySetting::DEFAULTS['show_activity']);
+
         $createdProjects = $user->createdProjects->map(function ($project) {
             return [
                 'id' => $project->id,
@@ -132,12 +145,11 @@ class UserService
                 'proficiency' => $tech->pivot->proficiency,
             ])->toArray();
 
-        return [
+        $profile = [
             'id' => $user->id,
             'name' => $user->name,
             'bio' => $user->bio,
             'avatar' => $user->avatar,
-            'email' => $user->email,
             'created_at' => $user->created_at?->toISOString(),
             'privacySetting' => $user->privacySetting?->toArray(),
             'socialLinks' => $user->socialLinks->map(fn ($link) => [
@@ -145,9 +157,19 @@ class UserService
                 'platform' => $link->platform,
                 'url' => $link->url,
             ])->toArray(),
-            'createdProjects' => $createdProjects,
-            'participatingProjects' => $participatingProjects,
+            'createdProjects' => $showActivity ? $createdProjects : [],
+            'participatingProjects' => $showActivity ? $participatingProjects : [],
             'techs' => $techs,
         ];
+
+        if ($showEmail) {
+            $profile['email'] = $user->email;
+        }
+
+        if ($showPhone && $user->phone !== null) {
+            $profile['phone'] = $user->phone;
+        }
+
+        return $profile;
     }
 }

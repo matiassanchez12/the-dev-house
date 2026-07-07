@@ -43,6 +43,19 @@ class PiiExposureExtensionTest extends TestCase
         );
     }
 
+    public function test_phone_of_other_user_is_visible_only_on_public_profile_when_show_phone_is_true(): void
+    {
+        $owner = User::factory()->create(['phone' => '+541112345678']);
+        $owner->privacySetting()->create(['show_phone' => true]);
+
+        $response = $this->get("/users/{$owner->slug}");
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('users/show')
+            ->where('user.phone', '+541112345678')
+        );
+    }
+
     public function test_phone_of_other_user_is_never_in_default_transformer_output(): void
     {
         $owner = User::factory()->create(['phone' => '+541112345678']);
@@ -51,6 +64,23 @@ class PiiExposureExtensionTest extends TestCase
         $transformed = ApiResourceTransformer::user($owner->fresh());
 
         $this->assertArrayNotHasKey('phone', $transformed);
+    }
+
+    public function test_public_profile_hides_activity_when_show_activity_is_false(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $project = \App\Models\Project::factory()->create(['user_id' => $owner->id]);
+        $project->participants()->attach($otherUser->id, ['role' => 'dev', 'joined_at' => now()]);
+        $owner->privacySetting()->create(['show_activity' => false]);
+
+        $response = $this->get("/users/{$owner->slug}");
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('users/show')
+            ->where('user.createdProjects', [])
+            ->where('user.participatingProjects', [])
+        );
     }
 
     public function test_users_with_is_discoverable_false_are_excluded_from_directory(): void
@@ -93,6 +123,19 @@ class PiiExposureExtensionTest extends TestCase
 
         $response->assertSessionHasNoErrors();
         $this->assertSame('+541199999999', $user->fresh()->phone);
+    }
+
+    public function test_project_context_does_not_expose_creator_email_even_when_user_opted_in(): void
+    {
+        $owner = User::factory()->create(['email' => 'owner@example.com']);
+        $owner->privacySetting()->create(['show_email' => true]);
+        $project = \App\Models\Project::factory()->create(['user_id' => $owner->id]);
+
+        $response = $this->get(route('projects.show', $project));
+
+        $response->assertInertia(fn ($page) => $page
+            ->missing('project.creator.email')
+        );
     }
 
     public function test_transformer_does_not_leak_email_in_user_payload_when_show_email_false(): void

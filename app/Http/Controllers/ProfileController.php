@@ -39,6 +39,8 @@ class ProfileController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'emailVerifiedAt' => $user->email_verified_at,
+            'phone' => $user->phone,
+            'privacySetting' => $this->userPrivacyService->getFor($user),
             'userTechs' => $userTechs,
             'socialLinks' => $socialLinks,
         ]);

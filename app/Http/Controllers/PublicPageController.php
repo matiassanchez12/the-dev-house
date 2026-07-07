@@ -9,9 +9,7 @@ class PublicPageController extends Controller
 {
     private function renderPage(string $component, array $props = [])
     {
-        return Inertia::render($component, array_merge([
-            'auth' => ['user' => auth()->user()],
-        ], $props));
+        return Inertia::render($component, $props);
     }
 
     public function howStart(Request $request)

@@ -43,7 +43,7 @@ class UserController extends Controller
         $userData = $this->userService->getPublicProfile($user);
 
         return Inertia::render('users/show', [
-            'user' => ApiResourceTransformer::user($userData),
+            'user' => ApiResourceTransformer::publicProfile($userData),
         ]);
     }
 }

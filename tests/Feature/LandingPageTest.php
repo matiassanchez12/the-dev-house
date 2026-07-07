@@ -139,4 +139,19 @@ class LandingPageTest extends TestCase
             ->has('techs', 0)
         );
     }
+
+    public function test_landing_page_excludes_users_who_opted_out_of_discovery(): void
+    {
+        User::factory()->create(['name' => 'Visible User']);
+        $hiddenUser = User::factory()->create(['name' => 'Hidden User']);
+        $hiddenUser->privacySetting()->create(['is_discoverable' => false]);
+
+        $response = $this->get('/');
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('landing')
+            ->has('users', 1)
+            ->where('users.0.name', 'Visible User')
+        );
+    }
 }
