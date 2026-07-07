@@ -8,7 +8,7 @@ export function HeroHeadline() {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-                The Dev House conecta estudiantes y developers junior para practicar en equipo,
+                The Dev House conecta estudiantes y profesionales para practicar en equipo,
                 encontrar colaboradores y mostrar trabajo concreto desde el primer proyecto.
             </p>
         </div>

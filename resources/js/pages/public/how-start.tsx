@@ -75,34 +75,6 @@ export default function HowStart({ auth }: Props) {
                                 heroInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
                             )}
                         >
-                            {/* Author */}
-                            <div className="inline-flex items-center gap-5 mb-10 px-5 py-3 rounded-full border border-border/40 bg-background/50 backdrop-blur-sm">
-                                <div className="relative">
-                                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md" />
-                                    <img
-                                        src="https://avatars.githubusercontent.com/u/52495199?v=4"
-                                        alt="Matias Sanchez"
-                                        className="relative size-14 rounded-full ring-2 ring-accent/30"
-                                    />
-                                </div>
-                                <div className="text-left">
-                                    <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground/60">
-                                        Publicado por
-                                    </span>
-                                    <a
-                                        href="https://the-dev-house.up.railway.app/users/matias-sanchez"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block font-display font-semibold text-foreground hover:text-accent-foreground transition-colors leading-tight"
-                                    >
-                                        Matias Sanchez
-                                    </a>
-                                    <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
-                                        Founder de The Dev House
-                                    </p>
-                                </div>
-                            </div>
-
                             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
                                 Cómo empezar tu primer{' '}
                                 <span className="text-accent-foreground bg-accent px-2">SaaS</span>{' '}
@@ -172,10 +144,40 @@ export default function HowStart({ auth }: Props) {
                             })}
                         </div>
                     </div>
-                </section>
+                    {/* Author */}
+                    <div className="container mx-auto flex justify-center pt-12"
+                    >
+                        <div className="inline-flex justify-center items-center gap-5 pb-4 px-8 py-2 rounded-full border border-border/40 bg-background/50 backdrop-blur-sm">
+                            <div className="relative">
+                                <div className="absolute inset-0 rounded-full bg-accent/20 blur-md" />
+                                <img
+                                    src="https://avatars.githubusercontent.com/u/52495199?v=4"
+                                    alt="Matias Sanchez"
+                                    className="relative size-14 rounded-full ring-2 ring-accent/30"
+                                />
+                            </div>
+                            <div className="text-left">
+                                <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground/60">
+                                    Publicado por
+                                </span>
+                                <a
+                                    href="https://the-dev-house.up.railway.app/users/matias-sanchez"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block font-display font-semibold text-foreground hover:text-accent-foreground transition-colors leading-tight"
+                                >
+                                    Matias Sanchez
+                                </a>
+                                <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
+                                    Founder de The Dev House
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section >
 
                 {/* Recursos visuales */}
-                <section className="py-20 bg-background">
+                < section className="py-20 bg-background" >
                     <div className="container mx-auto px-4">
                         <div className="text-center mb-12">
                             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -208,10 +210,10 @@ export default function HowStart({ auth }: Props) {
                             })}
                         </div>
                     </div>
-                </section>
+                </section >
 
                 {/* Cierre */}
-                <section className="py-20 bg-accent/5 border-t border-border">
+                < section className="py-20 bg-accent/5 border-t border-border" >
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
                             ¿Listo para empezar?
@@ -233,10 +235,10 @@ export default function HowStart({ auth }: Props) {
                         </div>
 
                     </div>
-                </section>
+                </section >
 
                 <LandingFooter />
-            </div>
+            </div >
         </>
     );
 }
