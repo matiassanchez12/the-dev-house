@@ -497,17 +497,24 @@ class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $csrf = 'test-csrf-token';
+        $socketId = '123.456';
+        $channelName = 'private-user.' . $user->id;
+        $expectedAuth = config('broadcasting.connections.testing.key') . ':' . hash_hmac(
+            'sha256',
+            $socketId . ':' . $channelName,
+            config('broadcasting.connections.testing.secret'),
+        );
 
         $response = $this->actingAs($user)
             ->withSession(['_token' => $csrf])
             ->withHeader('X-CSRF-TOKEN', $csrf)
             ->post('/broadcasting/auth', [
-                'socket_id' => '123.456',
-                'channel_name' => 'private-user.' . $user->id,
+                'socket_id' => $socketId,
+                'channel_name' => $channelName,
             ]);
 
         $response->assertOk();
-        $response->assertJsonStructure(['auth']);
+        $response->assertExactJson(['auth' => $expectedAuth]);
     }
 
     public function test_user_cannot_authorize_another_users_private_notification_channel(): void
