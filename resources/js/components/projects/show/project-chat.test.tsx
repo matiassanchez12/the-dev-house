@@ -70,8 +70,15 @@ vi.mock('@/components/ui/form-error', () => ({
 
 describe('ProjectChat', () => {
     beforeEach(() => {
+        messageHandler = undefined;
+        Object.defineProperty(globalThis as typeof globalThis & { route?: unknown }, 'route', {
+            configurable: true,
+            value: vi.fn((name: string, slug?: string) => `/mock/${name}${slug ? `/${slug}` : ''}`),
+        });
         mockState.private.mockReturnValue({
-            listen: mockState.listen,
+            listen: mockState.listen.mockImplementation((_event: string, handler: (message: Message) => void) => {
+                messageHandler = handler;
+            }),
             stopListening: mockState.stopListening,
         });
 
@@ -91,10 +98,8 @@ describe('ProjectChat', () => {
         mockState.stopListening.mockClear();
         mockState.post.mockClear();
         mockState.data.body = '';
-        // @ts-expect-error test cleanup
         delete window.Echo;
-        // @ts-expect-error test cleanup
-        delete globalThis.route;
+        Reflect.deleteProperty(globalThis as typeof globalThis & { route?: unknown }, 'route');
     });
 
     it('does not subscribe when the server omits messages', async () => {
