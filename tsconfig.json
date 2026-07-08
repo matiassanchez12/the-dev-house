@@ -18,11 +18,10 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./resources/js/*"],
-      "@components/*": ["resources/js/components/*"],
+      "@components/*": ["./resources/js/components/*"],
       "@layouts/*": ["./resources/js/layouts/*"],
       "@pages/*": ["./resources/js/pages/*"]
     },
-    "baseUrl": "."
   },
   "include": [
     "resources/js/**/*.ts",
