@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Models\JoinRequest;
 use App\Models\Phase;
 use App\Models\Project;
+use App\Models\ProjectInvitation;
 use App\Policies\JoinRequestPolicy;
 use App\Policies\PhasePolicy;
+use App\Policies\ProjectInvitationPolicy;
 use App\Policies\ProjectPolicy;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Support\Facades\Gate;
@@ -33,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         // Register policies
         Gate::policy(Project::class, ProjectPolicy::class);
         Gate::policy(JoinRequest::class, JoinRequestPolicy::class);
+        Gate::policy(ProjectInvitation::class, ProjectInvitationPolicy::class);
         Gate::policy(Phase::class, PhasePolicy::class);
 
         if ($this->app->environment('testing')) {

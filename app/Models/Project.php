@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\ProjectStatus;
@@ -54,6 +56,14 @@ class Project extends Model
     public function joinRequests(): HasMany
     {
         return $this->hasMany(JoinRequest::class);
+    }
+
+    /**
+     * Outbound invitations created for this project.
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(ProjectInvitation::class);
     }
 
     /**
