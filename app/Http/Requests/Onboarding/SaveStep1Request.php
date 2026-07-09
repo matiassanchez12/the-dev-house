@@ -28,6 +28,7 @@ class SaveStep1Request extends FormRequest
                 'required',
                 'array',
                 'min:1',
+                'max:3',
             ],
             'techs.*.id' => [
                 'required',
@@ -52,11 +53,24 @@ class SaveStep1Request extends FormRequest
             'techs.required' => 'Debes seleccionar al menos una tecnología.',
             'techs.array' => 'El formato de tecnologías es inválido.',
             'techs.min' => 'Debes seleccionar al menos una tecnología.',
+            'techs.max' => 'Podés seleccionar hasta 3 tecnologías.',
             'techs.*.id.required' => 'Cada tecnología debe tener un ID válido.',
             'techs.*.id.exists' => 'La tecnología seleccionada no existe.',
             'techs.*.proficiency.required' => 'Cada tecnología debe tener un nivel de proficiencia.',
             'techs.*.proficiency.integer' => 'El nivel de proficiencia debe ser un número entero.',
             'techs.*.proficiency.between' => 'El nivel de proficiencia debe estar entre 1 y 5.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'techs' => 'tecnologías',
+            'techs.*.id' => 'tecnología',
+            'techs.*.proficiency' => 'nivel de experiencia',
         ];
     }
 }

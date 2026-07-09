@@ -24,17 +24,16 @@ class SaveStepSocialLinksRequest extends FormRequest
     {
         return [
             'links' => [
-                'required',
+                'nullable',
                 'array',
-                'min:1',
             ],
             'links.*.platform' => [
-                'required',
+                'required_with:links',
                 'string',
                 'in:github,linkedin,twitter,website,youtube,discord,stackoverflow',
             ],
             'links.*.url' => [
-                'required',
+                'required_with:links',
                 'url',
                 'max:2048',
             ],
@@ -49,14 +48,24 @@ class SaveStepSocialLinksRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'links.required' => 'Debes incluir al menos un link social.',
             'links.array' => 'El formato de links es inválido.',
-            'links.min' => 'Debes incluir al menos un link social.',
-            'links.*.platform.required' => 'Cada link debe especificar una plataforma.',
+            'links.*.platform.required_with' => 'Cada link debe especificar una plataforma.',
             'links.*.platform.in' => 'La plataforma debe ser una de las plataformas soportadas.',
-            'links.*.url.required' => 'Cada link debe tener una URL.',
+            'links.*.url.required_with' => 'Cada link debe tener una URL.',
             'links.*.url.url' => 'La URL debe tener un formato válido.',
             'links.*.url.max' => 'La URL no debe exceder los 2048 caracteres.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'links' => 'links profesionales',
+            'links.*.platform' => 'plataforma',
+            'links.*.url' => 'URL',
         ];
     }
 }

@@ -27,7 +27,7 @@ interface Props extends LandingPageProps {
 export default function Landing({ auth, projects, project_count, collaboration_count, users, techs }: Props) {
     return (
         <>
-            <Seo title="Donde los desarrolladores construyen juntos" description="The Dev House es una plataforma colaborativa para desarrolladores. Creá proyectos, unite a equipos y construí software en comunidad." />
+            <Seo title="Construí proyectos reales con otros developers" description="The Dev House conecta estudiantes y developers junior para practicar en equipo, encontrar colaboradores y convertir proyectos reales en portfolio." />
             <div className="min-h-screen bg-background">
                 {/* Navigation */}
                 <LandingNav auth={auth} />
