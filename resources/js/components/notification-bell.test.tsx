@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import NotificationBell from './notification-bell';
 
@@ -98,12 +98,10 @@ describe('NotificationBell', () => {
         const callback = notificationMock.mock.calls[0][0] as () => void;
 
         act(() => {
-            callback({ type: 'join_request_received' });
+            callback();
         });
 
-        await waitFor(() => {
-            expect(reloadMock).toHaveBeenCalledWith({ only: ['auth', 'notifications'] });
-        });
+        expect(reloadMock).toHaveBeenCalledWith({ only: ['auth', 'notifications'] });
 
         expect(screen.getByText('3')).toBeInTheDocument();
     });
@@ -145,9 +143,7 @@ describe('NotificationBell', () => {
 
         render(<NotificationBell />);
 
-        await waitFor(() => {
-            expect(document.title).toBe('(2) The Dev House');
-        });
+        expect(document.title).toBe('(2) The Dev House');
 
         act(() => {
             vi.advanceTimersByTime(1000);
@@ -199,9 +195,7 @@ describe('NotificationBell', () => {
 
         const { unmount } = render(<NotificationBell />);
 
-        await waitFor(() => {
-            expect(document.title).toBe('(2) The Dev House');
-        });
+        expect(document.title).toBe('(2) The Dev House');
 
         unmount();
 
