@@ -30,6 +30,13 @@ return [
 
     'connections' => [
 
+        'testing' => [
+            'driver' => 'testing',
+            'key' => env('TESTING_BROADCAST_KEY'),
+            'secret' => env('TESTING_BROADCAST_SECRET'),
+            'app_id' => env('TESTING_BROADCAST_APP_ID'),
+        ],
+
         'reverb' => [
             'driver' => 'reverb',
             'key' => env('REVERB_APP_KEY'),
