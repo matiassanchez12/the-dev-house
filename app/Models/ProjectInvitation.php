@@ -14,6 +14,10 @@ final class ProjectInvitation extends Model
 
     public const STATUS_PENDING = 'pending';
 
+    public const STATUS_ACCEPTED = 'accepted';
+
+    public const STATUS_REJECTED = 'rejected';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
@@ -21,11 +25,13 @@ final class ProjectInvitation extends Model
         'invited_user_id',
         'message',
         'project_id',
+        'responded_at',
         'status',
     ];
 
     protected $casts = [
         'cancelled_at' => 'datetime',
+        'responded_at' => 'datetime',
     ];
 
     /**

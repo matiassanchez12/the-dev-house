@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import Seo from '@/components/seo';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
     ProjectHero,
@@ -45,6 +46,17 @@ export default function Show({ auth, project }: Props) {
         () => project.participants?.some((p) => p.id === auth.user?.id) ?? false,
         [project.participants, auth.user?.id],
     );
+    const viewerPendingInvitation = project.viewerPendingInvitation ?? null;
+
+    const handleInvitationResponse = (action: 'accept' | 'reject') => {
+        if (!viewerPendingInvitation) {
+            return;
+        }
+
+        router.post(route(`project-invitations.${action}`, viewerPendingInvitation.id), {}, {
+            preserveScroll: true,
+        });
+    };
 
     return (
         <AppLayout
@@ -104,6 +116,33 @@ export default function Show({ auth, project }: Props) {
                                 repository_url={project.repository_url}
                                 demo_url={project.demo_url}
                             />
+                            {viewerPendingInvitation && (
+                                <Card className="border-primary/20">
+                                    <CardHeader>
+                                        <CardTitle>You were invited to collaborate</CardTitle>
+                                        <CardDescription>
+                                            {viewerPendingInvitation.message ?? 'Respond to this project invitation.'}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            className="w-full"
+                                            onClick={() => handleInvitationResponse('accept')}
+                                        >
+                                            Accept invitation
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full"
+                                            onClick={() => handleInvitationResponse('reject')}
+                                        >
+                                            Reject invitation
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            )}
                             <ProjectJoinForm
                                 projectId={project.id}
                                 isOpen={project.status === 'open' || project.status === 'in_progress'}

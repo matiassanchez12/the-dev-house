@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Project;
 use App\Models\JoinRequest;
+use App\Models\ProjectInvitation;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -335,6 +336,33 @@ class ProjectTest extends TestCase
                 ->where('project.viewerJoinRequest.status', 'rejected')
                 ->where('project.viewerJoinRequest.id', $joinRequest->id)
                 ->where('project.viewerJoinRequest.message', 'I would like to contribute.')
+        );
+    }
+
+    public function test_project_detail_includes_viewer_pending_invitation(): void
+    {
+        $project = Project::factory()->create(['slug' => 'project-with-invitation']);
+        $creator = User::factory()->create();
+        $viewer = User::factory()->create();
+
+        $project->update(['user_id' => $creator->id]);
+
+        $invitation = ProjectInvitation::create([
+            'project_id' => $project->id,
+            'invited_user_id' => $viewer->id,
+            'message' => 'We would like to collaborate with you.',
+            'status' => ProjectInvitation::STATUS_PENDING,
+        ]);
+
+        $response = $this->actingAs($viewer)->get('/projects/project-with-invitation');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('projects/show')
+                ->where('project.viewerPendingInvitation.id', $invitation->id)
+                ->where('project.viewerPendingInvitation.status', 'pending')
+                ->where('project.viewerPendingInvitation.message', 'We would like to collaborate with you.')
         );
     }
 

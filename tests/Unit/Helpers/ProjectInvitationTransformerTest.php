@@ -38,6 +38,44 @@ final class ProjectInvitationTransformerTest extends TestCase
         self::assertArrayNotHasKey('email', $data['invited_user']);
     }
 
+    public function test_project_invitation_includes_responded_at_when_present(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $owner->id]);
+        $invitedUser = User::factory()->create();
+
+        $invitation = ProjectInvitation::create([
+            'project_id' => $project->id,
+            'invited_user_id' => $invitedUser->id,
+            'message' => 'Join us on this project.',
+            'status' => ProjectInvitation::STATUS_ACCEPTED,
+            'responded_at' => now(),
+        ]);
+
+        $data = ApiResourceTransformer::projectInvitation($invitation);
+
+        self::assertArrayHasKey('responded_at', $data);
+        self::assertNotNull($data['responded_at']);
+    }
+
+    public function test_project_transformer_exposes_viewer_pending_invitation(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $owner->id]);
+        $invitedUser = User::factory()->create();
+        $invitation = ProjectInvitation::create([
+            'project_id' => $project->id,
+            'invited_user_id' => $invitedUser->id,
+            'message' => 'Join us on this project.',
+            'status' => ProjectInvitation::STATUS_PENDING,
+        ]);
+
+        $data = ApiResourceTransformer::project($project, null, null, $invitation);
+
+        self::assertSame($invitation->id, $data['viewerPendingInvitation']['id']);
+        self::assertSame(ProjectInvitation::STATUS_PENDING, $data['viewerPendingInvitation']['status']);
+    }
+
     public function test_collaborator_suggestion_is_transformed_with_safe_nested_models(): void
     {
         $owner = User::factory()->create();

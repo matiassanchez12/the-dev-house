@@ -3,6 +3,10 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Show from './show';
 
+const { postMock } = vi.hoisted(() => ({
+    postMock: vi.fn(),
+}));
+
 vi.mock('@/layouts/app-layout', () => ({
     default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
@@ -13,13 +17,17 @@ vi.mock('@/components/seo', () => ({
 
 vi.mock('@inertiajs/react', () => ({
     Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
+    router: {
+        post: postMock,
+    },
 }));
 
 beforeEach(() => {
     Object.defineProperty(globalThis, 'route', {
         configurable: true,
-        value: vi.fn().mockReturnValue('/'),
+        value: vi.fn((name: string, id?: number) => `/${name}/${id ?? ''}`),
     });
+    postMock.mockClear();
 });
 
 let capturedJoinFormProps: { isOpen: boolean; isParticipant: boolean; isCreator: boolean } | undefined;
@@ -79,5 +87,29 @@ describe('Project show page wiring', () => {
 
         expect(screen.getByText('JOIN_FORM_CLOSED')).toBeInTheDocument();
         expect(capturedJoinFormProps?.isOpen).toBe(false);
+    });
+
+    it('renders invitation response actions when the viewer has a pending invitation', () => {
+        render(
+            <Show
+                auth={{ user: { id: 1, name: 'Ada' } }}
+                project={baseProject({
+                    viewerPendingInvitation: {
+                        id: 42,
+                        project_id: 1,
+                        invited_user_id: 1,
+                        status: 'pending',
+                        message: 'Come join us',
+                        created_at: '',
+                        updated_at: '',
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText('You were invited to collaborate')).toBeInTheDocument();
+        expect(screen.getByText('Come join us')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Accept invitation' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Reject invitation' })).toBeInTheDocument();
     });
 });

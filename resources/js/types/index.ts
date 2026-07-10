@@ -68,15 +68,17 @@ export interface Project {
         status: 'pending' | 'approved' | 'rejected';
         message?: string;
     } | null;
+    viewerPendingInvitation?: ProjectInvitation | null;
 }
 
 export interface ProjectInvitation {
     id: number;
     project_id: number;
     invited_user_id: number;
-    status: 'pending' | 'cancelled';
+    status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
     message?: string | null;
     cancelled_at?: string | null;
+    responded_at?: string | null;
     created_at: string;
     updated_at: string;
     project?: Project;

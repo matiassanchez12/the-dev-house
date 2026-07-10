@@ -23,6 +23,7 @@ class ApiResourceTransformer
         Model|array $project,
         ?JoinRequest $viewerJoinRequest = null,
         ?string $viewerRole = null,
+        ?ProjectInvitation $viewerPendingInvitation = null,
     ): array {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
@@ -67,6 +68,10 @@ class ApiResourceTransformer
                 'status' => $viewerJoinRequest->status,
                 'message' => $viewerJoinRequest->message,
             ];
+
+        $data['viewerPendingInvitation'] = $viewerPendingInvitation === null
+            ? null
+            : self::projectInvitation($viewerPendingInvitation);
 
         return $data;
     }
@@ -206,6 +211,7 @@ class ApiResourceTransformer
             'status',
             'message',
             'cancelled_at',
+            'responded_at',
             'created_at',
             'updated_at',
             'project',

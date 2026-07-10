@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Project;
 use App\Models\ProjectInvitation;
 use App\Models\User;
+use App\Notifications\ProjectInvitationAccepted;
 use App\Notifications\ProjectInvitationReceived;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -95,12 +96,60 @@ class ProjectInvitationService
         return $invitation->refresh();
     }
 
+    public function accept(ProjectInvitation $invitation): ProjectInvitation
+    {
+        if ($invitation->status !== ProjectInvitation::STATUS_PENDING) {
+            throw ValidationException::withMessages([
+                'status' => 'Only pending invitations can be accepted.',
+            ]);
+        }
+
+        DB::transaction(function () use ($invitation): void {
+            $invitation->update([
+                'status' => ProjectInvitation::STATUS_ACCEPTED,
+                'responded_at' => now(),
+            ]);
+
+            $invitation->project->participants()->syncWithoutDetaching([
+                $invitation->invited_user_id,
+            ]);
+        });
+
+        $invitation->refresh()->load(['project.creator', 'invitedUser']);
+
+        /** @var User $creator */
+        $creator = $invitation->project->creator;
+        $creator->notify(new ProjectInvitationAccepted($invitation));
+
+        return $invitation;
+    }
+
+    public function reject(ProjectInvitation $invitation): ProjectInvitation
+    {
+        if ($invitation->status !== ProjectInvitation::STATUS_PENDING) {
+            throw ValidationException::withMessages([
+                'status' => 'Only pending invitations can be rejected.',
+            ]);
+        }
+
+        $invitation->update([
+            'status' => ProjectInvitation::STATUS_REJECTED,
+            'responded_at' => now(),
+        ]);
+
+        return $invitation->refresh();
+    }
+
     private function hasActiveInvitation(Project $project, int $invitedUserId): bool
     {
         return ProjectInvitation::query()
             ->where('project_id', $project->id)
             ->where('invited_user_id', $invitedUserId)
-            ->where('status', ProjectInvitation::STATUS_PENDING)
+            ->whereIn('status', [
+                ProjectInvitation::STATUS_PENDING,
+                ProjectInvitation::STATUS_ACCEPTED,
+                ProjectInvitation::STATUS_REJECTED,
+            ])
             ->exists();
     }
 
