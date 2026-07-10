@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    name: Frontend (build + test)
+    name: Frontend (build + test + typecheck)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,25 +29,5 @@ jobs:
       - name: Test
         run: npm test
 
-  typecheck-informational:
-    name: Typecheck (informational — TS debt tracked)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Typecheck
         run: npx tsc --noEmit
-
-      # Flip this job to a hard gate (remove `continue-on-error: true` and merge the steps into the `frontend` job)
-      # once `npx tsc --noEmit` exits 0 locally and in CI for the relevant scope.
