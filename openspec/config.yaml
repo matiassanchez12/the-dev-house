@@ -39,5 +39,9 @@ testing:
   coverage: true
   quality:
     linter: pint
-    type_checker: null
+    # Staged: TypeScript currently runs as an informational gate only via
+    # `.github/workflows/frontend.yml`. Domain typing debt still exists; flip
+    # `type_checker` to `tsc` and remove `continue-on-error` once
+    # `npx tsc --noEmit` is clean for the relevant scope.
+    type_checker: tsc-staged
     formatter: pint
