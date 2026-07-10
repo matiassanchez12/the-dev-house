@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\ProjectInvitation;
 use App\Services\ProjectInvitationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -44,5 +45,29 @@ final class ProjectInvitationController extends Controller
 
         return redirect()->route('projects.collaborators', $project)
             ->with('success', 'Invitation cancelled successfully.');
+    }
+
+    public function accept(ProjectInvitation $projectInvitation): RedirectResponse
+    {
+        Gate::authorize('accept', $projectInvitation);
+
+        $project = $projectInvitation->project;
+
+        $this->projectInvitationService->accept($projectInvitation);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Invitation accepted successfully.');
+    }
+
+    public function reject(ProjectInvitation $projectInvitation): RedirectResponse
+    {
+        Gate::authorize('reject', $projectInvitation);
+
+        $project = $projectInvitation->project;
+
+        $this->projectInvitationService->reject($projectInvitation);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Invitation rejected successfully.');
     }
 }

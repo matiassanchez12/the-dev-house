@@ -25,4 +25,22 @@ final class ProjectInvitationPolicy
     {
         return $projectInvitation->project->user_id === $user->id;
     }
+
+    /**
+     * Determine whether the invited user can accept the invitation.
+     */
+    public function accept(User $user, ProjectInvitation $projectInvitation): bool
+    {
+        return $projectInvitation->status === ProjectInvitation::STATUS_PENDING
+            && $projectInvitation->invited_user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the invited user can reject the invitation.
+     */
+    public function reject(User $user, ProjectInvitation $projectInvitation): bool
+    {
+        return $projectInvitation->status === ProjectInvitation::STATUS_PENDING
+            && $projectInvitation->invited_user_id === $user->id;
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\ProjectInvitation;
 use App\Models\Tech;
 use App\Models\User;
+use App\Notifications\ProjectInvitationAccepted;
 use App\Notifications\ProjectInvitationReceived;
 use App\Services\CollaboratorSuggestionService;
 use App\Services\ProjectInvitationService;
@@ -111,5 +112,70 @@ final class ProjectInvitationServiceTest extends TestCase
 
         self::assertSame(ProjectInvitation::STATUS_CANCELLED, $cancelled->status);
         self::assertNotNull($cancelled->cancelled_at);
+    }
+
+    public function test_accept_attaches_participant_marks_invitation_and_notifies_creator(): void
+    {
+        Notification::fake();
+
+        $invitation = ProjectInvitation::create([
+            'project_id' => $this->project->id,
+            'invited_user_id' => $this->invitedUser->id,
+            'message' => 'Join us',
+            'status' => ProjectInvitation::STATUS_PENDING,
+        ]);
+
+        $accepted = $this->service->accept($invitation);
+
+        self::assertSame(ProjectInvitation::STATUS_ACCEPTED, $accepted->status);
+        self::assertNotNull($accepted->responded_at);
+        self::assertTrue($this->project->fresh()->participants()->whereKey($this->invitedUser->id)->exists());
+        Notification::assertSentTo($this->owner, ProjectInvitationAccepted::class);
+    }
+
+    public function test_reject_marks_invitation_as_rejected_without_attaching_participant(): void
+    {
+        $invitation = ProjectInvitation::create([
+            'project_id' => $this->project->id,
+            'invited_user_id' => $this->invitedUser->id,
+            'message' => 'Join us',
+            'status' => ProjectInvitation::STATUS_PENDING,
+        ]);
+
+        $rejected = $this->service->reject($invitation);
+
+        self::assertSame(ProjectInvitation::STATUS_REJECTED, $rejected->status);
+        self::assertNotNull($rejected->responded_at);
+        self::assertFalse($this->project->fresh()->participants()->whereKey($this->invitedUser->id)->exists());
+    }
+
+    public function test_create_rejects_accepted_invitation_as_duplicate_active_invitation(): void
+    {
+        ProjectInvitation::create([
+            'project_id' => $this->project->id,
+            'invited_user_id' => $this->invitedUser->id,
+            'message' => 'Join us',
+            'status' => ProjectInvitation::STATUS_ACCEPTED,
+            'responded_at' => now(),
+        ]);
+
+        $this->expectException(ValidationException::class);
+
+        $this->service->create($this->project, $this->invitedUser->id, 'Still interested');
+    }
+
+    public function test_create_rejects_rejected_invitation_as_duplicate_active_invitation(): void
+    {
+        ProjectInvitation::create([
+            'project_id' => $this->project->id,
+            'invited_user_id' => $this->invitedUser->id,
+            'message' => 'Join us',
+            'status' => ProjectInvitation::STATUS_REJECTED,
+            'responded_at' => now(),
+        ]);
+
+        $this->expectException(ValidationException::class);
+
+        $this->service->create($this->project, $this->invitedUser->id, 'Still interested');
     }
 }

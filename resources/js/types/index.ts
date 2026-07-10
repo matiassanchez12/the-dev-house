@@ -68,6 +68,7 @@ export interface Project {
         status: 'pending' | 'approved' | 'rejected'
         message?: string
     } | null
+    viewerPendingInvitation?: ProjectInvitation | null;
 }
 
 export interface ProjectInvitation {

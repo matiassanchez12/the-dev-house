@@ -165,4 +165,22 @@ final class ProjectInvitationTest extends TestCase
 
         self::assertSame('pending', $thirdInvitation->status);
     }
+
+    public function test_responded_invitation_clears_pending_key_and_casts_responded_at(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $owner->id]);
+        $invitedUser = User::factory()->create();
+
+        $invitation = ProjectInvitation::create([
+            'project_id' => $project->id,
+            'invited_user_id' => $invitedUser->id,
+            'message' => 'Join us on this project.',
+            'status' => ProjectInvitation::STATUS_ACCEPTED,
+            'responded_at' => now(),
+        ]);
+
+        self::assertNull($invitation->pending_invitation_key);
+        self::assertInstanceOf(\Illuminate\Support\Carbon::class, $invitation->responded_at);
+    }
 }
