@@ -26,15 +26,6 @@ export default function Register() {
             <Seo title="Crear cuenta" description="Registrate en The Dev House y empezá a colaborar en proyectos, conectá con desarrolladores y construí software en comunidad." />
 
             <form onSubmit={submit}>
-                <div className="mb-6 space-y-2 text-center">
-                    <h1 className="font-heading text-2xl font-semibold text-foreground">
-                        Creá tu cuenta
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Te pedimos lo mínimo para empezar. Después podés completar tu portfolio, redes y preferencias.
-                    </p>
-                </div>
-
                 <Field id="name" label="Nombre o alias" error={errors.name}>
                     <Input
                         id="name"
