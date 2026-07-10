@@ -4,7 +4,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MilestoneCard } from '@/components/public/milestone-card';
-import { Project } from '@/types';
+import type { Phase, Project } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -18,13 +18,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 
-type Milestone = {
-    id: number;
-    title: string;
-    description?: string | null;
-    completed_at?: string | null;
-    created_at: string;
-    updated_at: string;
+type Milestone = Phase & {
     project: Project;
 };
 
