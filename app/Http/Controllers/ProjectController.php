@@ -87,7 +87,7 @@ class ProjectController extends Controller
             $request->validated()
         );
 
-        return redirect()->route('projects.show', $project)
+        return redirect()->route('projects.collaborators', $project)
             ->with('success', 'Proyecto creado exitosamente!');
     }
 

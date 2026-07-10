@@ -32,19 +32,19 @@ Chain strategy: pending
 
 ## Phase 2: Core Implementation
 
-- [ ] 2.1 Implement `app/Services/CollaboratorSuggestionService.php` with overlap-only user lookup excluding creator, participants, and already-invited users.
-- [ ] 2.2 Implement `app/Services/ProjectInvitationService.php` for create/cancel flows and duplicate-active invitation checks.
-- [ ] 2.3 Add `app/Http/Controllers/ProjectCollaboratorController.php` and `ProjectInvitationController.php` with policy authorization and service wiring.
-- [ ] 2.4 Update `ProjectController::store()` and `routes/web.php` to redirect to `projects.collaborators` and register authenticated collaborator/invitation routes before `{project:slug}`.
+- [x] 2.1 Implement `app/Services/CollaboratorSuggestionService.php` with overlap-only user lookup excluding creator, participants, and already-invited users.
+- [x] 2.2 Implement `app/Services/ProjectInvitationService.php` for create/cancel flows and duplicate-active invitation checks.
+- [x] 2.3 Add `app/Http/Controllers/ProjectCollaboratorController.php` and `ProjectInvitationController.php` with policy authorization and service wiring.
+- [x] 2.4 Update `ProjectController::store()` and `routes/web.php` to redirect to `projects.collaborators` and register authenticated collaborator/invitation routes before `{project:slug}`.
 
 ## Phase 3: Integration / Frontend
 
-- [ ] 3.1 Create `resources/js/pages/projects/collaborators.tsx` and `resources/js/components/projects/collaborator-suggestion-card.tsx` with invite, cancel, and skip-to-show actions.
-- [ ] 3.2 Extend `resources/js/types/index.ts` for `ProjectInvitation` and `CollaboratorSuggestion`; update `resources/js/components/notification-list.tsx` to route invitation notifications to project show for V1.
-- [ ] 3.3 Ensure page props include project, suggestions, and pending invitation state via `ApiResourceTransformer`.
+- [x] 3.1 Create `resources/js/pages/projects/collaborators.tsx` and `resources/js/components/projects/collaborator-suggestion-card.tsx` with invite, cancel, and skip-to-show actions.
+- [x] 3.2 Extend `resources/js/types/index.ts` for `ProjectInvitation` and `CollaboratorSuggestion`; update `resources/js/components/notification-list.tsx` to route invitation notifications to project show for V1.
+- [x] 3.3 Ensure page props include project, suggestions, and pending invitation state via `ApiResourceTransformer`.
 
 ## Phase 4: Testing / Cleanup
 
-- [ ] 4.1 Add feature tests for create redirect, unauthorized access, invite/cancel, duplicate active invite prevention, and notification dispatch.
-- [ ] 4.2 Add service tests for tech-overlap suggestions and exclusion rules (creator, participants, already-invited users).
-- [ ] 4.3 Add frontend tests if the harness is available for empty state, invite/cancel button states, and skip link; remove temporary comments or TODOs.
+- [x] 4.1 Add feature tests for create redirect, unauthorized access, invite/cancel, duplicate active invite prevention, and notification dispatch.
+- [x] 4.2 Add service tests for tech-overlap suggestions and exclusion rules (creator, participants, already-invited users).
+- [x] 4.3 Add frontend tests if the harness is available for empty state, invite/cancel button states, and skip link; remove temporary comments or TODOs.
