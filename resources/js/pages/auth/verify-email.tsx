@@ -3,10 +3,10 @@ import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { Link, useForm } from '@inertiajs/react';
 
-export default function VerifyEmail({ status }) {
+export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
         post(route('verification.send'));

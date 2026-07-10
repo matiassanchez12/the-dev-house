@@ -38,7 +38,7 @@ interface Props {
 
 export default function Index({ users, techs, filters }: Props) {
     const [search, setSearch] = useState(filters.q || '');
-    const [selectedTech, setSelectedTech] = useState(filters.tech || '');
+    const [selectedTech, setSelectedTech] = useState<string | null>(filters.tech || null);
     const appliedSearch = filters.q || null;
     const appliedTech = filters.tech || null;
 

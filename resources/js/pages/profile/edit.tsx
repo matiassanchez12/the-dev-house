@@ -5,9 +5,17 @@ import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
 import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
 import SocialLinksEditForm from './partials/social-links-edit-form';
-import { SocialLink } from '@/types';
+import { SocialLink, Tech } from '@/types';
+import { type TechProficiency } from '@/lib/tech-proficiency';
 
 import { usePage } from '@inertiajs/react';
+
+interface UserTech extends Omit<Tech, 'pivot'> {
+    pivot: {
+        years_experience: number | null;
+        proficiency: TechProficiency | null;
+    };
+}
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -15,12 +23,12 @@ interface Props {
     name: string;
     email: string;
     emailVerifiedAt: string | null;
-    userTechs: unknown[];
+    userTechs: UserTech[];
     socialLinks?: SocialLink[];
 }
 
 export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, socialLinks }: Props) {
-    const { techs } = usePage().props as { techs: unknown[] };
+    const { techs } = usePage<{ techs: Tech[] }>().props;
     return (
         <AppLayout
             header={

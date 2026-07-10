@@ -21,12 +21,11 @@ import {
     ProjectDeleteDialog,
 } from '@/components/projects/show';
 
+type ViewerJoinRequest = ProjectType['viewerJoinRequest'];
+
 interface Props {
     auth: {
-        user: {
-            id: number;
-            name: string;
-        } | null;
+        user: User | null;
     };
     project: ProjectType & {
         viewer_role?: 'guest' | 'creator' | 'member';
@@ -36,6 +35,7 @@ interface Props {
         messages?: Message[];
         phases?: Phase[];
         messages_count?: number;
+        viewerJoinRequest?: ViewerJoinRequest;
     };
 }
 
