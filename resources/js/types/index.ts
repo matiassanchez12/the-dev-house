@@ -70,6 +70,26 @@ export interface Project {
     } | null;
 }
 
+export interface ProjectInvitation {
+    id: number;
+    project_id: number;
+    invited_user_id: number;
+    status: 'pending' | 'cancelled';
+    message?: string | null;
+    cancelled_at?: string | null;
+    created_at: string;
+    updated_at: string;
+    project?: Project;
+    invitedUser?: User & { techs?: Tech[] };
+    invited_user?: User & { techs?: Tech[] };
+}
+
+export interface CollaboratorSuggestion {
+    user: User & { techs?: Tech[] };
+    matching_techs: Tech[];
+    pending_invitation?: ProjectInvitation | null;
+}
+
 export interface JoinRequest {
     id: number;
     project_id: number;
