@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@radix-ui/react-dropdown-menu';
+import type { ComponentPropsWithoutRef } from 'react';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 
@@ -13,11 +14,11 @@ export const Dropdown = ({ children }: { children: React.ReactNode }) => (
 );
 Dropdown.Trigger = DropdownMenuTrigger;
 Dropdown.Content = ({
-  align = 'right',
+  align = 'end',
   className,
   children,
   ...props
-}: DropdownMenuContent.Props & { children?: React.ReactNode }) => (
+}: ComponentPropsWithoutRef<typeof DropdownMenuContent> & { children?: React.ReactNode }) => (
   <DropdownMenuContent align={align} className={cn('z-50 bg-card shadow-md rounded-none border border-border min-w-[8rem] p-1', className)} {...props}>
     {children}
   </DropdownMenuContent>
