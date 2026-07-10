@@ -22,7 +22,17 @@ beforeEach(() => {
     });
 });
 
-let capturedJoinFormProps: { isOpen: boolean; isParticipant: boolean; isCreator: boolean } | undefined;
+type JoinFormProps = { isOpen: boolean; isParticipant: boolean; isCreator: boolean };
+
+let capturedJoinFormProps: JoinFormProps | undefined;
+
+function requireCapturedJoinFormProps(): JoinFormProps {
+    if (!capturedJoinFormProps) {
+        throw new Error('Expected join form props to be captured');
+    }
+
+    return capturedJoinFormProps;
+}
 
 vi.mock('@/components/projects/show', () => ({
     ProjectHero: () => <div data-testid="hero" />,
@@ -65,19 +75,18 @@ describe('Project show page wiring', () => {
     it('renders the join UI for an in_progress project so guests can request to join', () => {
         capturedJoinFormProps = undefined;
 
-        render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
+        render(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'in_progress' })} />);
 
         expect(screen.getByText('JOIN_FORM_OPEN')).toBeInTheDocument();
-        expect(capturedJoinFormProps).toBeDefined();
-        expect(capturedJoinFormProps?.isOpen).toBe(true);
+        expect(requireCapturedJoinFormProps().isOpen).toBe(true);
     });
 
     it('does not render the join UI for a completed project', () => {
-        const { rerender } = render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
+        const { rerender } = render(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'in_progress' })} />);
 
-        rerender(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'completed' })} />);
+        rerender(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'completed' })} />);
 
         expect(screen.getByText('JOIN_FORM_CLOSED')).toBeInTheDocument();
-        expect(capturedJoinFormProps?.isOpen).toBe(false);
+        expect(requireCapturedJoinFormProps().isOpen).toBe(false);
     });
 });

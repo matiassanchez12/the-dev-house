@@ -74,7 +74,7 @@ describe('ProjectJoinForm', () => {
                     created_at: '2026-06-07T00:00:00.000Z',
                     updated_at: '2026-06-07T00:00:00.000Z',
                 }}
-                viewerJoinRequest={{ id: 5, status: 'pending' }}
+                viewerJoinRequest={{ id: 5, status: 'pending', message: 'Let me help build this' }}
             />,
         );
 
@@ -194,7 +194,7 @@ describe('ProjectJoinForm', () => {
                     created_at: '2026-06-07T00:00:00.000Z',
                     updated_at: '2026-06-07T00:00:00.000Z',
                 }}
-                viewerJoinRequest={{ id: 5, status: 'pending' }}
+                viewerJoinRequest={{ id: 5, status: 'pending', message: 'Let me help build this' }}
             />,
         );
 
