@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Helpers;
 
 use App\Models\JoinRequest;
+use App\Models\ProjectInvitation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -19,8 +23,7 @@ class ApiResourceTransformer
         Model|array $project,
         ?JoinRequest $viewerJoinRequest = null,
         ?string $viewerRole = null,
-    ): array
-    {
+    ): array {
         $data = $project instanceof Model ? $project->toArray() : $project;
 
         if (isset($data['images']) && is_array($data['images'])) {
@@ -33,14 +36,16 @@ class ApiResourceTransformer
             );
         }
 
-        // Scrub creator to safe fields only
         if (isset($data['creator'])) {
             $data['creator'] = self::user($data['creator']);
         }
 
-        // Scrub each participant to safe fields only
         if (isset($data['participants']) && is_array($data['participants'])) {
-            $data['participants'] = array_map(fn($p) => self::user($p), $data['participants']);
+            $data['participants'] = array_map(fn ($participant) => self::user($participant), $data['participants']);
+        }
+
+        if (isset($data['invitations']) && is_array($data['invitations'])) {
+            $data['invitations'] = array_map(fn ($invitation) => self::projectInvitation($invitation), $data['invitations']);
         }
 
         if (isset($data['messages']) && is_array($data['messages'])) {
@@ -118,9 +123,14 @@ class ApiResourceTransformer
             'created_projects_count',
             'joined_projects_count',
             'createdProjects',
+            'created_projects',
             'participatingProjects',
+            'participating_projects',
+            'receivedInvitations',
+            'received_invitations',
             'techs',
             'socialLinks',
+            'social_links',
         ]));
 
         if (isset($safe['avatar'])) {
@@ -131,8 +141,36 @@ class ApiResourceTransformer
             $safe['createdProjects'] = array_map(fn ($project) => self::project($project), $safe['createdProjects']);
         }
 
+        if (isset($safe['created_projects']) && is_array($safe['created_projects'])) {
+            $safe['created_projects'] = array_map(fn ($project) => self::project($project), $safe['created_projects']);
+        }
+
         if (isset($safe['participatingProjects']) && is_array($safe['participatingProjects'])) {
             $safe['participatingProjects'] = array_map(fn ($project) => self::project($project), $safe['participatingProjects']);
+        }
+
+        if (isset($safe['participating_projects']) && is_array($safe['participating_projects'])) {
+            $safe['participating_projects'] = array_map(fn ($project) => self::project($project), $safe['participating_projects']);
+        }
+
+        if (isset($safe['receivedInvitations']) && is_array($safe['receivedInvitations'])) {
+            $safe['receivedInvitations'] = array_map(fn ($invitation) => self::projectInvitation($invitation), $safe['receivedInvitations']);
+        }
+
+        if (isset($safe['received_invitations']) && is_array($safe['received_invitations'])) {
+            $safe['received_invitations'] = array_map(fn ($invitation) => self::projectInvitation($invitation), $safe['received_invitations']);
+        }
+
+        if (isset($safe['techs']) && is_array($safe['techs'])) {
+            $safe['techs'] = array_map(fn ($tech) => self::tech($tech), $safe['techs']);
+        }
+
+        if (isset($safe['socialLinks']) && is_array($safe['socialLinks'])) {
+            $safe['socialLinks'] = array_map(fn ($link) => $link, $safe['socialLinks']);
+        }
+
+        if (isset($safe['social_links']) && is_array($safe['social_links'])) {
+            $safe['social_links'] = array_map(fn ($link) => $link, $safe['social_links']);
         }
 
         if (isset($data['pivot'])) {
@@ -143,48 +181,154 @@ class ApiResourceTransformer
     }
 
     /**
-     * Transform a join request to array with disk-aware file URLs.
-     * Applicant and project creator are scrubbed to safe fields only.
+     * Transform an outbound project invitation to a safe array.
      */
-    public static function joinRequest(Model|array $request): array
+    public static function projectInvitation(Model|array $invitation): array
     {
-        $data = $request instanceof Model ? $request->toArray() : $request;
-
-        // Scrub applicant to safe fields only
-        if (isset($data['applicant'])) {
-            $data['applicant'] = self::user($data['applicant']);
-        }
+        $data = $invitation instanceof Model ? $invitation->toArray() : $invitation;
 
         if (isset($data['project'])) {
             $data['project'] = self::project($data['project']);
         }
 
-        return $data;
+        if (isset($data['invited_user'])) {
+            $data['invited_user'] = self::user($data['invited_user']);
+        }
+
+        if (isset($data['invitedUser'])) {
+            $data['invitedUser'] = self::user($data['invitedUser']);
+        }
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'project_id',
+            'invited_user_id',
+            'status',
+            'message',
+            'cancelled_at',
+            'created_at',
+            'updated_at',
+            'project',
+            'invited_user',
+            'invitedUser',
+        ]));
+    }
+
+    /**
+     * Transform a collaborator suggestion to a safe array.
+     */
+    public static function collaboratorSuggestion(Model|array $suggestion): array
+    {
+        $data = $suggestion instanceof Model ? $suggestion->toArray() : $suggestion;
+
+        if (isset($data['user'])) {
+            $data['user'] = self::user($data['user']);
+        }
+
+        if (isset($data['matching_techs']) && is_array($data['matching_techs'])) {
+            $data['matching_techs'] = array_map(fn ($tech) => self::tech($tech), $data['matching_techs']);
+        }
+
+        if (isset($data['pending_invitation'])) {
+            $data['pending_invitation'] = self::projectInvitation($data['pending_invitation']);
+        }
+
+        return array_intersect_key($data, array_flip([
+            'user',
+            'matching_techs',
+            'pending_invitation',
+        ]));
+    }
+
+    /**
+     * Transform a tech model to a safe array.
+     */
+    public static function tech(Model|array $tech): array
+    {
+        $data = $tech instanceof Model ? $tech->toArray() : $tech;
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'name',
+            'slug',
+            'icon',
+        ]));
     }
 
     /**
      * Transform a collection/paginator of projects.
      *
-     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $projects
+     * @param Collection|LengthAwarePaginator $projects
      * @return array
      */
-    public static function projects(Collection|\Illuminate\Pagination\LengthAwarePaginator $projects): array
+    public static function projects(Collection|LengthAwarePaginator $projects): array
     {
-        return $projects->map(fn($p) => self::project($p))->toArray();
+        return $projects->map(fn ($project) => self::project($project))->toArray();
+    }
+
+    /**
+     * Transform a collection/paginator of project invitations.
+     *
+     * @param Collection|LengthAwarePaginator $invitations
+     * @return array
+     */
+    public static function projectInvitations(Collection|LengthAwarePaginator $invitations): array
+    {
+        if ($invitations instanceof LengthAwarePaginator) {
+            return [
+                'data' => $invitations->map(fn ($invitation) => self::projectInvitation($invitation))->toArray(),
+                'links' => $invitations->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $invitations->currentPage(),
+                    'last_page' => $invitations->lastPage(),
+                    'per_page' => $invitations->perPage(),
+                    'total' => $invitations->total(),
+                    'from' => $invitations->firstItem(),
+                    'to' => $invitations->lastItem(),
+                ],
+            ];
+        }
+
+        return $invitations->map(fn ($invitation) => self::projectInvitation($invitation))->toArray();
+    }
+
+    /**
+     * Transform a collection/paginator of collaborator suggestions.
+     *
+     * @param Collection|LengthAwarePaginator $suggestions
+     * @return array
+     */
+    public static function collaboratorSuggestions(Collection|LengthAwarePaginator $suggestions): array
+    {
+        if ($suggestions instanceof LengthAwarePaginator) {
+            return [
+                'data' => $suggestions->map(fn ($suggestion) => self::collaboratorSuggestion($suggestion))->toArray(),
+                'links' => $suggestions->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $suggestions->currentPage(),
+                    'last_page' => $suggestions->lastPage(),
+                    'per_page' => $suggestions->perPage(),
+                    'total' => $suggestions->total(),
+                    'from' => $suggestions->firstItem(),
+                    'to' => $suggestions->lastItem(),
+                ],
+            ];
+        }
+
+        return $suggestions->map(fn ($suggestion) => self::collaboratorSuggestion($suggestion))->toArray();
     }
 
     /**
      * Transform a collection/paginator of users.
      *
-     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $users
+     * @param Collection|LengthAwarePaginator $users
      * @return array
      */
-    public static function users(Collection|\Illuminate\Pagination\LengthAwarePaginator $users): array
+    public static function users(Collection|LengthAwarePaginator $users): array
     {
-        // If it's a paginator, preserve structure with transformed data
-        if ($users instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+        if ($users instanceof LengthAwarePaginator) {
             return [
-                'data' => $users->map(fn($u) => self::user($u))->toArray(),
+                'data' => $users->map(fn ($user) => self::user($user))->toArray(),
                 'links' => $users->linkCollection()->toArray(),
                 'meta' => [
                     'current_page' => $users->currentPage(),
@@ -197,17 +341,72 @@ class ApiResourceTransformer
             ];
         }
 
-        return $users->map(fn($u) => self::user($u))->toArray();
+        return $users->map(fn ($user) => self::user($user))->toArray();
     }
 
     /**
      * Transform a collection/paginator of join requests.
      *
-     * @param Collection|\Illuminate\Pagination\LengthAwarePaginator $requests
+     * @param Collection|LengthAwarePaginator $requests
      * @return array
      */
-    public static function joinRequests(Collection|\Illuminate\Pagination\LengthAwarePaginator $requests): array
+    public static function joinRequests(Collection|LengthAwarePaginator $requests): array
     {
-        return $requests->map(fn($r) => self::joinRequest($r))->toArray();
+        return $requests->map(fn ($request) => self::joinRequest($request))->toArray();
+    }
+
+    /**
+     * Transform a join request to a safe array.
+     */
+    public static function joinRequest(Model|array $request): array
+    {
+        $data = $request instanceof Model ? $request->toArray() : $request;
+
+        if (isset($data['project'])) {
+            $data['project'] = self::project($data['project']);
+        }
+
+        if (isset($data['applicant'])) {
+            $data['applicant'] = self::user($data['applicant']);
+        }
+
+        return array_intersect_key($data, array_flip([
+            'id',
+            'project_id',
+            'user_id',
+            'status',
+            'message',
+            'reviewed_at',
+            'created_at',
+            'updated_at',
+            'project',
+            'applicant',
+        ]));
+    }
+
+    /**
+     * Transform a collection/paginator of techs.
+     *
+     * @param Collection|LengthAwarePaginator $techs
+     * @return array
+     */
+    public static function techs(Collection|LengthAwarePaginator $techs): array
+    {
+        if ($techs instanceof LengthAwarePaginator) {
+            return [
+                'data' => $techs->map(fn ($tech) => self::tech($tech))->toArray(),
+                'links' => $techs->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $techs->currentPage(),
+                    'last_page' => $techs->lastPage(),
+                    'per_page' => $techs->perPage(),
+                    'total' => $techs->total(),
+                    'from' => $techs->firstItem(),
+                    'to' => $techs->lastItem(),
+                ],
+            ];
+        }
+
+        return $techs->map(fn ($tech) => self::tech($tech))->toArray();
     }
 }

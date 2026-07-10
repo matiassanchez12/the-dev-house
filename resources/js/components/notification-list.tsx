@@ -6,12 +6,14 @@ export interface NotificationItem {
     id: string;
     type: string;
     data: {
-        type: 'join_request_received' | 'join_request_approved' | 'join_request_rejected';
+        type: 'join_request_received' | 'join_request_approved' | 'join_request_rejected' | 'project_invitation_received';
         project_id: number;
         project_slug: string;
         project_title: string;
         applicant_id?: number;
         applicant_name?: string;
+        inviter_id?: number;
+        inviter_name?: string;
     };
     read_at: string | null;
     created_at: string;
@@ -21,6 +23,7 @@ const typeLabels: Record<NotificationItem['data']['type'], string> = {
     join_request_received: 'quiere unirse a tu proyecto',
     join_request_approved: 'aprobó tu solicitud',
     join_request_rejected: 'rechazó tu solicitud',
+    project_invitation_received: 'invited you to collaborate',
 };
 
 interface NotificationListProps {
@@ -50,12 +53,15 @@ export function NotificationList({ limit, emptyText = 'Sin notificaciones' }: No
             {items.map((n) => {
                 const label = typeLabels[n.data.type] ?? 'actualizó un proyecto';
                 const project = n.data.project_title;
-                const from = n.data.applicant_name;
+                const from = n.data.applicant_name ?? n.data.inviter_name;
+                const href = n.data.type === 'project_invitation_received'
+                    ? route('projects.show', n.data.project_slug)
+                    : route('join-requests.index');
 
                 return (
                     <li key={n.id}>
                         <Link
-                            href={route('join-requests.index')}
+                            href={href}
                             onClick={() => {
                                 if (!n.read_at) {
                                     router.patch(route('notifications.read', n.id), {
