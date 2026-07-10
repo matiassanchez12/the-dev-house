@@ -65,7 +65,7 @@ const receivedRequests = [
         created_at: '2026-06-10T00:00:00.000Z',
         updated_at: '2026-06-10T00:00:00.000Z',
         applicant: { id: 20, name: 'Ada', email: 'ada@example.com', created_at: '', updated_at: '', slug: 'ada' },
-        project: { id: 10, user_id: 1, title: 'Project', slug: 'project', description: '', status: 'open', created_at: '', updated_at: '', creator: { id: 1, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '', slug: 'grace' } },
+        project: { id: 10, user_id: 1, title: 'Project', slug: 'project', description: '', status: 'open' as const, created_at: '', updated_at: '', creator: { id: 1, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '', slug: 'grace' } },
     },
 ];
 
@@ -78,7 +78,7 @@ const sentRequests = [
         status: 'pending' as const,
         created_at: '2026-06-10T00:00:00.000Z',
         updated_at: '2026-06-10T00:00:00.000Z',
-        project: { id: 11, user_id: 1, title: 'Project 2', slug: 'project-2', description: '', status: 'open', created_at: '', updated_at: '', creator: { id: 1, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '', slug: 'grace' } },
+        project: { id: 11, user_id: 1, title: 'Project 2', slug: 'project-2', description: '', status: 'open' as const, created_at: '', updated_at: '', creator: { id: 1, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '', slug: 'grace' } },
     },
 ];
 

@@ -35,6 +35,7 @@ interface OnboardingProps {
     allTechs: Tech[];
     userTechs: (Tech & { pivot?: { proficiency?: string } })[];
     totalSteps: number;
+    [key: string]: unknown;
 }
 
 const PROFICIENCY_MAP: Record<number, string> = {
@@ -110,14 +111,14 @@ export default function OnboardingIndex() {
     const [bio, setBio] = useState(user.bio || '');
 
     // Step 3: Social Links
-    const [socialLinks, setSocialLinks] = useState<Record<Platform, string>>({
+    const [socialLinks, setSocialLinks] = useState<Partial<Record<Platform, string>>>({
         github: '',
         linkedin: '',
         twitter: '',
         website: '',
     });
 
-    const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
+    const PLATFORM_ICONS: Partial<Record<Platform, React.ReactNode>> = {
         github: (
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -141,7 +142,7 @@ export default function OnboardingIndex() {
         ),
     };
 
-    const PLATFORM_LABELS: Record<Platform, string> = {
+    const PLATFORM_LABELS: Partial<Record<Platform, string>> = {
         github: 'GitHub',
         linkedin: 'LinkedIn',
         twitter: 'X (Twitter)',
@@ -235,7 +236,7 @@ export default function OnboardingIndex() {
                 }
             );
         } else if (currentStep === 3) {
-            const links: SocialLink[] = Object.entries(socialLinks)
+            const links = Object.entries(socialLinks)
                 .filter(([, url]) => url.trim() !== '')
                 .map(([platform, url]) => ({ platform: platform as Platform, url }));
 
@@ -247,7 +248,7 @@ export default function OnboardingIndex() {
             setProcessing(true);
             router.post(
                 '/onboarding/step-social-links',
-                { links },
+                { links: links.map((l) => ({ platform: l.platform, url: l.url })) },
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(4),
@@ -484,7 +485,7 @@ export default function OnboardingIndex() {
                                                 >
                                                     <Input
                                                         type="url"
-                                                        value={socialLinks[platform]}
+                                                        value={socialLinks[platform] ?? ''}
                                                         onChange={(e) =>
                                                             setSocialLinks((prev) => ({
                                                                 ...prev,
@@ -505,16 +506,16 @@ export default function OnboardingIndex() {
                                 })}
 
                                 {/* Preview */}
-                                {Object.values(socialLinks).some((url) => url.trim() !== '') && (
+                                {Object.values(socialLinks).some((url) => (url ?? '').trim() !== '') && (
                                     <div className="pt-2 border-t border-border">
                                         <p className="text-xs text-muted-foreground mb-2">Vista previa:</p>
                                         <div className="flex flex-wrap gap-2">
                                             {(Object.keys(socialLinks) as Platform[])
-                                                .filter((p) => socialLinks[p].trim() !== '')
+                                                .filter((p) => (socialLinks[p] ?? '').trim() !== '')
                                                 .map((platform) => (
                                                     <a
                                                         key={platform}
-                                                        href={socialLinks[platform]}
+                                                        href={socialLinks[platform] ?? '#'}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-background hover:bg-muted transition-colors text-sm"
@@ -603,14 +604,14 @@ export default function OnboardingIndex() {
                                             key={project.id}
                                             className="flex items-start gap-3 p-4 rounded-lg border border-border"
                                         >
-                                            <Checkbox
-                                                id={`project-${project.id}`}
-                                                checked={selectedProjects.includes(project.id)}
-                                                onChange={() => toggleProject(project.id)}
-                                                className="mt-1"
-                                                aria-invalid={Boolean(joinRequestsError)}
-                                                aria-describedby={joinRequestsError ? joinRequestsErrorId : undefined}
-                                            />
+                                    <Checkbox
+                                        id={`project-${project.id}`}
+                                        checked={selectedProjects.includes(project.id)}
+                                        onCheckedChange={() => toggleProject(project.id)}
+                                        className="mt-1"
+                                        aria-invalid={Boolean(joinRequestsError)}
+                                        aria-describedby={joinRequestsError ? joinRequestsErrorId : undefined}
+                                    />
                                             <label
                                                 htmlFor={`project-${project.id}`}
                                                 className="flex-1 cursor-pointer"

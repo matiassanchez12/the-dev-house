@@ -112,7 +112,7 @@ export default function SocialLinksEditForm({ socialLinks, className = '' }: Pro
                             <div className="w-40">
                                 <Select
                                     value={link.platform}
-                                    onValueChange={(value) => updateLink(index, 'platform', value)}
+                                    onValueChange={(value) => updateLink(index, 'platform', value ?? '')}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Plataforma" />

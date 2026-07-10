@@ -7,7 +7,7 @@ export interface UseInViewOnceOptions {
 
 export function useInViewOnce<T extends Element = HTMLDivElement>(
     options: UseInViewOnceOptions = {},
-): [RefObject<T>, boolean] {
+): [RefObject<T | null>, boolean] {
     const ref = useRef<T>(null);
     const [inView, setInView] = useState(false);
 

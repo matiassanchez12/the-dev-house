@@ -6,9 +6,13 @@ import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-export default function DeleteUserForm({ className = '' }) {
+interface Props {
+    className?: string;
+}
+
+export default function DeleteUserForm({ className = '' }: Props) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
-    const passwordInput = useRef();
+    const passwordInput = useRef<HTMLInputElement>(null);
 
     const {
         data,
@@ -26,7 +30,7 @@ export default function DeleteUserForm({ className = '' }) {
         setConfirmingUserDeletion(true);
     };
 
-    const deleteUser = (e) => {
+    const deleteUser = (e: React.FormEvent) => {
         e.preventDefault();
 
         destroy(route('profile.destroy'), {
@@ -34,7 +38,7 @@ export default function DeleteUserForm({ className = '' }) {
             onSuccess: () => closeModal(),
             onError: () => {
                 toast.error('Error al eliminar la cuenta. Verificá tu contraseña.');
-                passwordInput.current.focus();
+                passwordInput.current?.focus();
             },
             onFinish: () => reset(),
         });

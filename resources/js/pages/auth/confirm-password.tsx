@@ -10,7 +10,7 @@ export default function ConfirmPassword() {
         password: '',
     });
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
         post(route('password.confirm'), {

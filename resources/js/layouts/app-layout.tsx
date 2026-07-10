@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function AppLayout({ children, header }: Props) {
-    const user = (usePage().props.auth?.user as User | null | undefined) ?? null;
+    const user = usePage<{ auth?: { user: User | null } }>().props.auth?.user ?? null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const unreadNotifications = user?.unread_notifications_count ?? 0;
 

@@ -134,6 +134,18 @@ describe('UsersIndex', () => {
                 tech: 'react',
             },
             users: {
+                data: [
+                    {
+                        id: 1,
+                        name: 'Ada Lovelace',
+                        slug: 'ada-lovelace',
+                        avatar: null,
+                        bio: null,
+                        techs: [],
+                        created_projects_count: 2,
+                        joined_projects_count: 1,
+                    },
+                ],
                 links: [
                     { url: null, label: '&laquo; Previous', active: false },
                     { url: '/users?page=2', label: '2', active: false },
@@ -172,6 +184,7 @@ function buildProps(overrides?: Partial<Parameters<typeof UsersIndex>[0]> & {
                 {
                     id: 1,
                     name: 'Ada Lovelace',
+                    slug: 'ada-lovelace',
                     avatar: null,
                     bio: null,
                     techs: [],
