@@ -1,3 +1,5 @@
+import type { PageProps as InertiaPageProps } from '@inertiajs/core'
+
 export interface User {
     id: number
     name: string
@@ -9,6 +11,17 @@ export interface User {
     unread_notifications_count?: number
     created_at: string
     updated_at: string
+}
+
+export interface SharedPageProps extends InertiaPageProps {
+    auth?: { user: User | null }
+    flash: {
+        success?: string
+        error?: string
+        warning?: string
+        info?: string
+    }
+    errors: Record<string, string>
 }
 
 export interface Tech {

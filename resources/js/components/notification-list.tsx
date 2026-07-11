@@ -1,6 +1,7 @@
 import { router, usePage, Link } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { SharedPageProps } from '@/types';
 
 export interface NotificationItem {
     id: string;
@@ -35,7 +36,7 @@ interface NotificationListProps {
 }
 
 export function NotificationList({ limit, emptyText = 'Sin notificaciones' }: NotificationListProps) {
-    const page = usePage<{ notifications?: NotificationItem[] | { data: NotificationItem[] } }>();
+    const page = usePage<SharedPageProps & { notifications?: NotificationItem[] | { data: NotificationItem[] } }>();
     const notificationsProp = page.props.notifications;
     const notifications = Array.isArray(notificationsProp)
         ? notificationsProp
