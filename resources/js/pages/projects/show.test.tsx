@@ -55,6 +55,7 @@ vi.mock('@/components/projects/show', () => ({
     ProjectPhasesSection: () => <div />,
     ProjectStatusManager: () => <div />,
     ProjectDeleteDialog: () => <div />,
+    ProjectInvitationResponseCard: () => <div>INVITATION_RESPONSE_CARD</div>,
     ProjectJoinForm: (props: { isOpen: boolean; isParticipant: boolean; isCreator: boolean }) => {
         capturedJoinFormProps = props;
         return <div>{props.isOpen ? <span>JOIN_FORM_OPEN</span> : <span>JOIN_FORM_CLOSED</span>}</div>;
@@ -108,7 +109,7 @@ describe('Project show page wiring', () => {
                         project_id: 1,
                         invited_user_id: 1,
                         status: 'pending',
-                        message: 'Come join us',
+                        message: 'Vení a colaborar',
                         created_at: '',
                         updated_at: '',
                     },
@@ -116,9 +117,6 @@ describe('Project show page wiring', () => {
             />,
         );
 
-        expect(screen.getByText('You were invited to collaborate')).toBeInTheDocument();
-        expect(screen.getByText('Come join us')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Accept invitation' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Reject invitation' })).toBeInTheDocument();
+        expect(screen.getByText('INVITATION_RESPONSE_CARD')).toBeInTheDocument();
     });
 });
