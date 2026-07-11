@@ -12,3 +12,4 @@ export { ProjectChatSummary } from './project-chat-summary';
 export { ProjectDeleteDialog } from './project-delete-dialog';
 export { ProjectStatusManager } from './project-status-manager';
 export { ProjectPhasesSection } from './project-phases-section';
+export { ProjectInvitationResponseCard } from './project-invitation-response-card';

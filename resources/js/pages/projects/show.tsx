@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import Seo from '@/components/seo';
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
     ProjectHero,
@@ -19,6 +18,7 @@ import {
     ProjectPhasesSection,
     ProjectStatusManager,
     ProjectDeleteDialog,
+    ProjectInvitationResponseCard,
 } from '@/components/projects/show';
 
 type ViewerJoinRequest = ProjectType['viewerJoinRequest'];
@@ -47,16 +47,6 @@ export default function Show({ auth, project }: Props) {
         [project.participants, auth.user?.id],
     );
     const viewerPendingInvitation = project.viewerPendingInvitation ?? null;
-
-    const handleInvitationResponse = (action: 'accept' | 'reject') => {
-        if (!viewerPendingInvitation) {
-            return;
-        }
-
-        router.post(route(`project-invitations.${action}`, viewerPendingInvitation.id), {}, {
-            preserveScroll: true,
-        });
-    };
 
     return (
         <AppLayout
@@ -117,31 +107,10 @@ export default function Show({ auth, project }: Props) {
                                 demo_url={project.demo_url}
                             />
                             {viewerPendingInvitation && (
-                                <Card className="border-primary/20">
-                                    <CardHeader>
-                                        <CardTitle>You were invited to collaborate</CardTitle>
-                                        <CardDescription>
-                                            {viewerPendingInvitation.message ?? 'Respond to this project invitation.'}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex gap-2">
-                                        <Button
-                                            type="button"
-                                            className="w-full"
-                                            onClick={() => handleInvitationResponse('accept')}
-                                        >
-                                            Accept invitation
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="w-full"
-                                            onClick={() => handleInvitationResponse('reject')}
-                                        >
-                                            Reject invitation
-                                        </Button>
-                                    </CardContent>
-                                </Card>
+                                <ProjectInvitationResponseCard
+                                    invitationId={viewerPendingInvitation.id}
+                                    message={viewerPendingInvitation.message}
+                                />
                             )}
                             <ProjectJoinForm
                                 projectId={project.id}
