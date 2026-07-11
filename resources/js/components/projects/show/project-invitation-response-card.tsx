@@ -22,7 +22,7 @@ export function ProjectInvitationResponseCard({ invitationId, message }: Project
                     {message ?? 'Respondé a esta invitación.'}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col sm:flex-row gap-2">
+            <CardContent className="flex flex-col gap-2">
                 <Button
                     type="button"
                     className="w-full"
