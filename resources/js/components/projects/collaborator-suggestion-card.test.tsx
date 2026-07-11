@@ -62,7 +62,7 @@ describe('collaborator suggestion card', () => {
             />,
         );
 
-        fireEvent.click(screen.getByRole('button', { name: 'Send invitation' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Enviar invitación' }));
 
         expect(globalThis.route).toHaveBeenCalledWith('project-invitations.store', 'alpha');
     });
@@ -98,9 +98,9 @@ describe('collaborator suggestion card', () => {
             />,
         );
 
-        expect(screen.queryByRole('button', { name: 'Send invitation' })).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Enviar invitación' })).toBeNull();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Cancel invitation' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Cancelar invitación' }));
 
         expect(globalThis.route).toHaveBeenCalledWith('project-invitations.destroy', 1);
     });

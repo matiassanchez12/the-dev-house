@@ -33,15 +33,15 @@ export default function Collaborators({ project, suggestions, pendingInvitations
 
     return (
         <>
-            <Seo title={`${project.title} · Collaborators`} description="Invite relevant collaborators after creating your project." />
+            <Seo title={`${project.title} · Colaboradores`} description="Invitá colaboradores relevantes para tu proyecto." />
             <AppLayout
                 header={
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <h2 className="font-semibold text-xl text-foreground leading-tight">
-                            Find collaborators
+                            Buscar colaboradores
                         </h2>
                         <Link href={route('projects.show', project.slug)}>
-                            <Button variant="outline">Skip for now</Button>
+                            <Button variant="outline">Omitir por ahora</Button>
                         </Link>
                     </div>
                 }
@@ -50,15 +50,15 @@ export default function Collaborators({ project, suggestions, pendingInvitations
                     <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 sm:px-6 lg:px-8">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Suggested collaborators</CardTitle>
+                                <CardTitle>Colaboradores sugeridos</CardTitle>
                                 <CardDescription>
-                                    These users share at least one tech with your project.
+                                    Estos usuarios comparten al menos una tecnología con tu proyecto.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {suggestions.length === 0 ? (
                                     <p className="text-sm text-muted-foreground">
-                                        No matching collaborators were found.
+                                        No se encontraron colaboradores compatibles.
                                     </p>
                                 ) : (
                                     <div className="grid gap-4 md:grid-cols-2">
@@ -76,15 +76,15 @@ export default function Collaborators({ project, suggestions, pendingInvitations
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Pending invitations</CardTitle>
+                                <CardTitle>Invitaciones pendientes</CardTitle>
                                 <CardDescription>
-                                    Review invitations that are waiting for a response.
+                                    Revisá las invitaciones que esperan respuesta.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {pendingSuggestions.length === 0 ? (
                                     <p className="text-sm text-muted-foreground">
-                                        You have not sent any invitations yet.
+                                        Aún no enviaste invitaciones.
                                     </p>
                                 ) : (
                                     <div className="grid gap-4 md:grid-cols-2">
