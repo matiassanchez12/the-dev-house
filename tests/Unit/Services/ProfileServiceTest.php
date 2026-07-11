@@ -34,7 +34,7 @@ class ProfileServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('avatar.jpg', 500, 500);
+        $file = UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg');
 
         $path = $this->service->updateAvatar($this->user, $file);
 
@@ -48,7 +48,7 @@ class ProfileServiceTest extends TestCase
         Storage::fake('public');
 
         // Upload initial avatar
-        $oldFile = UploadedFile::fake()->image('old-avatar.jpg', 500, 500);
+        $oldFile = UploadedFile::fake()->create('old-avatar.jpg', 100, 'image/jpeg');
         $oldPath = $oldFile->store('avatars', 'public');
         $this->user->avatar = $oldPath;
         $this->user->save();
@@ -56,7 +56,7 @@ class ProfileServiceTest extends TestCase
         Storage::disk('public')->assertExists($oldPath);
 
         // Update with new avatar
-        $newFile = UploadedFile::fake()->image('new-avatar.jpg', 500, 500);
+        $newFile = UploadedFile::fake()->create('new-avatar.jpg', 100, 'image/jpeg');
         $newPath = $this->service->updateAvatar($this->user, $newFile);
 
         Storage::disk('public')->assertMissing($oldPath);
@@ -68,7 +68,7 @@ class ProfileServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('avatar.jpg', 500, 500);
+        $file = UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg');
         $path = $this->service->updateAvatar($this->user, $file);
 
         $this->user->refresh();
@@ -82,7 +82,7 @@ class ProfileServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('avatar.jpg', 500, 500);
+        $file = UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg');
         $path = $file->store('avatars', 'public');
         $this->user->avatar = $path;
         $this->user->save();
@@ -178,7 +178,7 @@ class ProfileServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('avatar.jpg', 500, 500);
+        $file = UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg');
         $path = $file->store('avatars', 'public');
         $this->user->avatar = $path;
         $this->user->save();

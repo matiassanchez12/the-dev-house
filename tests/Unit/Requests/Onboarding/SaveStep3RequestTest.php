@@ -49,7 +49,7 @@ class SaveStep3RequestTest extends TestCase
     public function valid_image_jpg_passes(): void
     {
         $data = [
-            'avatar' => UploadedFile::fake()->image('avatar.jpg', 500, 500),
+            'avatar' => UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg'),
         ];
 
         $validator = $this->validateRequest($data);
@@ -61,7 +61,7 @@ class SaveStep3RequestTest extends TestCase
     public function valid_image_png_passes(): void
     {
         $data = [
-            'avatar' => UploadedFile::fake()->image('avatar.png', 500, 500),
+            'avatar' => UploadedFile::fake()->create('avatar.png', 100, 'image/png'),
         ];
 
         $validator = $this->validateRequest($data);
@@ -73,7 +73,7 @@ class SaveStep3RequestTest extends TestCase
     public function valid_image_webp_passes(): void
     {
         $data = [
-            'avatar' => UploadedFile::fake()->image('avatar.webp', 500, 500),
+            'avatar' => UploadedFile::fake()->create('avatar.webp', 100, 'image/webp'),
         ];
 
         $validator = $this->validateRequest($data);
