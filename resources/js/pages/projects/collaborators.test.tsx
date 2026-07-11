@@ -87,11 +87,11 @@ describe('projects/collaborators page', () => {
             />,
         );
 
-        expect(screen.getByText('Find collaborators')).toBeInTheDocument();
+        expect(screen.getByText('Buscar colaboradores')).toBeInTheDocument();
         expect(screen.getAllByTestId('suggestion-card')).toHaveLength(2);
         expect(screen.getByText('Maya')).toBeInTheDocument();
         expect(screen.getByText('Nico')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Skip for now' })).toHaveAttribute('href', '/projects/alpha');
+        expect(screen.getByRole('link', { name: 'Omitir por ahora' })).toHaveAttribute('href', '/projects/alpha');
 
         // @ts-expect-error test cleanup
         delete globalThis.route;

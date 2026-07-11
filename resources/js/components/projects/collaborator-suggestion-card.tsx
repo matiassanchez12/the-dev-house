@@ -35,7 +35,7 @@ export default function CollaboratorSuggestionCard({ projectSlug, suggestion }: 
             <CardHeader>
                 <CardTitle>{suggestion.user.name}</CardTitle>
                 <CardDescription>
-                    {isPending ? 'Invitation pending' : 'Matches your project tech stack'}
+                    {isPending ? 'Invitación pendiente' : 'Compatible con las tecnologías de tu proyecto'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -49,10 +49,10 @@ export default function CollaboratorSuggestionCard({ projectSlug, suggestion }: 
 
                 {isPending ? (
                     <Button variant="outline" onClick={cancel}>
-                        Cancel invitation
+                        Cancelar invitación
                     </Button>
                 ) : (
-                    <Button onClick={invite}>Send invitation</Button>
+                    <Button onClick={invite}>Enviar invitación</Button>
                 )}
             </CardContent>
         </Card>
