@@ -201,7 +201,7 @@ class ProjectTest extends TestCase
         // Arrange
         Storage::fake('public');
         
-        $image = UploadedFile::fake()->image('project.jpg', 800, 600);
+        $image = UploadedFile::fake()->create('project.jpg', 100, 'image/jpeg');
         
         $projectData = [
             'title' => 'Proyecto con Imágenes',

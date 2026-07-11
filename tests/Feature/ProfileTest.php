@@ -127,7 +127,7 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->post('/profile/complete', [
-                'avatar' => \Illuminate\Http\UploadedFile::fake()->image('avatar.jpg', 400, 400),
+                'avatar' => \Illuminate\Http\UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg'),
             ]);
 
         $response
@@ -272,7 +272,7 @@ class ProfileTest extends TestCase
             ->actingAs($user)
             ->post('/profile/complete', [
                 'bio' => 'Full-stack developer',
-                'avatar' => \Illuminate\Http\UploadedFile::fake()->image('avatar.jpg', 400, 400),
+                'avatar' => \Illuminate\Http\UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg'),
                 'techs' => [
                     [
                         'id' => $tech->id,
