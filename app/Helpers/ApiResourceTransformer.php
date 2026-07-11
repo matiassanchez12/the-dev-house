@@ -258,6 +258,8 @@ class ApiResourceTransformer
             'name',
             'slug',
             'icon',
+            'years',
+            'proficiency',
         ]));
     }
 
