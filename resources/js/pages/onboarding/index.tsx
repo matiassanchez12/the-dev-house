@@ -1,6 +1,7 @@
 import Seo from '@/components/seo';
 import { router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import type { SharedPageProps } from '@/types';
 import { toast } from 'sonner';
 import OnboardingLayout from '@/layouts/onboarding';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ import { avatarUrl } from '@/components/projects/project-utils';
 
 const MAX_SELECTED_TECHS = 3;
 
-interface OnboardingProps {
+interface OnboardingProps extends SharedPageProps {
     auth: {
         user: User;
     };
@@ -35,7 +36,6 @@ interface OnboardingProps {
     allTechs: Tech[];
     userTechs: (Tech & { pivot?: { proficiency?: string } })[];
     totalSteps: number;
-    [key: string]: unknown;
 }
 
 const PROFICIENCY_MAP: Record<number, string> = {
@@ -71,7 +71,7 @@ interface Recommendation {
 }
 
 export default function OnboardingIndex() {
-    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps & { errors: Record<string, string> }>().props;
+    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps>().props;
 
     const [currentStep, setCurrentStep] = useState(1);
     const [processing, setProcessing] = useState(false);

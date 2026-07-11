@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Bell, FolderKanban, Inbox, LogIn, LogOut, Settings2, Sparkles, UserRound, UsersRound } from 'lucide-react';
-import { User } from '@/types';
+import type { SharedPageProps } from '@/types';
 
 interface Props {
     children: React.ReactNode;
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function AppLayout({ children, header }: Props) {
-    const user = usePage<{ auth?: { user: User | null } }>().props.auth?.user ?? null;
+    const user = usePage<SharedPageProps>().props.auth?.user ?? null;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const unreadNotifications = user?.unread_notifications_count ?? 0;
 

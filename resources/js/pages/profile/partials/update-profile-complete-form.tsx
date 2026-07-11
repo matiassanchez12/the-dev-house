@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { Tech, User } from '@/types';
+import { Tech, User, SharedPageProps } from '@/types';
 import { toast } from 'sonner';
 import { avatarUrl } from '@/components/projects/project-utils';
 import {
@@ -44,7 +44,7 @@ interface Props {
 }
 
 export default function UpdateProfileCompleteForm({ className = '', userTechs, allTechs }: Props) {
-    const { auth } = usePage<{ auth: { user: User } }>().props;
+    const { auth } = usePage<SharedPageProps & { auth: { user: User } }>().props;
     const user = auth.user;
     const [previewAvatar, setPreviewAvatar] = useState<string | null>(
         avatarUrl(user.avatar)
