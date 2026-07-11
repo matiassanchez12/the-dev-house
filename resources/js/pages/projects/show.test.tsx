@@ -102,7 +102,7 @@ describe('Project show page wiring', () => {
     it('renders invitation response actions when the viewer has a pending invitation', () => {
         render(
             <Show
-                auth={{ user: { id: 1, name: 'Ada' } }}
+                auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }}
                 project={baseProject({
                     viewerPendingInvitation: {
                         id: 42,
