@@ -8,7 +8,12 @@ const { postMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/layouts/app-layout', () => ({
-    default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    default: ({ children, header }: { children: ReactNode; header?: ReactNode }) => (
+        <div>
+            {header && <header>{header}</header>}
+            {children}
+        </div>
+    ),
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -16,7 +21,7 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@inertiajs/react', () => ({
-    Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
+    Link: ({ children, className, href }: { children: ReactNode; className?: string; href: string }) => <a className={className} href={href}>{children}</a>,
     router: {
         post: postMock,
     },
@@ -118,5 +123,19 @@ describe('Project show page wiring', () => {
         );
 
         expect(screen.getByText('INVITATION_RESPONSE_CARD')).toBeInTheDocument();
+    });
+
+    it('renders a mobile-first collaborators link for project creators', () => {
+        render(
+            <Show
+                auth={{ user: { id: 99, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '' } }}
+                project={baseProject({ viewer_role: 'creator' })}
+            />,
+        );
+
+        const collaboratorsLink = screen.getByRole('link', { name: /colaboradores/i });
+
+        expect(collaboratorsLink).toHaveAttribute('href', '/projects.collaborators/collab-app');
+        expect(collaboratorsLink).toHaveClass('flex-1', 'sm:flex-none');
     });
 });
