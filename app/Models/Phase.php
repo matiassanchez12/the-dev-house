@@ -13,6 +13,7 @@ class Phase extends Model
     protected $fillable = [
         'completed_at',
         'description',
+        'image_path',
         'project_id',
         'title',
     ];

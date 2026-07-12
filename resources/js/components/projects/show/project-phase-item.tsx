@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
 import { Separator } from '@/components/ui/separator';
 import type { Phase } from '@/types';
 
@@ -22,6 +23,7 @@ function formatDate(value: string | null | undefined): string {
 
 export function ProjectPhaseItem({ phase, projectSlug, canManage = false, onEdit }: ProjectPhaseItemProps) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [galleryOpen, setGalleryOpen] = useState(false);
 
     function handleDelete() {
         router.delete(route('projects.phases.destroy', [projectSlug, phase.id]), { preserveScroll: true, onSuccess: () => setIsDeleteDialogOpen(false) });
@@ -34,6 +36,19 @@ export function ProjectPhaseItem({ phase, projectSlug, canManage = false, onEdit
                     <div className="flex flex-col gap-1">
                         <CardTitle className="flex items-center gap-2 text-base"><CheckCircle2 className="size-4 text-emerald-600" />{phase.title}</CardTitle>
                         {phase.description ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{phase.description}</p> : <p className="text-sm text-muted-foreground">Sin descripción</p>}
+                        {phase.image && (
+                            <button
+                                type="button"
+                                onClick={() => setGalleryOpen(true)}
+                                className="mt-2 w-fit cursor-pointer"
+                            >
+                                <img
+                                    src={phase.image.url}
+                                    alt={phase.title}
+                                    className="h-16 w-16 rounded-lg object-cover hover:opacity-90 transition-opacity"
+                                />
+                            </button>
+                        )}
                     </div>
                     <Badge variant="outline">{phase.completed_at ? `Completado el ${formatDate(phase.completed_at)}` : `Registrado el ${formatDate(phase.created_at)}`}</Badge>
                 </div>
@@ -53,6 +68,14 @@ export function ProjectPhaseItem({ phase, projectSlug, canManage = false, onEdit
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            {phase.image && (
+                <ImageGalleryDialog
+                    images={[phase.image.url]}
+                    open={galleryOpen}
+                    initialIndex={0}
+                    onOpenChange={setGalleryOpen}
+                />
+            )}
         </Card>
     );
 }

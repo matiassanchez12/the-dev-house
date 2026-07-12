@@ -43,11 +43,17 @@ export interface ProjectImage {
     url: string
 }
 
+export interface PhaseImage {
+    path: string
+    url: string
+}
+
 export interface Phase {
     id: number
     project_id: number
     title: string
     description?: string | null
+    image?: PhaseImage | null
     completed_at?: string | null
     created_at: string
     updated_at: string

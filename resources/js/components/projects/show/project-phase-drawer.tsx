@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form-error';
@@ -6,11 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PhaseDatePicker } from './phase-date-picker';
+import { PhaseImageInput } from './phase-image-input';
+import type { PhaseImage } from '@/types';
 
 export interface ProjectPhaseValues {
     title: string;
     description: string;
     completed_at: string;
+    image?: PhaseImage | null;
 }
 
 interface ProjectPhaseDrawerProps {
@@ -21,10 +24,12 @@ interface ProjectPhaseDrawerProps {
     initialValues?: ProjectPhaseValues;
 }
 
-const emptyValues: ProjectPhaseValues = { title: '', description: '', completed_at: '' };
+const emptyValues: ProjectPhaseValues = { title: '', description: '', completed_at: '', image: null };
 
 export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, initialValues = emptyValues }: ProjectPhaseDrawerProps) {
     const isEditing = phaseId !== undefined;
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [removeExisting, setRemoveExisting] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: isEditing ? 'put' : 'post',
         ...initialValues,
@@ -37,11 +42,23 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
             setData('title', initialValues.title);
             setData('description', initialValues.description);
             setData('completed_at', initialValues.completed_at);
+            setData('image', initialValues.image ?? null);
+            setImageFile(null);
+            setRemoveExisting(false);
         }
     }, [open, initialValues, isEditing, reset, setData]);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('_method', isEditing ? 'put' : 'post');
+        formData.append('title', data.title);
+        formData.append('description', data.description);
+        formData.append('completed_at', data.completed_at);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
 
         const routeName = isEditing ? route('projects.phases.update', [projectSlug, phaseId]) : route('projects.phases.store', projectSlug);
 
@@ -64,6 +81,14 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
                 <Textarea id="phase-description" value={data.description} onChange={(event) => setData('description', event.target.value)} placeholder="Contá qué se logró en este hito" rows={3} />
                 <FormError message={errors.description} />
             </div>
+
+            <PhaseImageInput
+                file={imageFile}
+                existingImage={removeExisting ? null : data.image}
+                onFileChange={setImageFile}
+                onRemoveExisting={() => setRemoveExisting(true)}
+                error={errors.image}
+            />
 
             <div className="flex flex-col gap-2">
                 <Label htmlFor="phase-completed-at">Fecha de cierre</Label>
