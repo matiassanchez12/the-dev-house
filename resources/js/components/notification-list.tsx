@@ -26,8 +26,8 @@ const typeLabels: Record<NotificationItem['data']['type'], string> = {
     join_request_received: 'quiere unirse a tu proyecto',
     join_request_approved: 'aprobó tu solicitud',
     join_request_rejected: 'rechazó tu solicitud',
-    project_invitation_received: 'invited you to collaborate',
-    project_invitation_accepted: 'joined your project',
+    project_invitation_received: 'te invitó a colaborar en',
+    project_invitation_accepted: 'se unió a tu proyecto',
 };
 
 interface NotificationListProps {

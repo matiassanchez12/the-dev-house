@@ -61,7 +61,7 @@ describe('NotificationList', () => {
 
         render(<NotificationList />);
 
-        expect(screen.getByText('joined your project')).toBeInTheDocument();
+        expect(screen.getByText('se unió a tu proyecto')).toBeInTheDocument();
         expect(screen.getByText('Grace')).toBeInTheDocument();
         expect(screen.getByRole('link')).toHaveAttribute('href', '/projects.show/collab-app');
 
