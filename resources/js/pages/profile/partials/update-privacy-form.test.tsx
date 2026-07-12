@@ -5,7 +5,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PrivacySetting } from '@/types';
 import UpdatePrivacyForm from './update-privacy-form';
 
-const mockState = vi.hoisted(() => ({
+interface MockFormData {
+    phone: string;
+    show_email: boolean;
+    show_phone: boolean;
+    is_discoverable: boolean;
+    show_activity: boolean;
+}
+
+interface MockState {
+    formData: MockFormData;
+    errors: Record<string, string>;
+    recentlySuccessful: boolean;
+    post: ReturnType<typeof vi.fn>;
+    setData: ReturnType<typeof vi.fn>;
+    transform: ReturnType<typeof vi.fn>;
+    transformedData: MockFormData | null;
+}
+
+const mockState = vi.hoisted((): MockState => ({
     formData: {
         phone: '555-1234',
         show_email: true,
@@ -22,11 +40,11 @@ const mockState = vi.hoisted(() => ({
     setData: vi.fn((field: string, value: unknown) => {
         (mockState.formData as Record<string, unknown>)[field] = value;
     }),
-    transform: vi.fn((callback: (data: typeof mockState.formData) => typeof mockState.formData) => {
+    transform: vi.fn((callback: (data: MockFormData) => MockFormData) => {
         mockState.formData = callback({ ...mockState.formData });
         return mockState.formData;
     }),
-    transformedData: null as null | typeof mockState.formData,
+    transformedData: null as MockFormData | null,
 }));
 
 vi.mock('@inertiajs/react', () => ({

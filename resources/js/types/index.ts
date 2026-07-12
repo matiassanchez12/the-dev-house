@@ -216,6 +216,7 @@ export interface UserTech {
 export interface DiscoverableUser {
     id: number
     name: string
+    slug: string
     avatar: string | null
     bio: string | null
     techs: Array<{ id: number; name: string; slug: string }>

@@ -24,7 +24,7 @@ interface Props {
     name: string;
     email: string;
     emailVerifiedAt: string | null;
-    userTechs: unknown[];
+    userTechs: UserTech[];
     phone: string | null;
     privacySetting: PrivacySetting;
     socialLinks?: SocialLink[];
