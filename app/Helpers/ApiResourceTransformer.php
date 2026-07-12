@@ -114,6 +114,9 @@ class ApiResourceTransformer
 
     /**
      * Transform a user model to array with safe fields and disk-aware avatar URLs.
+     *
+     * This is the SAFE default shape for listings, project participants, chat,
+     * dashboard cards, etc. Sensitive contact fields stay out of this payload.
      */
     public static function user(Model|array $user): array
     {
@@ -186,6 +189,30 @@ class ApiResourceTransformer
     }
 
     /**
+     * Transform a public profile detail payload.
+     *
+     * Unlike the safe default `user()` payload, this shape may include contact
+     * fields the owner explicitly opted into for their public profile.
+     */
+    public static function publicProfile(Model|array $user): array
+    {
+        $safe = self::user($user);
+        $data = $user instanceof Model ? $user->toArray() : $user;
+
+        if (! empty($data['email'])) {
+            $safe['email'] = $data['email'];
+        }
+
+        if (! empty($data['phone'])) {
+            $safe['phone'] = $data['phone'];
+        }
+
+        return $safe;
+    }
+
+    /**
+     * Transform a join request to array with disk-aware file URLs.
+     * Applicant and project creator are scrubbed to safe fields only.
      * Transform an outbound project invitation to a safe array.
      */
     public static function projectInvitation(Model|array $invitation): array

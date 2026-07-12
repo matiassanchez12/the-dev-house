@@ -4,8 +4,9 @@ import DeleteUserForm from './partials/delete-user-form';
 import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
 import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
+import UpdatePrivacyForm from './partials/update-privacy-form';
 import SocialLinksEditForm from './partials/social-links-edit-form';
-import { SocialLink, Tech, SharedPageProps } from '@/types';
+import { SocialLink, Tech, SharedPageProps, PrivacySetting } from '@/types';
 import { type TechProficiency } from '@/lib/tech-proficiency';
 
 import { usePage } from '@inertiajs/react';
@@ -23,12 +24,15 @@ interface Props {
     name: string;
     email: string;
     emailVerifiedAt: string | null;
-    userTechs: UserTech[];
+    userTechs: unknown[];
+    phone: string | null;
+    privacySetting: PrivacySetting;
     socialLinks?: SocialLink[];
 }
 
-export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, socialLinks }: Props) {
+export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, phone, privacySetting, socialLinks }: Props) {
     const { techs } = usePage<SharedPageProps & { techs: Tech[] }>().props;
+  
     return (
         <AppLayout
             header={
@@ -59,6 +63,15 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
                             userTechs={userTechs}
                             allTechs={techs}
                             className="max-w-3xl"
+                        />
+                    </div>
+
+                    {/* Privacidad y contacto */}
+                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
+                        <UpdatePrivacyForm
+                            phone={phone}
+                            privacySetting={privacySetting}
+                            className="max-w-xl"
                         />
                     </div>
 

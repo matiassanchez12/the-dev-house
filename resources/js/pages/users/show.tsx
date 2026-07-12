@@ -1,23 +1,22 @@
-import Seo from '@/components/seo';
-import { FolderOpen, Users, Wrench } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
-import { UserProfile } from '@/types';
-import { UserProfileHeader } from '@/components/user/user-profile-header';
-import { ProjectShowcase } from '@/components/user/project-showcase';
-import { TechShowcase } from '@/components/user/tech-showcase';
-import { cn } from '@/lib/utils';
+import Seo from '@/components/seo'
+import { FolderOpen, Users, Wrench } from 'lucide-react'
+import AppLayout from '@/layouts/app-layout'
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { UserProfile } from '@/types'
+import { UserProfileHeader } from '@/components/user/user-profile-header'
+import { ProjectShowcase } from '@/components/user/project-showcase'
+import { TechShowcase } from '@/components/user/tech-showcase'
 
 interface Props {
     auth: {
         user: {
-            id: number;
-            name: string;
-        } | null;
-    };
-    user: UserProfile;
+            id: number
+            name: string
+        } | null
+    }
+    user: UserProfile
 }
 
 function StatItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
@@ -31,22 +30,39 @@ function StatItem({ icon, label, value }: { icon: React.ReactNode; label: string
                 <span className="text-xs text-muted-foreground">{label}</span>
             </div>
         </div>
-    );
+    )
 }
 
 export default function Show({ auth, user }: Props) {
-    const hasProjects = (user.createdProjects?.length ?? 0) > 0 || (user.participatingProjects?.length ?? 0) > 0;
-    const hasTechs = (user.techs?.length ?? 0) > 0;
+    const showActivity = user.privacySetting?.show_activity ?? true
+    const hasTechs = (user.techs?.length ?? 0) > 0
 
     const stats = [
-        { label: 'Proyectos creados', value: user.createdProjects?.length ?? 0, icon: <FolderOpen className="size-5" /> },
-        { label: 'Proyectos participando', value: user.participatingProjects?.length ?? 0, icon: <Users className="size-5" /> },
-        { label: 'Tecnologías', value: user.techs?.length ?? 0, icon: <Wrench className="size-5" /> },
-    ];
+        {
+            label: 'Proyectos creados',
+            value: user.createdProjects?.length ?? 0,
+            icon: <FolderOpen className="size-5" />,
+        },
+        {
+            label: 'Proyectos participando',
+            value: user.participatingProjects?.length ?? 0,
+            icon: <Users className="size-5" />,
+        },
+        {
+            label: 'Tecnologías',
+            value: user.techs?.length ?? 0,
+            icon: <Wrench className="size-5" />,
+        },
+    ]
 
     return (
         <>
-            <Seo title={user.name} description={user.bio ? user.bio.slice(0, 160) : `Perfil de ${user.name} en The Dev House`} />
+            <Seo
+                title={user.name}
+                description={
+                    user.bio ? user.bio.slice(0, 160) : `Perfil de ${user.name} en The Dev House`
+                }
+            />
             <AppLayout>
                 {/* Hero Section */}
                 <div className="bg-gradient-to-b from-muted/50 to-background">
@@ -90,30 +106,17 @@ export default function Show({ auth, user }: Props) {
                     <Separator className="my-8" />
 
                     {/* Project Showcase */}
-                    {hasProjects ? (
-                        <Card>
-                            <CardContent className="py-6">
-                                <ProjectShowcase
-                                    createdProjects={user.createdProjects}
-                                    participatingProjects={user.participatingProjects}
-                                />
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <Empty className="py-8">
-                            <EmptyHeader>
-                                <EmptyMedia variant="icon">
-                                    <FolderOpen className="size-5 text-muted-foreground" />
-                                </EmptyMedia>
-                                <EmptyTitle>Sin proyectos</EmptyTitle>
-                                <EmptyDescription>
-                                    Este usuario aún no ha creado ni participado en proyectos.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                        </Empty>
-                    )}
+                    <Card>
+                        <CardContent className="py-6">
+                            <ProjectShowcase
+                                createdProjects={user.createdProjects}
+                                participatingProjects={user.participatingProjects}
+                                showActivity={showActivity}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
             </AppLayout>
         </>
-    );
+    )
 }

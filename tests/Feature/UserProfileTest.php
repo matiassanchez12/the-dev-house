@@ -209,7 +209,7 @@ class UserProfileTest extends TestCase
      * Scenario: Any profile view (auth or guest)
      * Expected: Email field is never present in response
      */
-    public function test_profile_never_exposes_email(): void
+    public function test_profile_hides_email_by_default(): void
     {
         // Arrange
         $user = User::factory()->create([

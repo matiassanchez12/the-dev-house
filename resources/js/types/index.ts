@@ -214,14 +214,13 @@ export interface UserTech {
 }
 
 export interface DiscoverableUser {
-    id: number;
-    name: string;
-    slug: string;
-    avatar: string | null;
-    bio: string | null;
-    techs: Array<{ id: number; name: string; slug: string }>;
-    created_projects_count: number;
-    joined_projects_count: number;
+    id: number
+    name: string
+    avatar: string | null
+    bio: string | null
+    techs: Array<{ id: number; name: string; slug: string }>
+    created_projects_count: number
+    joined_projects_count: number
 }
 
 export interface ImageGalleryDialogProps {

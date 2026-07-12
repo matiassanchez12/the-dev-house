@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/complete', [ProfileController::class, 'updateComplete'])->name('profile.update-complete');
+    Route::post('/profile/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.privacy.update');
     Route::put('/profile/social-links', [ProfileController::class, 'updateSocialLinks'])->name('social-links.update');
     Route::delete('/profile/social-links/{socialLink}', [ProfileController::class, 'destroySocialLink'])->name('social-links.destroy');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
