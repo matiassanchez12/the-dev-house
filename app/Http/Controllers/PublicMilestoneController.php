@@ -18,7 +18,6 @@ class PublicMilestoneController extends Controller
             ->withQueryString();
 
         return Inertia::render('milestones', [
-            'auth' => ['user' => auth()->user()],
             'milestones' => [
                 'data' => $milestones->getCollection()
                     ->map(fn (Phase $phase) => ApiResourceTransformer::phase($phase))

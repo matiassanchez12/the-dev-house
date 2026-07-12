@@ -61,7 +61,33 @@ class PiiExposureTest extends TestCase
 
         $response->assertInertia(fn ($page) => $page
             ->where('email', $this->user->email)
+            ->where('phone', $this->user->phone)
+            ->has('privacySetting')
             ->has('emailVerifiedAt')
+        );
+    }
+
+    public function test_public_page_auth_user_does_not_expose_email_or_phone(): void
+    {
+        $this->user->update(['phone' => '+541112345678']);
+
+        $response = $this->actingAs($this->user)->get(route('privacy'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->missing('auth.user.email')
+            ->missing('auth.user.phone')
+        );
+    }
+
+    public function test_public_milestones_auth_user_does_not_expose_email_or_phone(): void
+    {
+        $this->user->update(['phone' => '+541112345678']);
+
+        $response = $this->actingAs($this->user)->get(route('milestones.index'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->missing('auth.user.email')
+            ->missing('auth.user.phone')
         );
     }
 

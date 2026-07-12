@@ -6,7 +6,7 @@ import type { HeroCtaProps } from './types';
 export function HeroCta({ auth, className }: HeroCtaProps) {
     const isAuthed = auth.user !== null;
     const primaryHref = isAuthed ? route('projects.create') : route('register');
-    const primaryLabel = isAuthed ? 'Crear proyecto' : 'Empezá gratis';
+    const primaryLabel = isAuthed ? 'Crear proyecto' : 'Crear mi perfil';
 
     const baseClasses = 'min-h-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
@@ -22,7 +22,7 @@ export function HeroCta({ auth, className }: HeroCtaProps) {
                 href={route('projects.index')}
                 className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), baseClasses, 'sm:flex-1')}
             >
-                Explorar proyectos
+                Ver proyectos
             </Link>
         </div>
     );

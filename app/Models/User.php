@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -33,6 +35,7 @@ class User extends Authenticatable
         'name',
         'onboarding_completed_at',
         'password',
+        'phone',
         'slug',
     ];
 
@@ -42,6 +45,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
+        'phone',
         'password',
         'remember_token',
     ];
@@ -57,6 +61,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'onboarding_completed_at' => 'datetime',
+            'phone' => 'encrypted',
         ];
     }
 
@@ -98,6 +103,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Invitations received by this user.
+     */
+    public function receivedInvitations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProjectInvitation::class, 'invited_user_id');
+    }
+
+    /**
      * Solicitudes de ingreso para proyectos de este usuario (como creator)
      */
     public function receivedJoinRequests(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
@@ -119,6 +132,23 @@ class User extends Authenticatable
     public function socialLinks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SocialLink::class);
+    }
+
+    /**
+     * Preferencias de privacidad de este usuario (1:1).
+     */
+    public function privacySetting(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserPrivacySetting::class);
+    }
+
+    /**
+     * Si el usuario aparece en el directorio público. Default true si nunca
+     * creó una fila de preferencias (back-compat con usuarios existentes).
+     */
+    public function isDiscoverable(): bool
+    {
+        return $this->privacySetting?->is_discoverable ?? true;
     }
 
     /**

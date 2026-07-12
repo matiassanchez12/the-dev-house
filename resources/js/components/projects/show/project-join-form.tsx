@@ -8,13 +8,17 @@ import { FormError } from '@/components/ui/form-error';
 import { toast } from 'sonner';
 import type { JoinRequest, User } from '@/types';
 
+type ViewerJoinRequest = Pick<JoinRequest, 'id' | 'status'> & {
+    message?: string;
+};
+
 interface ProjectJoinFormProps {
     projectId: number;
     isOpen: boolean;
     isCreator: boolean;
     isParticipant: boolean;
     user: User | null;
-    viewerJoinRequest?: Pick<JoinRequest, 'id' | 'status' | 'message'> | null;
+    viewerJoinRequest?: ViewerJoinRequest | null;
 }
 
 export function ProjectJoinForm({ projectId, isOpen, isCreator, isParticipant, user, viewerJoinRequest }: ProjectJoinFormProps) {

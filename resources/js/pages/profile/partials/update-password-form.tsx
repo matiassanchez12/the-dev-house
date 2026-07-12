@@ -6,9 +6,13 @@ import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 
-export default function UpdatePasswordForm({ className = '' }) {
-    const passwordInput = useRef();
-    const currentPasswordInput = useRef();
+interface Props {
+    className?: string;
+}
+
+export default function UpdatePasswordForm({ className = '' }: Props) {
+    const passwordInput = useRef<HTMLInputElement>(null);
+    const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     const {
         data,
@@ -24,7 +28,7 @@ export default function UpdatePasswordForm({ className = '' }) {
         password_confirmation: '',
     });
 
-    const updatePassword = (e) => {
+    const updatePassword = (e: React.FormEvent) => {
         e.preventDefault();
 
         put(route('password.update'), {
@@ -37,12 +41,12 @@ export default function UpdatePasswordForm({ className = '' }) {
                 toast.error('Error al actualizar la contraseña');
                 if (errors.password) {
                     reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
+                    passwordInput.current?.focus();
                 }
 
                 if (errors.current_password) {
                     reset('current_password');
-                    currentPasswordInput.current.focus();
+                    currentPasswordInput.current?.focus();
                 }
             },
         });

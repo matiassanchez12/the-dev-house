@@ -22,11 +22,12 @@ class ContactService
             'improvements' => $data['improvements'],
         ]);
 
-        // Temporarily disabled until the production sending domain is ready.
-        // Mail::to(
-        //     config('contact.feedback_recipient.address'),
-        //     config('contact.feedback_recipient.name'),
-        // )->send(new ContactFeedbackSubmitted($contactMessage));
+        if (config('contact.feedback_recipient.enabled')) {
+            Mail::to(
+                config('contact.feedback_recipient.address'),
+                config('contact.feedback_recipient.name'),
+            )->send(new ContactFeedbackSubmitted($contactMessage));
+        }
 
         return $contactMessage;
     }
