@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dropdown } from '@/components/ui/dropdown';
-import { NotificationList } from '@/components/notification-list';
+import { NotificationList, type NotificationItem } from '@/components/notification-list';
 
 interface User {
     id: number;
@@ -12,13 +14,11 @@ interface User {
     unread_notifications_count: number;
 }
 
-interface PageProps {
+interface PageProps extends InertiaPageProps {
     auth?: { user: User | null };
     notifications?: NotificationItem[] | { data: NotificationItem[] };
     url?: string;
 }
-
-export type { NotificationItem } from '@/components/notification-list';
 
 const unreadTitlePrefix = /^\(\d+\)\s+/;
 
@@ -30,7 +30,7 @@ export default function NotificationBell() {
     const initialUnread = user?.unread_notifications_count ?? 0;
     const [unreadCount, setUnreadCount] = useState(initialUnread);
     const titleBaseRef = useRef(typeof document === 'undefined' ? '' : stripUnreadPrefix(document.title));
-    const titleIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
+    const titleIntervalRef = useRef<number | null>(null);
 
     useEffect(() => {
         setUnreadCount(initialUnread);
@@ -62,7 +62,7 @@ export default function NotificationBell() {
         };
 
         renderTitle();
-        titleIntervalRef.current = window.setInterval(renderTitle, 1000);
+        titleIntervalRef.current = window.setInterval(renderTitle, 1000) as unknown as number;
 
         return () => {
             if (titleIntervalRef.current) {

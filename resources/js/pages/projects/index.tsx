@@ -206,7 +206,10 @@ export default function Index({ auth, projects, techs, filters }: Props) {
                                         <label className="mb-2 block text-sm font-medium">
                                             Tecnología
                                         </label>
-                                        <Select value={selectedTech} onValueChange={setSelectedTech}>
+                                        <Select
+                                            value={selectedTech}
+                                            onValueChange={(value) => setSelectedTech(value ?? '')}
+                                        >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Todas" />
                                             </SelectTrigger>
@@ -224,7 +227,10 @@ export default function Index({ auth, projects, techs, filters }: Props) {
                                         <label className="mb-2 block text-sm font-medium">
                                             Estado
                                         </label>
-                                        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                        <Select
+                                            value={selectedStatus}
+                                            onValueChange={(value) => setSelectedStatus(value ?? '')}
+                                        >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Todos" />
                                             </SelectTrigger>

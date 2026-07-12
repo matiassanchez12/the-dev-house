@@ -3,8 +3,17 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Show from './show';
 
+const { postMock } = vi.hoisted(() => ({
+    postMock: vi.fn(),
+}));
+
 vi.mock('@/layouts/app-layout', () => ({
-    default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    default: ({ children, header }: { children: ReactNode; header?: ReactNode }) => (
+        <div>
+            {header && <header>{header}</header>}
+            {children}
+        </div>
+    ),
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -12,17 +21,31 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@inertiajs/react', () => ({
-    Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
+    Link: ({ children, className, href }: { children: ReactNode; className?: string; href: string }) => <a className={className} href={href}>{children}</a>,
+    router: {
+        post: postMock,
+    },
 }));
 
 beforeEach(() => {
     Object.defineProperty(globalThis, 'route', {
         configurable: true,
-        value: vi.fn().mockReturnValue('/'),
+        value: vi.fn((name: string, id?: number) => `/${name}/${id ?? ''}`),
     });
+    postMock.mockClear();
 });
 
-let capturedJoinFormProps: { isOpen: boolean; isParticipant: boolean; isCreator: boolean } | undefined;
+type JoinFormProps = { isOpen: boolean; isParticipant: boolean; isCreator: boolean };
+
+let capturedJoinFormProps: JoinFormProps | undefined;
+
+function requireCapturedJoinFormProps(): JoinFormProps {
+    if (!capturedJoinFormProps) {
+        throw new Error('Expected join form props to be captured');
+    }
+
+    return capturedJoinFormProps;
+}
 
 vi.mock('@/components/projects/show', () => ({
     ProjectHero: () => <div data-testid="hero" />,
@@ -37,6 +60,7 @@ vi.mock('@/components/projects/show', () => ({
     ProjectPhasesSection: () => <div />,
     ProjectStatusManager: () => <div />,
     ProjectDeleteDialog: () => <div />,
+    ProjectInvitationResponseCard: () => <div>INVITATION_RESPONSE_CARD</div>,
     ProjectJoinForm: (props: { isOpen: boolean; isParticipant: boolean; isCreator: boolean }) => {
         capturedJoinFormProps = props;
         return <div>{props.isOpen ? <span>JOIN_FORM_OPEN</span> : <span>JOIN_FORM_CLOSED</span>}</div>;
@@ -65,19 +89,53 @@ describe('Project show page wiring', () => {
     it('renders the join UI for an in_progress project so guests can request to join', () => {
         capturedJoinFormProps = undefined;
 
-        render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
+        render(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'in_progress' })} />);
 
         expect(screen.getByText('JOIN_FORM_OPEN')).toBeInTheDocument();
-        expect(capturedJoinFormProps).toBeDefined();
-        expect(capturedJoinFormProps?.isOpen).toBe(true);
+        expect(requireCapturedJoinFormProps().isOpen).toBe(true);
     });
 
     it('does not render the join UI for a completed project', () => {
-        const { rerender } = render(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'in_progress' })} />);
+        const { rerender } = render(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'in_progress' })} />);
 
-        rerender(<Show auth={{ user: { id: 1, name: 'Ada' } }} project={baseProject({ status: 'completed' })} />);
+        rerender(<Show auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }} project={baseProject({ status: 'completed' })} />);
 
         expect(screen.getByText('JOIN_FORM_CLOSED')).toBeInTheDocument();
-        expect(capturedJoinFormProps?.isOpen).toBe(false);
+        expect(requireCapturedJoinFormProps().isOpen).toBe(false);
+    });
+
+    it('renders invitation response actions when the viewer has a pending invitation', () => {
+        render(
+            <Show
+                auth={{ user: { id: 1, name: 'Ada', email: 'ada@example.com', created_at: '2026-07-01T00:00:00.000Z', updated_at: '2026-07-01T00:00:00.000Z' } }}
+                project={baseProject({
+                    viewerPendingInvitation: {
+                        id: 42,
+                        project_id: 1,
+                        invited_user_id: 1,
+                        status: 'pending',
+                        message: 'Vení a colaborar',
+                        created_at: '',
+                        updated_at: '',
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText('INVITATION_RESPONSE_CARD')).toBeInTheDocument();
+    });
+
+    it('renders a mobile-first collaborators link for project creators', () => {
+        render(
+            <Show
+                auth={{ user: { id: 99, name: 'Grace', email: 'grace@example.com', created_at: '', updated_at: '' } }}
+                project={baseProject({ viewer_role: 'creator' })}
+            />,
+        );
+
+        const collaboratorsLink = screen.getByRole('link', { name: /colaboradores/i });
+
+        expect(collaboratorsLink).toHaveAttribute('href', '/projects.collaborators/collab-app');
+        expect(collaboratorsLink).toHaveClass('flex-1', 'sm:flex-none');
     });
 });

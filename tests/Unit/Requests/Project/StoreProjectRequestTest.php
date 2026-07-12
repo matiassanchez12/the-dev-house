@@ -183,7 +183,7 @@ class StoreProjectRequestTest extends TestCase
     {
         $files = [];
         for ($i = 0; $i < 6; $i++) {
-            $files[] = UploadedFile::fake()->image("project{$i}.jpg");
+            $files[] = UploadedFile::fake()->create("project{$i}.jpg", 100, 'image/jpeg');
         }
 
         $data = [

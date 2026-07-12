@@ -194,9 +194,9 @@ class OnboardingTest extends TestCase
     }
 
     /**
-     * TEST 12: Social links empty array rejected
+     * TEST 12: Social links empty array is accepted (step is optional).
      */
-    public function test_social_links_empty_array_rejected(): void
+    public function test_social_links_empty_array_accepted(): void
     {
         $user = User::factory()->create();
 
@@ -204,7 +204,72 @@ class OnboardingTest extends TestCase
             'links' => [],
         ]);
 
-        $response->assertSessionHasErrors('links');
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect('/onboarding');
+    }
+
+    /**
+     * TEST 12a: Social links field absent is accepted without 500.
+     */
+    public function test_social_links_field_absent_accepted(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', []);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect('/onboarding');
+    }
+
+    /**
+     * TEST 12b: Social links null is accepted without 500.
+     */
+    public function test_social_links_null_value_accepted(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => null,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect('/onboarding');
+    }
+
+    /**
+     * TEST 12c: Social links rejected when an item has platform but no url.
+     */
+    public function test_social_links_partial_item_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
+            'links' => [
+                ['platform' => 'github', 'url' => ''],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('links.0.url');
+    }
+
+    /**
+     * TEST 12c: Tech selection is capped at 3 items.
+     */
+    public function test_tech_selection_capped_at_three(): void
+    {
+        $user = User::factory()->create();
+        $techs = \App\Models\Tech::factory()->count(4)->create();
+
+        $payload = [
+            'techs' => $techs->map(fn ($tech) => [
+                'id' => $tech->id,
+                'proficiency' => 3,
+            ])->all(),
+        ];
+
+        $response = $this->actingAs($user)->post('/onboarding/step-1', $payload);
+
+        $response->assertSessionHasErrors('techs');
     }
 
     /**

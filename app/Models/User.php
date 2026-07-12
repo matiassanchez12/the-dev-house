@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -98,6 +100,14 @@ class User extends Authenticatable
     public function sentJoinRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(JoinRequest::class, 'user_id');
+    }
+
+    /**
+     * Invitations received by this user.
+     */
+    public function receivedInvitations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProjectInvitation::class, 'invited_user_id');
     }
 
     /**

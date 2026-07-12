@@ -89,8 +89,8 @@ class ProjectServiceTest extends TestCase
         Storage::fake('public');
 
         $files = [
-            UploadedFile::fake()->image('project1.jpg'),
-            UploadedFile::fake()->image('project2.jpg'),
+            UploadedFile::fake()->create('project1.jpg', 100, 'image/jpeg'),
+            UploadedFile::fake()->create('project2.jpg', 100, 'image/jpeg'),
         ];
 
         $paths = $this->service->uploadImages($files);
@@ -106,7 +106,7 @@ class ProjectServiceTest extends TestCase
         Storage::fake('public');
         config(['filesystems.default' => 'public']);
 
-        $image = UploadedFile::fake()->image('project.jpg');
+        $image = UploadedFile::fake()->create('project.jpg', 100, 'image/jpeg');
 
         $project = $this->service->create($this->user, [
             'title' => 'Project with Images',
@@ -127,7 +127,7 @@ class ProjectServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('to-delete.jpg');
+        $file = UploadedFile::fake()->create('to-delete.jpg', 100, 'image/jpeg');
         $path = $file->store('projects', 'public');
 
         Storage::disk('public')->assertExists($path);
@@ -216,8 +216,8 @@ class ProjectServiceTest extends TestCase
         ]);
 
         // Create actual files
-        $file1 = UploadedFile::fake()->image('image1.jpg')->store('projects', 'public');
-        $file2 = UploadedFile::fake()->image('image2.jpg')->store('projects', 'public');
+        $file1 = UploadedFile::fake()->create('image1.jpg', 100, 'image/jpeg')->store('projects', 'public');
+        $file2 = UploadedFile::fake()->create('image2.jpg', 100, 'image/jpeg')->store('projects', 'public');
         $project->images = [$file1, $file2];
         $project->save();
 
@@ -256,7 +256,7 @@ class ProjectServiceTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->image('project.jpg')->store('projects', 'public');
+        $file = UploadedFile::fake()->create('project.jpg', 100, 'image/jpeg')->store('projects', 'public');
         $project = Project::factory()->create([
             'user_id' => $this->user->id,
             'images' => [$file],

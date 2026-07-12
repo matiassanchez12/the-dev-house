@@ -1,3 +1,5 @@
+import type { PageProps as InertiaPageProps } from '@inertiajs/core'
+
 export interface User {
     id: number
     name: string
@@ -9,6 +11,17 @@ export interface User {
     unread_notifications_count?: number
     created_at: string
     updated_at: string
+}
+
+export interface SharedPageProps extends InertiaPageProps {
+    auth?: { user: User | null }
+    flash: {
+        success?: string
+        error?: string
+        warning?: string
+        info?: string
+    }
+    errors: Record<string, string>
 }
 
 export interface Tech {
@@ -68,6 +81,27 @@ export interface Project {
         status: 'pending' | 'approved' | 'rejected'
         message?: string
     } | null
+    viewerPendingInvitation?: ProjectInvitation | null;
+}
+
+export interface ProjectInvitation {
+    id: number
+    project_id: number
+    invited_user_id: number
+    status: 'pending' | 'cancelled'
+    message?: string | null
+    cancelled_at?: string | null
+    created_at: string
+    updated_at: string
+    project?: Project
+    invitedUser?: User & { techs?: Tech[] }
+    invited_user?: User & { techs?: Tech[] }
+}
+
+export interface CollaboratorSuggestion {
+    user: User & { techs?: Tech[] }
+    matching_techs: Tech[]
+    pending_invitation?: ProjectInvitation | null
 }
 
 export interface JoinRequest {

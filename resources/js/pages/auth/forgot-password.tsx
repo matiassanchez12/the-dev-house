@@ -5,12 +5,12 @@ import GuestLayout from '@/layouts/guest';
 import Seo from '@/components/seo';
 import { useForm } from '@inertiajs/react';
 
-export default function ForgotPassword({ status }) {
+export default function ForgotPassword({ status }: { status?: string }) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
         post(route('password.email'));

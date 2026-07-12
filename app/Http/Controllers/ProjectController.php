@@ -6,6 +6,7 @@ use App\Helpers\ApiResourceTransformer;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
+use App\Models\ProjectInvitation;
 use App\Services\JoinRequestService;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
@@ -87,7 +88,7 @@ class ProjectController extends Controller
             $request->validated()
         );
 
-        return redirect()->route('projects.show', $project)
+        return redirect()->route('projects.collaborators', $project)
             ->with('success', 'Proyecto creado exitosamente!');
     }
 
@@ -110,8 +111,23 @@ class ProjectController extends Controller
                 ->getViewerFullRequest($project, $viewer);
         }
 
+        $viewerPendingInvitation = null;
+
+        if ($viewer !== null) {
+            $viewerPendingInvitation = $viewer->receivedInvitations()
+                ->where('project_id', $project->id)
+                ->where('status', ProjectInvitation::STATUS_PENDING)
+                ->latest()
+                ->first();
+        }
+
         return Inertia::render('projects/show', [
-            'project' => ApiResourceTransformer::project($project, $viewerJoinRequest, $viewerRole),
+            'project' => ApiResourceTransformer::project(
+                $project,
+                $viewerJoinRequest,
+                $viewerRole,
+                $viewerPendingInvitation,
+            ),
         ]);
     }
 

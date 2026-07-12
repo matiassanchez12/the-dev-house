@@ -49,17 +49,17 @@ class ProjectService
             return $slug;
         }
 
-        $pattern = $originalSlug . '-%';
+        $pattern = $originalSlug.'-%';
         $existing = Project::where('slug', 'LIKE', $pattern);
         if ($excludeId !== null) {
             $existing->where('id', '!=', $excludeId);
         }
 
         $maxSuffix = $existing->pluck('slug')
-            ->map(fn($s) => (int) Str::after($s, $originalSlug . '-'))
+            ->map(fn ($s) => (int) Str::after($s, $originalSlug.'-'))
             ->max();
 
-        return $originalSlug . '-' . (max($maxSuffix, 0) + 1);
+        return $originalSlug.'-'.(max($maxSuffix, 0) + 1);
     }
 
     /**
@@ -147,7 +147,7 @@ class ProjectService
     /**
      * Upload images and return stored paths.
      *
-     * @param array<UploadedFile> $files
+     * @param  array<UploadedFile>  $files
      * @return array<string>
      */
     public function uploadImages(array $files): array
@@ -163,13 +163,14 @@ class ProjectService
 
             $paths[] = $path;
         }
+
         return $paths;
     }
 
     /**
      * Delete images from storage.
      *
-     * @param array<string> $paths
+     * @param  array<string>  $paths
      */
     public function deleteImages(array $paths): void
     {
@@ -207,6 +208,10 @@ class ProjectService
 
         if (! $currentStatus instanceof ProjectStatus) {
             $currentStatus = ProjectStatus::tryFrom($currentStatus);
+        }
+
+        if (! $currentStatus?->canTransitionTo($newStatus)) {
+            throw new \InvalidArgumentException('Invalid project status transition.');
         }
 
         $project->update(['status' => $newStatus->value]);

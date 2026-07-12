@@ -13,7 +13,7 @@ export default function Register() {
         password_confirmation: '',
     });
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
         post(route('register'), {
@@ -26,7 +26,7 @@ export default function Register() {
             <Seo title="Crear cuenta" description="Registrate en The Dev House y empezá a colaborar en proyectos, conectá con desarrolladores y construí software en comunidad." />
 
             <form onSubmit={submit}>
-                <Field id="name" label="Name" error={errors.name}>
+                <Field id="name" label="Nombre o alias" error={errors.name}>
                     <Input
                         id="name"
                         name="name"
@@ -40,7 +40,7 @@ export default function Register() {
                     />
                 </Field>
 
-                <Field id="email" label="Email" error={errors.email} className="mt-4">
+                <Field id="email" label="Correo electrónico" error={errors.email} className="mt-4">
                     <Input
                         id="email"
                         type="email"
@@ -54,7 +54,7 @@ export default function Register() {
                     />
                 </Field>
 
-                <Field id="password" label="Password" error={errors.password} className="mt-4">
+                <Field id="password" label="Contraseña" error={errors.password} className="mt-4">
                     <Input
                         id="password"
                         type="password"
@@ -68,7 +68,7 @@ export default function Register() {
                     />
                 </Field>
 
-                <Field id="password_confirmation" label="Confirm Password" error={errors.password_confirmation} className="mt-4">
+                <Field id="password_confirmation" label="Confirmar contraseña" error={errors.password_confirmation} className="mt-4">
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -89,11 +89,11 @@ export default function Register() {
                         href={route('login')}
                         className="rounded-md text-sm text-muted-foreground underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
-                        Already registered?
+                        ¿Ya tenés cuenta?
                     </Link>
 
                     <Button type="submit" className="ms-4" disabled={processing}>
-                        Register
+                        Crear perfil
                     </Button>
                 </div>
             </form>

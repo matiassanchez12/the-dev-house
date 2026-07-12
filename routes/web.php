@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectCollaboratorController;
+use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\JoinRequestController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DashboardController;
@@ -40,6 +42,11 @@ Route::get('/milestones', [PublicMilestoneController::class, 'index'])->name('mi
 Route::middleware('auth')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project:slug}/collaborators', [ProjectCollaboratorController::class, 'index'])->name('projects.collaborators');
+    Route::post('/projects/{project:slug}/invitations', [ProjectInvitationController::class, 'store'])->name('project-invitations.store');
+    Route::delete('/project-invitations/{projectInvitation}', [ProjectInvitationController::class, 'destroy'])->name('project-invitations.destroy');
+    Route::post('/project-invitations/{projectInvitation}/accept', [ProjectInvitationController::class, 'accept'])->name('project-invitations.accept');
+    Route::post('/project-invitations/{projectInvitation}/reject', [ProjectInvitationController::class, 'reject'])->name('project-invitations.reject');
     Route::get('/projects/{project:slug}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project:slug}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project:slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');

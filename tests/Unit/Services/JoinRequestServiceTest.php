@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\JoinRequest;
+use App\Models\ProjectInvitation;
 use App\Models\Project;
 use App\Models\Tech;
 use App\Models\User;
@@ -84,6 +85,22 @@ $this->project = Project::factory()->create([
         $this->project->refresh();
 
         // Should not throw
+        $this->service->validateCanCreate($this->project, $this->user);
+
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function validate_can_create_passes_when_a_rejected_invitation_exists(): void
+    {
+        ProjectInvitation::create([
+            'project_id' => $this->project->id,
+            'invited_user_id' => $this->user->id,
+            'message' => 'Join us before the invite was rejected.',
+            'status' => ProjectInvitation::STATUS_REJECTED,
+            'responded_at' => now(),
+        ]);
+
         $this->service->validateCanCreate($this->project, $this->user);
 
         $this->assertTrue(true);

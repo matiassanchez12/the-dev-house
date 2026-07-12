@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { statusConfig, type ProjectStatus } from '@/components/projects/project-utils';
 
-const transitions: Record<ProjectStatus, ProjectStatus[]> = {
+const transitions: Record<ProjectStatus, ProjectStatus[]> & { all: ProjectStatus[] } = {
     open: ['in_progress', 'closed', 'completed'],
     in_progress: ['completed', 'closed'],
     completed: ['closed'],
@@ -50,7 +50,8 @@ export function ProjectStatusManager({ projectSlug, currentStatus }: ProjectStat
                 <form onSubmit={handleSubmit} className="flex flex-col w-full gap-2">
                     <Select
                         key={currentStatus}
-                        value={data.status} onValueChange={(v) => setData('status', v || '')}
+                        value={data.status}
+                        onValueChange={(value) => setData('status', value ?? '')}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Seleccione estado">

@@ -17,13 +17,13 @@ export function Field({ id, label, labelClassName, error, className, children }:
   const describedBy = error ? errorId : undefined;
   const childProps = isValidElement(children) ? (children.props as Record<string, unknown>) : {};
   const child = isValidElement(children)
-    ? cloneElement(children as ReactElement, {
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, {
         id,
         'aria-invalid': error ? 'true' : childProps['aria-invalid'],
         'aria-describedby': [childProps['aria-describedby'], describedBy]
           .filter(Boolean)
           .join(' ') || undefined,
-      })
+      } as Record<string, unknown>)
     : children;
 
   return (

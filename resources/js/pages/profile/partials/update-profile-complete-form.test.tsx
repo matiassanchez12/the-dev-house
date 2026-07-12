@@ -8,7 +8,7 @@ const mockState = vi.hoisted(() => ({
     post: vi.fn(),
     transform: vi.fn(),
     props: {
-        auth: { user: { id: 1, name: 'Ada Lovelace', avatar: null, bio: '' } },
+        auth: { user: { id: 1, name: 'Ada Lovelace', avatar: null, bio: '', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' } },
     },
 }));
 
@@ -52,11 +52,13 @@ describe('UpdateProfileCompleteForm', () => {
                         id: 1,
                         name: 'React',
                         slug: 'react',
+                        created_at: '2024-01-01T00:00:00Z',
+                        updated_at: '2024-01-01T00:00:00Z',
                         pivot: { years_experience: 3, proficiency: 'advanced' },
                     },
                 ]}
                 allTechs={[
-                    { id: 1, name: 'React', slug: 'react' },
+                    { id: 1, name: 'React', slug: 'react', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' },
                 ]}
             />,
         );
