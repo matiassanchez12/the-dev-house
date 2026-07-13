@@ -43,7 +43,7 @@ export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExi
             <Label>Imagen (opcional)</Label>
 
             {hasImage ? (
-                <div className="relative group w-24">
+                <div className="flex items-start gap-3">
                     <img
                         src={previewUrl || existingImage?.url}
                         alt="Vista previa"
@@ -52,15 +52,30 @@ export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExi
                             if (previewUrl) URL.revokeObjectURL((e.target as HTMLImageElement).src);
                         }}
                     />
-                    <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute -top-2 -right-2 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={handleRemove}
-                    >
-                        <X className="size-3" />
-                    </Button>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => inputRef.current?.click()}
+                        >
+                            <Upload className="size-4" data-icon="inline-start" />
+                            {file ? 'Cambiar imagen' : 'Reemplazar imagen'}
+                        </Button>
+
+                        {file && (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleRemove}
+                            >
+                                <X className="size-4" data-icon="inline-start" />
+                                Quitar selección
+                            </Button>
+                        )}
+                    </div>
                 </div>
             ) : (
                 <button

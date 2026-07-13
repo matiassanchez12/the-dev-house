@@ -21,6 +21,7 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
         title: '',
         description: '',
         completed_at: '',
+        image: null as File | null,
     });
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -35,6 +36,7 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
         }
 
         post(route('projects.phases.store', projectSlug), {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 reset();

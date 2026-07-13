@@ -22,6 +22,8 @@ class PhaseServiceImageTest extends TestCase
     {
         parent::setUp();
 
+        config(['filesystems.media_disk' => 'public']);
+
         $this->service = new PhaseService;
         $this->project = Project::factory()->create(['user_id' => User::factory()->create()->id]);
     }

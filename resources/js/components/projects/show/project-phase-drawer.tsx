@@ -32,7 +32,10 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
     const [removeExisting, setRemoveExisting] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: isEditing ? 'put' : 'post',
-        ...initialValues,
+        title: initialValues.title,
+        description: initialValues.description,
+        completed_at: initialValues.completed_at,
+        image: null as File | null,
     });
 
     useEffect(() => {
@@ -63,6 +66,7 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
         const routeName = isEditing ? route('projects.phases.update', [projectSlug, phaseId]) : route('projects.phases.store', projectSlug);
 
         post(routeName, {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => onOpenChange(false),
         });

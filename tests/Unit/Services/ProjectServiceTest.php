@@ -16,14 +16,16 @@ class ProjectServiceTest extends TestCase
     use RefreshDatabase;
 
     private ProjectService $service;
+
     private User $user;
+
     private array $techIds;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->service = new ProjectService();
+        $this->service = new ProjectService;
         $this->user = User::factory()->create();
 
         $techs = Tech::factory()->count(3)->create();
@@ -87,6 +89,7 @@ class ProjectServiceTest extends TestCase
     public function upload_images_stores_files_and_returns_paths(): void
     {
         Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
 
         $files = [
             UploadedFile::fake()->create('project1.jpg', 100, 'image/jpeg'),
@@ -101,10 +104,10 @@ class ProjectServiceTest extends TestCase
     }
 
     /** @test */
-    public function create_always_stores_project_images_on_the_public_disk(): void
+    public function create_always_stores_project_images_on_the_media_disk(): void
     {
         Storage::fake('public');
-        config(['filesystems.default' => 'public']);
+        config(['filesystems.media_disk' => 'public']);
 
         $image = UploadedFile::fake()->create('project.jpg', 100, 'image/jpeg');
 
@@ -126,6 +129,7 @@ class ProjectServiceTest extends TestCase
     public function delete_images_removes_files_from_storage(): void
     {
         Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
 
         $file = UploadedFile::fake()->create('to-delete.jpg', 100, 'image/jpeg');
         $path = $file->store('projects', 'public');
@@ -141,6 +145,7 @@ class ProjectServiceTest extends TestCase
     public function delete_images_does_not_throw_when_file_missing(): void
     {
         Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
 
         // Should not throw
         $this->service->deleteImages(['nonexistent/path.jpg']);
