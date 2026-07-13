@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PhaseDatePicker } from './phase-date-picker';
+import { PhaseImageInput } from './phase-image-input';
 
 interface ProjectPhaseFormProps {
     projectSlug: string;
@@ -14,6 +16,7 @@ interface ProjectPhaseFormProps {
 }
 
 export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormProps) {
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
@@ -23,10 +26,19 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
+        const formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('description', data.description);
+        formData.append('completed_at', data.completed_at);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
         post(route('projects.phases.store', projectSlug), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
+                setImageFile(null);
                 onSuccess?.();
             },
         });
@@ -63,6 +75,12 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
                         />
                         <FormError message={errors.description} />
                     </div>
+
+                    <PhaseImageInput
+                        file={imageFile}
+                        onFileChange={setImageFile}
+                        error={errors.image}
+                    />
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="phase-completed-at">Fecha de cierre</Label>

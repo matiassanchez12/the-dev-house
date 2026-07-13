@@ -18,6 +18,7 @@ class PhaseFactory extends Factory
             'title' => fake()->sentence(3),
             'description' => fake()->optional()->paragraph(),
             'completed_at' => fake()->optional()->dateTimeBetween('-1 year', 'now'),
+            'image_path' => null,
         ];
     }
 }
