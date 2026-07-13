@@ -63,12 +63,7 @@ export function ProjectPhasesSection({ projectSlug, phases = [], viewerRole }: P
                                     setIsSheetOpen(open);
                                     if (!open) setEditingPhase(null);
                                 }}
-                                phaseId={editingPhase?.id}
-                                initialValues={editingPhase ? {
-                                    title: editingPhase.title,
-                                    description: editingPhase.description ?? '',
-                                    completed_at: editingPhase.completed_at ? editingPhase.completed_at.slice(0, 10) : '',
-                                } : undefined}
+                                phase={editingPhase}
                             />
                         </div>
                     </SheetContent>

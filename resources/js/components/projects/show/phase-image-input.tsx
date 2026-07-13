@@ -11,11 +11,10 @@ interface PhaseImageInputProps {
     file: File | null;
     existingImage?: PhaseImage | null;
     onFileChange: (file: File | null) => void;
-    onRemoveExisting?: () => void;
     error?: string;
 }
 
-export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExisting, error }: PhaseImageInputProps) {
+export function PhaseImageInput({ file, existingImage, onFileChange, error }: PhaseImageInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     function handleBrowse(e: React.ChangeEvent<HTMLInputElement>) {
@@ -32,7 +31,6 @@ export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExi
 
     function handleRemove() {
         onFileChange(null);
-        onRemoveExisting?.();
     }
 
     const previewUrl = file ? URL.createObjectURL(file) : null;
@@ -54,6 +52,12 @@ export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExi
                     />
 
                     <div className="flex flex-col gap-2">
+                        {existingImage && !file && (
+                            <p className="text-xs text-muted-foreground">
+                                Ya hay una imagen guardada. Si seleccionás otra, se reemplazará al guardar.
+                            </p>
+                        )}
+
                         <Button
                             type="button"
                             variant="outline"
