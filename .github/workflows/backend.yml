@@ -3,6 +3,7 @@ name: Backend CI
 on:
   pull_request:
     branches:
+      - development
       - master
 
 jobs:
@@ -31,6 +32,5 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      # Baseline debt: 23 test failures pre-exist this workflow and remain out of scope.
       - name: Run backend tests
         run: composer run test

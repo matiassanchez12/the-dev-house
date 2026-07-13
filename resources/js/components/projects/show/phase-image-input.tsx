@@ -11,10 +11,11 @@ interface PhaseImageInputProps {
     file: File | null;
     existingImage?: PhaseImage | null;
     onFileChange: (file: File | null) => void;
+    onRemoveExisting?: () => void;
     error?: string;
 }
 
-export function PhaseImageInput({ file, existingImage, onFileChange, error }: PhaseImageInputProps) {
+export function PhaseImageInput({ file, existingImage, onFileChange, onRemoveExisting, error }: PhaseImageInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     function handleBrowse(e: React.ChangeEvent<HTMLInputElement>) {
@@ -31,6 +32,7 @@ export function PhaseImageInput({ file, existingImage, onFileChange, error }: Ph
 
     function handleRemove() {
         onFileChange(null);
+        onRemoveExisting?.();
     }
 
     const previewUrl = file ? URL.createObjectURL(file) : null;
