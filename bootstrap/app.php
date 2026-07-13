@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // See: https://laravel.com/docs/11.x/requests#trusting-the-proxy
         $middleware->trustProxies(at: '*');
 
+        $middleware->prepend(\App\Http\Middleware\SetAppUrl::class);
+
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
