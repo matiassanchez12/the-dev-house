@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,29 +15,21 @@ interface ProjectPhaseFormProps {
 }
 
 export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormProps) {
-    const [imageFile, setImageFile] = useState<File | null>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
         completed_at: '',
+        image: null as File | null,
     });
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const formData = new FormData();
-        formData.append('title', data.title);
-        formData.append('description', data.description);
-        formData.append('completed_at', data.completed_at);
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
-
         post(route('projects.phases.store', projectSlug), {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                setImageFile(null);
                 onSuccess?.();
             },
         });
@@ -77,8 +68,8 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
                     </div>
 
                     <PhaseImageInput
-                        file={imageFile}
-                        onFileChange={setImageFile}
+                        file={data.image}
+                        onFileChange={(file) => setData('image', file)}
                         error={errors.image}
                     />
 

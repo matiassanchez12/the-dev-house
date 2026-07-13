@@ -10,12 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class PhaseService
 {
+    private function mediaDisk(): string
+    {
+        return config('filesystems.media_disk', 'public');
+    }
+
     public function create(Project $project, array $data, ?UploadedFile $image = null): Phase
     {
         $imagePath = null;
 
         if ($image) {
-            $imagePath = $image->store('phases', config('filesystems.default', 'public'));
+            $imagePath = $image->store('phases', $this->mediaDisk());
         }
 
         return $project->phases()->create([
@@ -36,7 +41,7 @@ class PhaseService
 
         if ($image) {
             $this->deleteImageFile($phase->image_path);
-            $updateData['image_path'] = $image->store('phases', config('filesystems.default', 'public'));
+            $updateData['image_path'] = $image->store('phases', $this->mediaDisk());
         }
 
         $phase->update($updateData);
@@ -59,7 +64,7 @@ class PhaseService
     {
         if ($path) {
             try {
-                Storage::disk(config('filesystems.default', 'public'))->delete($path);
+                Storage::disk($this->mediaDisk())->delete($path);
             } catch (\Exception $e) {
                 // Ignore if file doesn't exist
             }

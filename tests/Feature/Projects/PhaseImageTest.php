@@ -15,6 +15,13 @@ class PhaseImageTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['filesystems.media_disk' => 'public']);
+    }
+
     public function test_project_creator_can_create_phase_with_image(): void
     {
         Storage::fake('public');

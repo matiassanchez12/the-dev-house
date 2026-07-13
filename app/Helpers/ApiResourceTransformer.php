@@ -15,6 +15,11 @@ use Illuminate\Support\Collection;
  */
 class ApiResourceTransformer
 {
+    private static function mediaDisk(): string
+    {
+        return config('filesystems.media_disk', 'public');
+    }
+
     /**
      * Transform a project model to array with disk-aware image URLs.
      * Creator and participants are scrubbed to safe fields only.
@@ -31,7 +36,7 @@ class ApiResourceTransformer
             $data['images'] = array_map(
                 fn ($img) => [
                     'path' => $img,
-                    'url' => StorageUrlHelper::url($img),
+                    'url' => StorageUrlHelper::url($img, self::mediaDisk()),
                 ],
                 $data['images']
             );
@@ -90,7 +95,7 @@ class ApiResourceTransformer
         if (isset($data['image_path'])) {
             $data['image'] = [
                 'path' => $data['image_path'],
-                'url' => StorageUrlHelper::url($data['image_path']),
+                'url' => StorageUrlHelper::url($data['image_path'], self::mediaDisk()),
             ];
         } else {
             $data['image'] = null;

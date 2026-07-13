@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form-error';
@@ -28,11 +28,12 @@ const emptyValues: ProjectPhaseValues = { title: '', description: '', completed_
 
 export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, initialValues = emptyValues }: ProjectPhaseDrawerProps) {
     const isEditing = phaseId !== undefined;
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [removeExisting, setRemoveExisting] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: isEditing ? 'put' : 'post',
-        ...initialValues,
+        title: initialValues.title,
+        description: initialValues.description,
+        completed_at: initialValues.completed_at,
+        image: null as File | null,
     });
 
     useEffect(() => {
@@ -42,27 +43,17 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
             setData('title', initialValues.title);
             setData('description', initialValues.description);
             setData('completed_at', initialValues.completed_at);
-            setData('image', initialValues.image ?? null);
-            setImageFile(null);
-            setRemoveExisting(false);
+            setData('image', null);
         }
     }, [open, initialValues, isEditing, reset, setData]);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const formData = new FormData();
-        formData.append('_method', isEditing ? 'put' : 'post');
-        formData.append('title', data.title);
-        formData.append('description', data.description);
-        formData.append('completed_at', data.completed_at);
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
-
         const routeName = isEditing ? route('projects.phases.update', [projectSlug, phaseId]) : route('projects.phases.store', projectSlug);
 
         post(routeName, {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => onOpenChange(false),
         });
@@ -83,10 +74,9 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
             </div>
 
             <PhaseImageInput
-                file={imageFile}
-                existingImage={removeExisting ? null : data.image}
-                onFileChange={setImageFile}
-                onRemoveExisting={() => setRemoveExisting(true)}
+                file={data.image}
+                existingImage={data.image ? null : initialValues.image}
+                onFileChange={(file) => setData('image', file)}
                 error={errors.image}
             />
 

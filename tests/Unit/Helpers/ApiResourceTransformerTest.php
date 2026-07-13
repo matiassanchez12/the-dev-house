@@ -15,6 +15,8 @@ class ApiResourceTransformerTest extends TestCase
     /** @test */
     public function project_images_are_transformed_to_path_and_disk_url_objects(): void
     {
+        config(['filesystems.media_disk' => 'public']);
+
         $project = Project::factory()->create([
             'images' => ['projects/example.jpg'],
         ]);
