@@ -25,7 +25,11 @@ export default function LandingHero({ auth, user_count, techs, className }: Land
     return (
         <section
             className={cn(
-                'group relative overflow-x-hidden overflow-y-visible min-h-[calc(100vh-1px)] flex items-center',
+                // overflow-x-clip (not overflow-x-hidden) keeps the vertical axis
+                // truly visible so HeroBackground's lower glow can bleed past the
+                // hero into the stats section. With overflow-x-hidden the spec
+                // rewrites overflow-y-visible to auto, clipping the bleed.
+                'group relative overflow-x-clip overflow-y-visible min-h-[calc(100vh-1px)] flex items-center',
                 'pt-20 pb-16 md:pt-32 md:pb-24',
                 className,
             )}

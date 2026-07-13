@@ -35,6 +35,21 @@ beforeEach(() => {
 })
 
 describe('LandingHero', () => {
+    it('lets the background bleed vertically by using overflow-x-clip (not overflow-x-hidden)', () => {
+        const { container } = render(<LandingHero auth={{ user: null }} techs={[]} user_count={12} />)
+
+        const section = container.querySelector('section') as HTMLElement
+        expect(section).not.toBeNull()
+
+        // overflow-x-hidden would rewrite overflow-y-visible to `auto` per the
+        // CSS Overflow spec, clipping the lower glow's bleed into the stats
+        // section. overflow-x-clip keeps the y axis truly visible.
+        expect(section).toHaveClass('overflow-x-clip')
+        expect(section).toHaveClass('overflow-y-visible')
+        expect(section).not.toHaveClass('overflow-x-hidden')
+        expect(section).not.toHaveClass('overflow-hidden')
+    })
+
     it('renders a live trust badge, one headline, both CTAs, and a visible wordmark', () => {
         render(<LandingHero auth={{ user: null }} techs={[]} user_count={12} />)
 

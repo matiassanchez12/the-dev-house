@@ -94,22 +94,22 @@ The hero MUST display a tech list driven by a `techs: Tech[]` prop. When the pro
 
 ### Requirement: Atmospheric Background
 
-The hero MUST render an atmospheric background layer behind all content. The background MUST use the design-system tokens (no hardcoded colors), MUST include a subtle dot or grid pattern with a radial mask, and MUST include one soft primary-colored glow positioned behind the wordmark area. The atmosphere MUST NOT cause layout shift and MUST NOT compete with the foreground content for attention.
+The hero MUST render an atmospheric background layer behind all content. It MUST use design-system tokens, include the existing dot or grid pattern with a radial mask, and include one soft primary-colored glow behind the wordmark area. The lower glow MUST extend slightly below the hero boundary so it visually connects to the next section. The lower glow SHOULD move with a very subtle, slow ambient float, and MUST remain static when `prefers-reduced-motion: reduce` is enabled. The atmosphere MUST NOT cause layout shift or compete with foreground content.
+(Previously: the background was confined to the hero bounds and did not provide a visual bridge to the stats section.)
 
-#### Scenario: Background uses design tokens only
+#### Scenario: Lower glow overlaps the next section
 
-- GIVEN the hero is rendered
-- WHEN the background layer is inspected
-- THEN it MUST NOT use hardcoded hex values like `#9CA3AF` or `rgb(...)`
-- AND it MUST NOT use Tailwind's `text-green-400`, `bg-gray-900/80`, or `border-gray-700`
-- AND any color used MUST come from a CSS custom property defined in `app.css`
+- GIVEN the landing page is rendered
+- WHEN the hero and stats sections are visible together
+- THEN the hero's lower glow MUST continue into the top edge of the stats section
+- AND the transition MUST NOT appear clipped or abrupt
 
-#### Scenario: Background renders behind the foreground
+#### Scenario: Reduced motion keeps the overlap static
 
-- GIVEN the hero is rendered
-- WHEN stacking context is inspected
-- THEN the background MUST have a z-index lower than the headline, wordmark, tech grid, and CTAs
-- AND the atmosphere MUST be visible but opacity SHALL NOT exceed 30%
+- GIVEN the user has `prefers-reduced-motion: reduce`
+- WHEN the hero renders
+- THEN the lower glow MUST remain visible without motion
+- AND no ambient float animation MUST run
 
 ### Requirement: Accessibility Guarantees
 
