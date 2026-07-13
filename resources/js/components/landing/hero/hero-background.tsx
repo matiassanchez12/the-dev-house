@@ -2,7 +2,7 @@ export function HeroBackground() {
     return (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
             <div
-                className="absolute inset-0 opacity-[0.12] dark:opacity-[0.18]"
+                className="absolute inset-0 opacity-[0.14] dark:opacity-[0.2]"
                 style={{
                     backgroundImage:
                         'radial-gradient(circle at 50% 50%, var(--muted-foreground) 1px, transparent 1px)',
@@ -14,9 +14,8 @@ export function HeroBackground() {
                 }}
             />
 
-            <div className="absolute top-10 left-1/4 size-96 -translate-x-1/2 rounded-full bg-primary/12 blur-3xl" />
-            <div className="absolute right-1/4 bottom-10 size-72 translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+            <div className="absolute top-12 left-1/4 size-[26rem] -translate-x-1/2 rounded-full bg-primary/14 blur-3xl" />
+            <div className="absolute right-1/4 bottom-12 size-[22rem] translate-x-1/2 rounded-full bg-primary/18 blur-3xl" />
         </div>
-    );
+    )
 }
-
