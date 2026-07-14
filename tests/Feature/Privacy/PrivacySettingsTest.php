@@ -30,6 +30,7 @@ class PrivacySettingsTest extends TestCase
             'show_phone' => false,
             'is_discoverable' => true,
             'show_activity' => true,
+            'email_notifications_enabled' => false,
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -42,6 +43,12 @@ class PrivacySettingsTest extends TestCase
         $this->assertNotNull($settings);
         $this->assertTrue($settings->show_email);
         $this->assertFalse($settings->show_phone);
+
+        $profileResponse = $this->actingAs($user)->get(route('profile.edit'));
+
+        $profileResponse->assertInertia(fn ($page) => $page
+            ->where('privacySetting.email_notifications_enabled', false)
+        );
     }
 
     public function test_phone_is_optional(): void
@@ -66,6 +73,17 @@ class PrivacySettingsTest extends TestCase
         ]);
 
         $this->assertNotNull($user->fresh()->privacySetting()->first());
+    }
+
+    public function test_profile_edit_hydrates_default_email_notifications_enabled_true(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('profile.edit'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->where('privacySetting.email_notifications_enabled', true)
+        );
     }
 
     public function test_phone_validation_rejects_too_long_value(): void
@@ -99,6 +117,17 @@ class PrivacySettingsTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors('show_email');
+    }
+
+    public function test_email_notifications_validation_rejects_non_boolean(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('profile.privacy.update'), [
+            'email_notifications_enabled' => 'not-a-boolean',
+        ]);
+
+        $response->assertSessionHasErrors('email_notifications_enabled');
     }
 
     public function test_updating_privacy_only_affects_current_user(): void

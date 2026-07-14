@@ -35,6 +35,7 @@ class UserPrivacyServiceTest extends TestCase
         $this->assertFalse($settings->show_phone);
         $this->assertTrue($settings->is_discoverable);
         $this->assertTrue($settings->show_activity);
+        $this->assertTrue($settings->email_notifications_enabled);
     }
 
     public function test_get_for_returns_existing_settings_on_subsequent_calls(): void
@@ -82,6 +83,7 @@ class UserPrivacyServiceTest extends TestCase
             'show_phone' => true,
             'is_discoverable' => false,
             'show_activity' => false,
+            'email_notifications_enabled' => false,
         ]);
 
         $settings = $user->privacySetting()->first();
@@ -89,6 +91,7 @@ class UserPrivacyServiceTest extends TestCase
         $this->assertTrue($settings->show_phone);
         $this->assertFalse($settings->is_discoverable);
         $this->assertFalse($settings->show_activity);
+        $this->assertFalse($settings->email_notifications_enabled);
     }
 
     public function test_update_creates_settings_if_missing(): void

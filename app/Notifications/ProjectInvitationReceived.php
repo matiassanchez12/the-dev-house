@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\ProjectInvitation;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -21,7 +22,9 @@ final class ProjectInvitationReceived extends Notification implements ShouldBroa
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail', 'broadcast'];
+        return $notifiable instanceof User && ! $notifiable->receivesOptionalEmailNotifications()
+            ? ['database', 'broadcast']
+            : ['database', 'mail', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -152,6 +152,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Whether the user wants optional product emails.
+     */
+    public function receivesOptionalEmailNotifications(): bool
+    {
+        return $this->privacySetting?->email_notifications_enabled ?? true;
+    }
+
+    /**
      * Verificar si el usuario completó el onboarding.
      */
     public function hasCompletedOnboarding(): bool

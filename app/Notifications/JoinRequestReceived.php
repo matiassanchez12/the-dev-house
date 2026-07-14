@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\JoinRequest;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -19,7 +20,9 @@ class JoinRequestReceived extends Notification implements ShouldBroadcastNow
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail', 'broadcast'];
+        return $notifiable instanceof User && ! $notifiable->receivesOptionalEmailNotifications()
+            ? ['database', 'broadcast']
+            : ['database', 'mail', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage

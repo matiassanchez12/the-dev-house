@@ -43,6 +43,7 @@ class UpdatePrivacyRequest extends FormRequest
             'show_phone' => ['sometimes', 'boolean'],
             'is_discoverable' => ['sometimes', 'boolean'],
             'show_activity' => ['sometimes', 'boolean'],
+            'email_notifications_enabled' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -58,6 +59,7 @@ class UpdatePrivacyRequest extends FormRequest
             'show_phone.boolean' => 'El valor de "mostrar teléfono" debe ser verdadero o falso.',
             'is_discoverable.boolean' => 'El valor de "visible en el directorio" debe ser verdadero o falso.',
             'show_activity.boolean' => 'El valor de "mostrar actividad" debe ser verdadero o falso.',
+            'email_notifications_enabled.boolean' => 'El valor de "notificaciones por email" debe ser verdadero o falso.',
         ];
     }
 }

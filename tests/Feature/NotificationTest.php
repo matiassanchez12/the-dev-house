@@ -147,6 +147,7 @@ class NotificationTest extends TestCase
     {
         $creator = User::factory()->create();
         $applicant = User::factory()->create();
+        $applicant->privacySetting()->create(['email_notifications_enabled' => true]);
         $project = Project::factory()->create([
             'user_id' => $creator->id,
             'status' => 'open',
@@ -167,7 +168,7 @@ class NotificationTest extends TestCase
         Notification::assertSentTo(
             $applicant,
             JoinRequestApproved::class,
-            fn ($notification, $channels) => in_array('mail', $channels)
+            fn ($notification, $channels) => in_array('mail', $channels, true)
         );
     }
 
@@ -175,6 +176,7 @@ class NotificationTest extends TestCase
     {
         $creator = User::factory()->create();
         $applicant = User::factory()->create();
+        $applicant->privacySetting()->create(['email_notifications_enabled' => true]);
         $project = Project::factory()->create([
             'user_id' => $creator->id,
             'status' => 'open',
@@ -195,7 +197,7 @@ class NotificationTest extends TestCase
         Notification::assertSentTo(
             $applicant,
             JoinRequestRejected::class,
-            fn ($notification, $channels) => in_array('mail', $channels)
+            fn ($notification, $channels) => in_array('mail', $channels, true)
         );
     }
 
@@ -560,6 +562,32 @@ class NotificationTest extends TestCase
         );
     }
 
+    public function test_join_request_received_skips_mail_when_recipient_disables_optional_emails(): void
+    {
+        $creator = User::factory()->create();
+        $creator->privacySetting()->create(['email_notifications_enabled' => false]);
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($applicant)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero unirme',
+            ]);
+
+        Notification::assertSentTo(
+            $creator,
+            JoinRequestReceived::class,
+            fn ($notification, $channels) => in_array('database', $channels, true)
+                && in_array('broadcast', $channels, true)
+                && ! in_array('mail', $channels, true),
+        );
+    }
+
     public function test_join_request_approved_uses_broadcast_channel(): void
     {
         $creator = User::factory()->create();
@@ -588,6 +616,37 @@ class NotificationTest extends TestCase
         );
     }
 
+    public function test_join_request_approved_skips_mail_when_recipient_disables_optional_emails(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $applicant->privacySetting()->create(['email_notifications_enabled' => false]);
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($creator)
+            ->post(route('join-requests.approve', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestApproved::class,
+            fn ($notification, $channels) => in_array('database', $channels, true)
+                && in_array('broadcast', $channels, true)
+                && ! in_array('mail', $channels, true),
+        );
+    }
+
     public function test_join_request_rejected_uses_broadcast_channel(): void
     {
         $creator = User::factory()->create();
@@ -613,6 +672,37 @@ class NotificationTest extends TestCase
             $applicant,
             JoinRequestRejected::class,
             fn ($notification, $channels) => in_array('broadcast', $channels, true),
+        );
+    }
+
+    public function test_join_request_rejected_skips_mail_when_recipient_disables_optional_emails(): void
+    {
+        $creator = User::factory()->create();
+        $applicant = User::factory()->create();
+        $applicant->privacySetting()->create(['email_notifications_enabled' => false]);
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        $joinRequest = JoinRequest::create([
+            'project_id' => $project->id,
+            'user_id' => $applicant->id,
+            'message' => 'Quiero unirme',
+            'status' => 'pending',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($creator)
+            ->post(route('join-requests.reject', $joinRequest));
+
+        Notification::assertSentTo(
+            $applicant,
+            JoinRequestRejected::class,
+            fn ($notification, $channels) => in_array('database', $channels, true)
+                && in_array('broadcast', $channels, true)
+                && ! in_array('mail', $channels, true),
         );
     }
 }

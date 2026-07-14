@@ -21,6 +21,7 @@ interface PrivacyFormData {
     show_phone: boolean;
     is_discoverable: boolean;
     show_activity: boolean;
+    email_notifications_enabled: boolean;
 }
 
 const privacyFields = [
@@ -44,6 +45,11 @@ const privacyFields = [
         label: 'Mostrar actividad pública',
         description: 'Tu actividad pública podrá mostrarse a otros usuarios.',
     },
+    {
+        key: 'email_notifications_enabled' as const,
+        label: 'Recibir emails opcionales de colaboración',
+        description: 'Solo controla correos opcionales de colaboración, como invitaciones a proyectos y actualizaciones de solicitudes de ingreso.',
+    },
 ] satisfies Array<{
     key: keyof Omit<PrivacyFormData, 'phone'>;
     label: string;
@@ -57,6 +63,7 @@ export default function UpdatePrivacyForm({ phone, privacySetting, className = '
         show_phone: privacySetting.show_phone,
         is_discoverable: privacySetting.is_discoverable,
         show_activity: privacySetting.show_activity,
+        email_notifications_enabled: privacySetting.email_notifications_enabled,
     });
 
     const submit = (event: FormEvent<HTMLFormElement>) => {

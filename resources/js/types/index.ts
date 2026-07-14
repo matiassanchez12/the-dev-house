@@ -159,6 +159,7 @@ export interface PrivacySetting {
     show_phone: boolean
     is_discoverable: boolean
     show_activity: boolean
+    email_notifications_enabled: boolean
     created_at: string
     updated_at: string
 }

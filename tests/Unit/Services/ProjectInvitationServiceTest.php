@@ -56,6 +56,22 @@ final class ProjectInvitationServiceTest extends TestCase
         Notification::assertSentTo($this->invitedUser, ProjectInvitationReceived::class);
     }
 
+    public function test_create_skips_mail_when_recipient_disables_optional_emails(): void
+    {
+        Notification::fake();
+        $this->invitedUser->privacySetting()->create(['email_notifications_enabled' => false]);
+
+        $this->service->create($this->project, $this->invitedUser->id, 'Welcome aboard');
+
+        Notification::assertSentTo(
+            $this->invitedUser,
+            ProjectInvitationReceived::class,
+            fn ($notification, $channels) => in_array('database', $channels, true)
+                && in_array('broadcast', $channels, true)
+                && ! in_array('mail', $channels, true),
+        );
+    }
+
     public function test_create_rejects_duplicate_active_invitation(): void
     {
         ProjectInvitation::create([

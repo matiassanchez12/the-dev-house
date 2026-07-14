@@ -54,6 +54,7 @@ function buildPrivacySetting(overrides: Partial<PrivacySetting> = {}): PrivacySe
         id: 1,
         user_id: 1,
         show_email: true,
+        email_notifications_enabled: true,
         show_phone: false,
         is_discoverable: true,
         show_activity: false,
