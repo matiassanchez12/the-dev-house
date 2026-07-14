@@ -48,10 +48,14 @@ export default function LandingStats({
     return (
         <section
             ref={ref}
-            className={cn('relative overflow-hidden py-20 bg-primary-soft text-primary-foreground', className)}
+            className={cn('relative overflow-hidden pt-24 pb-20 bg-primary-soft text-primary-foreground md:pt-28', className)}
         >
             <div className="absolute inset-0 bg-dots-primary opacity-60" />
-            <div className="container mx-auto px-4 relative z-10">
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-background/35 via-background/10 to-transparent"
+            />
+            <div className="container mx-auto px-4 relative z-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     {stats.map((stat, index) => {
                         const Icon = stat.icon;
