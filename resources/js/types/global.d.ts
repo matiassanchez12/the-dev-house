@@ -1,4 +1,3 @@
-import { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { AxiosInstance } from 'axios';
 import type Echo from 'laravel-echo';
 import type Pusher from 'pusher-js';
@@ -25,7 +24,7 @@ declare module 'axios' {
 }
 
 declare module '@inertiajs/core' {
-    interface PageProps extends InertiaPageProps {
+    interface PageProps {
         flash: {
             success?: string;
             error?: string;

@@ -5,8 +5,9 @@ import UpdatePasswordForm from './partials/update-password-form';
 import UpdateProfileInformationForm from './partials/update-profile-information-form';
 import UpdateProfileCompleteForm from './partials/update-profile-complete-form';
 import UpdatePrivacyForm from './partials/update-privacy-form';
+import UpdateNotificationSettingsForm from './partials/update-notification-settings-form';
 import SocialLinksEditForm from './partials/social-links-edit-form';
-import { SocialLink, Tech, SharedPageProps, PrivacySetting } from '@/types';
+import { SocialLink, Tech, SharedPageProps, PrivacySetting, NotificationSetting } from '@/types';
 import { type TechProficiency } from '@/lib/tech-proficiency';
 
 import { usePage } from '@inertiajs/react';
@@ -27,12 +28,13 @@ interface Props {
     userTechs: UserTech[];
     phone: string | null;
     privacySetting: PrivacySetting;
+    notificationSetting: NotificationSetting;
     socialLinks?: SocialLink[];
 }
 
-export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, phone, privacySetting, socialLinks }: Props) {
+export default function Edit({ mustVerifyEmail, status, name, email, emailVerifiedAt, userTechs, phone, privacySetting, notificationSetting, socialLinks }: Props) {
     const { techs } = usePage<SharedPageProps & { techs: Tech[] }>().props;
-  
+
     return (
         <AppLayout
             header={
@@ -71,6 +73,14 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
                         <UpdatePrivacyForm
                             phone={phone}
                             privacySetting={privacySetting}
+                            className="max-w-xl"
+                        />
+                    </div>
+
+                    {/* Notificaciones opcionales */}
+                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
+                        <UpdateNotificationSettingsForm
+                            notificationSetting={notificationSetting}
                             className="max-w-xl"
                         />
                     </div>

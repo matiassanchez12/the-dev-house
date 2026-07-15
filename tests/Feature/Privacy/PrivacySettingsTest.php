@@ -4,6 +4,7 @@ namespace Tests\Feature\Privacy;
 
 use App\Models\User;
 use App\Models\UserPrivacySetting;
+use App\Models\UserNotificationSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,7 +31,6 @@ class PrivacySettingsTest extends TestCase
             'show_phone' => false,
             'is_discoverable' => true,
             'show_activity' => true,
-            'email_notifications_enabled' => false,
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -47,7 +47,8 @@ class PrivacySettingsTest extends TestCase
         $profileResponse = $this->actingAs($user)->get(route('profile.edit'));
 
         $profileResponse->assertInertia(fn ($page) => $page
-            ->where('privacySetting.email_notifications_enabled', false)
+            ->where('privacySetting.show_email', true)
+            ->where('notificationSetting.collaboration_emails', true)
         );
     }
 
@@ -75,15 +76,70 @@ class PrivacySettingsTest extends TestCase
         $this->assertNotNull($user->fresh()->privacySetting()->first());
     }
 
-    public function test_profile_edit_hydrates_default_email_notifications_enabled_true(): void
+    public function test_profile_edit_hydrates_default_notification_setting_true(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get(route('profile.edit'));
 
         $response->assertInertia(fn ($page) => $page
-            ->where('privacySetting.email_notifications_enabled', true)
+            ->where('notificationSetting.collaboration_emails', true)
         );
+    }
+
+    public function test_profile_edit_preserves_legacy_notification_opt_out_when_setting_is_missing(): void
+    {
+        $user = User::factory()->create();
+        $user->privacySetting()->create(['email_notifications_enabled' => false]);
+
+        $this->assertNull($user->fresh()->notificationSetting()->first());
+
+        $response = $this->actingAs($user)->get(route('profile.edit'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->where('notificationSetting.collaboration_emails', false)
+        );
+
+        $settings = $user->fresh()->notificationSetting()->first();
+        $this->assertNotNull($settings);
+        $this->assertFalse($settings->collaboration_emails);
+        $this->assertFalse($user->fresh()->receivesOptionalEmailNotifications());
+    }
+
+    public function test_authenticated_user_can_update_notification_settings(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('profile.notifications.update'), [
+            'collaboration_emails' => false,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $settings = $user->fresh()->notificationSetting()->first();
+        $this->assertInstanceOf(UserNotificationSetting::class, $settings);
+        $this->assertFalse($settings->collaboration_emails);
+    }
+
+    public function test_guest_cannot_update_notification_settings(): void
+    {
+        $response = $this->post(route('profile.notifications.update'), [
+            'collaboration_emails' => false,
+        ]);
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_notification_settings_validation_rejects_non_boolean(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('profile.notifications.update'), [
+            'collaboration_emails' => 'not-a-boolean',
+        ]);
+
+        $response->assertSessionHasErrors('collaboration_emails');
     }
 
     public function test_phone_validation_rejects_too_long_value(): void
@@ -119,15 +175,16 @@ class PrivacySettingsTest extends TestCase
         $response->assertSessionHasErrors('show_email');
     }
 
-    public function test_email_notifications_validation_rejects_non_boolean(): void
+    public function test_legacy_email_notifications_field_is_rejected_on_privacy_update(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('profile.privacy.update'), [
-            'email_notifications_enabled' => 'not-a-boolean',
+            'email_notifications_enabled' => false,
         ]);
 
         $response->assertSessionHasErrors('email_notifications_enabled');
+        $this->assertNull($user->fresh()->notificationSetting()->first());
     }
 
     public function test_updating_privacy_only_affects_current_user(): void

@@ -565,6 +565,32 @@ class NotificationTest extends TestCase
     public function test_join_request_received_skips_mail_when_recipient_disables_optional_emails(): void
     {
         $creator = User::factory()->create();
+        $creator->notificationSetting()->create(['collaboration_emails' => false]);
+        $applicant = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $creator->id,
+            'status' => 'open',
+        ]);
+
+        Notification::fake();
+
+        $this->actingAs($applicant)
+            ->post(route('join-requests.store', $project), [
+                'message' => 'Quiero unirme',
+            ]);
+
+        Notification::assertSentTo(
+            $creator,
+            JoinRequestReceived::class,
+            fn ($notification, $channels) => in_array('database', $channels, true)
+                && in_array('broadcast', $channels, true)
+                && ! in_array('mail', $channels, true),
+        );
+    }
+
+    public function test_join_request_received_skips_mail_when_legacy_privacy_setting_is_false(): void
+    {
+        $creator = User::factory()->create();
         $creator->privacySetting()->create(['email_notifications_enabled' => false]);
         $applicant = User::factory()->create();
         $project = Project::factory()->create([
@@ -620,7 +646,7 @@ class NotificationTest extends TestCase
     {
         $creator = User::factory()->create();
         $applicant = User::factory()->create();
-        $applicant->privacySetting()->create(['email_notifications_enabled' => false]);
+        $applicant->notificationSetting()->create(['collaboration_emails' => false]);
         $project = Project::factory()->create([
             'user_id' => $creator->id,
             'status' => 'open',
@@ -679,7 +705,7 @@ class NotificationTest extends TestCase
     {
         $creator = User::factory()->create();
         $applicant = User::factory()->create();
-        $applicant->privacySetting()->create(['email_notifications_enabled' => false]);
+        $applicant->notificationSetting()->create(['collaboration_emails' => false]);
         $project = Project::factory()->create([
             'user_id' => $creator->id,
             'status' => 'open',

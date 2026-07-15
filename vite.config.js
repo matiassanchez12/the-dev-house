@@ -7,6 +7,7 @@ export default defineConfig({
     plugins: [
         laravel({
             input: 'resources/js/app.tsx',
+            buildDirectory: 'build-assets',
             refresh: true,
         }),
         react(),

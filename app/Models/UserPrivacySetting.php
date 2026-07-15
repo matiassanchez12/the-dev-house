@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_discoverable
  * @property bool $show_activity
  * @property bool $email_notifications_enabled
+ * @deprecated Use UserNotificationSetting::collaboration_emails instead.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */

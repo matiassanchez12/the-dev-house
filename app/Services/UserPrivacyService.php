@@ -25,7 +25,6 @@ class UserPrivacyService
         'show_phone',
         'is_discoverable',
         'show_activity',
-        'email_notifications_enabled',
     ];
 
     /**
@@ -46,7 +45,7 @@ class UserPrivacyService
      * `user_privacy_settings`. Both are written inside a single DB transaction
      * so partial writes never reach the database.
      *
-     * @param  array{phone?: string|null, show_email?: bool, show_phone?: bool, is_discoverable?: bool, show_activity?: bool, email_notifications_enabled?: bool}  $data
+     * @param  array{phone?: string|null, show_email?: bool, show_phone?: bool, is_discoverable?: bool, show_activity?: bool}  $data
      */
     public function update(User $user, array $data): UserPrivacySetting
     {

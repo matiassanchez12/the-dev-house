@@ -11,7 +11,6 @@ interface MockFormData {
     show_phone: boolean;
     is_discoverable: boolean;
     show_activity: boolean;
-    email_notifications_enabled: boolean;
 }
 
 interface MockState {
@@ -31,7 +30,6 @@ const mockState = vi.hoisted((): MockState => ({
         show_phone: false,
         is_discoverable: true,
         show_activity: false,
-        email_notifications_enabled: true,
     },
     errors: {
         phone: 'El teléfono no es válido',
@@ -39,8 +37,11 @@ const mockState = vi.hoisted((): MockState => ({
     },
     recentlySuccessful: false,
     post: vi.fn(),
-    setData: vi.fn((field: string, value: unknown) => {
-        (mockState.formData as Record<string, unknown>)[field] = value;
+    setData: vi.fn(<K extends keyof MockFormData>(field: K, value: MockFormData[K]) => {
+        mockState.formData = {
+            ...mockState.formData,
+            [field]: value,
+        };
     }),
     transform: vi.fn((callback: (data: MockFormData) => MockFormData) => {
         mockState.formData = callback({ ...mockState.formData });
@@ -96,7 +97,6 @@ beforeEach(() => {
         show_phone: false,
         is_discoverable: true,
         show_activity: false,
-        email_notifications_enabled: true,
     };
     mockState.errors = {
         phone: 'El teléfono no es válido',
@@ -123,13 +123,12 @@ describe('UpdatePrivacyForm', () => {
         expect(screen.getByRole('checkbox', { name: /Mostrar teléfono/i })).not.toBeChecked();
         expect(screen.getByRole('checkbox', { name: /Ser descubrible en el directorio/i })).toBeChecked();
         expect(screen.getByRole('checkbox', { name: /Mostrar actividad pública/i })).not.toBeChecked();
-        expect(screen.getByRole('checkbox', { name: /Recibir emails opcionales de colaboración/i })).toBeChecked();
 
         expect(screen.getByText(/Cualquiera que visite tu perfil podrá ver tu correo/i)).toBeInTheDocument();
         expect(screen.getByText(/tu teléfono será visible/i)).toBeInTheDocument();
         expect(screen.getByText(/aparecer en el directorio/i)).toBeInTheDocument();
         expect(screen.getByText(/tu actividad pública podrá mostrarse/i)).toBeInTheDocument();
-        expect(screen.getByText(/Solo controla correos opcionales de colaboración/i)).toBeInTheDocument();
+        expect(screen.queryByText(/recibir emails opcionales de colaboración/i)).not.toBeInTheDocument();
     });
 
     it('updates privacy toggles and normalizes a blank phone on submit', async () => {
@@ -149,29 +148,6 @@ describe('UpdatePrivacyForm', () => {
             show_phone: true,
             is_discoverable: true,
             show_activity: false,
-            email_notifications_enabled: true,
-        });
-        expect(globalThis.route).toHaveBeenCalledWith('profile.privacy.update');
-        expect(mockState.post).toHaveBeenCalledWith('/profile/privacy', expect.objectContaining({
-            preserveScroll: true,
-        }));
-    });
-
-    it('submits email notifications disabled when the toggle is turned off', async () => {
-        const user = userEvent.setup();
-
-        render(<UpdatePrivacyForm phone="555-1234" privacySetting={buildPrivacySetting()} />);
-
-        await user.click(screen.getByRole('checkbox', { name: /Recibir emails opcionales de colaboración/i }));
-        fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
-
-        expect(mockState.transformedData).toMatchObject({
-            phone: '555-1234',
-            show_email: true,
-            show_phone: false,
-            is_discoverable: true,
-            show_activity: false,
-            email_notifications_enabled: false,
         });
         expect(globalThis.route).toHaveBeenCalledWith('profile.privacy.update');
         expect(mockState.post).toHaveBeenCalledWith('/profile/privacy', expect.objectContaining({
@@ -186,7 +162,6 @@ describe('UpdatePrivacyForm', () => {
             show_phone: false,
             is_discoverable: true,
             show_activity: false,
-            email_notifications_enabled: true,
         };
 
         render(<UpdatePrivacyForm phone={null} privacySetting={buildPrivacySetting()} />);
@@ -205,7 +180,6 @@ describe('UpdatePrivacyForm', () => {
             show_phone: false,
             is_discoverable: true,
             show_activity: false,
-            email_notifications_enabled: true,
         });
     });
 
@@ -221,16 +195,16 @@ describe('UpdatePrivacyForm', () => {
 });
 
 function buildPrivacySetting(overrides: Partial<PrivacySetting> = {}): PrivacySetting {
-    return {
-        id: 1,
-        user_id: 1,
-        show_email: true,
-        show_phone: false,
-        is_discoverable: true,
-        show_activity: false,
-        email_notifications_enabled: true,
-        created_at: '2026-07-07T00:00:00.000Z',
-        updated_at: '2026-07-07T00:00:00.000Z',
-        ...overrides,
-    };
-}
+        return {
+            id: 1,
+            user_id: 1,
+            show_email: true,
+            email_notifications_enabled: true,
+            show_phone: false,
+            is_discoverable: true,
+            show_activity: false,
+            created_at: '2026-07-07T00:00:00.000Z',
+            updated_at: '2026-07-07T00:00:00.000Z',
+            ...overrides,
+        };
+    }
