@@ -57,7 +57,7 @@ class PhaseService
 
     public function listFor(Project $project): Collection
     {
-        return $project->phases()->orderBy('created_at')->get();
+        return $project->phases()->orderByDesc('created_at')->get();
     }
 
     private function deleteImageFile(?string $path): void

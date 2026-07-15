@@ -71,7 +71,7 @@ class Project extends Model
      */
     public function phases(): HasMany
     {
-        return $this->hasMany(Phase::class)->orderBy('created_at');
+        return $this->hasMany(Phase::class)->orderByDesc('created_at');
     }
 
     /**

@@ -36,7 +36,7 @@ class PhaseServiceTest extends TestCase
         $this->assertSame('First milestone', $phase->title);
     }
 
-    public function test_list_for_returns_phases_ordered_by_created_at(): void
+    public function test_list_for_returns_phases_newest_first(): void
     {
         $older = Phase::factory()->create(['project_id' => $this->project->id]);
         sleep(1);
@@ -44,7 +44,7 @@ class PhaseServiceTest extends TestCase
 
         $phases = $this->service->listFor($this->project);
 
-        $this->assertSame([$older->id, $newer->id], $phases->pluck('id')->all());
+        $this->assertSame([$newer->id, $older->id], $phases->pluck('id')->all());
     }
 
     public function test_update_changes_phase_fields(): void
