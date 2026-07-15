@@ -45,6 +45,12 @@ class ShowTest extends TestCase
             'title' => 'Discovery',
             'description' => 'Validated the main idea',
         ]);
+        sleep(1);
+        Phase::factory()->create([
+            'project_id' => $project->id,
+            'title' => 'Delivery',
+            'description' => 'Shipped the feature',
+        ]);
 
         // Act
         $response = $this->get("/projects/{$project->slug}");
@@ -65,8 +71,9 @@ class ShowTest extends TestCase
         $this->assertEquals('Project Creator', $props['project']['creator']['name']);
         $this->assertCount(1, $props['project']['techs']);
         $this->assertCount(1, $props['project']['participants']);
-        $this->assertCount(1, $props['project']['phases']);
-        $this->assertEquals('Discovery', $props['project']['phases'][0]['title']);
+        $this->assertCount(2, $props['project']['phases']);
+        $this->assertEquals('Delivery', $props['project']['phases'][0]['title']);
+        $this->assertEquals('Discovery', $props['project']['phases'][1]['title']);
         $this->assertSame('guest', $props['project']['viewer_role']);
     }
 
