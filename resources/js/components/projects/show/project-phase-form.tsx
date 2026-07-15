@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PhaseDatePicker } from './phase-date-picker';
+import { PhaseImageInput } from './phase-image-input';
 
 interface ProjectPhaseFormProps {
     projectSlug: string;
@@ -18,12 +19,14 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
         title: '',
         description: '',
         completed_at: '',
+        image: null as File | null,
     });
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         post(route('projects.phases.store', projectSlug), {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 reset();
@@ -63,6 +66,12 @@ export function ProjectPhaseForm({ projectSlug, onSuccess }: ProjectPhaseFormPro
                         />
                         <FormError message={errors.description} />
                     </div>
+
+                    <PhaseImageInput
+                        file={data.image}
+                        onFileChange={(file) => setData('image', file)}
+                        error={errors.image}
+                    />
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="phase-completed-at">Fecha de cierre</Label>

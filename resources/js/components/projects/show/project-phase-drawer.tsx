@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form-error';
@@ -6,28 +6,48 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PhaseDatePicker } from './phase-date-picker';
+import { PhaseImageInput } from './phase-image-input';
+import type { Phase } from '@/types';
 
-export interface ProjectPhaseValues {
+interface ProjectPhaseValues {
     title: string;
     description: string;
     completed_at: string;
+    image: Phase['image'];
 }
 
 interface ProjectPhaseDrawerProps {
     projectSlug: string;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    phaseId?: number;
-    initialValues?: ProjectPhaseValues;
+    phase?: Phase | null;
 }
 
-const emptyValues: ProjectPhaseValues = { title: '', description: '', completed_at: '' };
+const emptyValues: ProjectPhaseValues = { title: '', description: '', completed_at: '', image: null };
 
-export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, initialValues = emptyValues }: ProjectPhaseDrawerProps) {
-    const isEditing = phaseId !== undefined;
+function toPhaseValues(phase?: Phase | null): ProjectPhaseValues {
+    if (!phase) {
+        return emptyValues;
+    }
+
+    return {
+        title: phase.title,
+        description: phase.description ?? '',
+        completed_at: phase.completed_at ? phase.completed_at.slice(0, 10) : '',
+        image: phase.image ?? null,
+    };
+}
+
+export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phase }: ProjectPhaseDrawerProps) {
+    const isEditing = phase !== null && phase !== undefined;
+    const initialValues = useMemo(() => toPhaseValues(phase), [phase]);
+
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: isEditing ? 'put' : 'post',
-        ...initialValues,
+        title: initialValues.title,
+        description: initialValues.description,
+        completed_at: initialValues.completed_at,
+        image: null as File | null,
     });
 
     useEffect(() => {
@@ -37,15 +57,19 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
             setData('title', initialValues.title);
             setData('description', initialValues.description);
             setData('completed_at', initialValues.completed_at);
+            setData('image', null);
         }
     }, [open, initialValues, isEditing, reset, setData]);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const routeName = isEditing ? route('projects.phases.update', [projectSlug, phaseId]) : route('projects.phases.store', projectSlug);
+        const routeName = isEditing
+            ? route('projects.phases.update', [projectSlug, phase?.id])
+            : route('projects.phases.store', projectSlug);
 
         post(routeName, {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => onOpenChange(false),
         });
@@ -64,6 +88,13 @@ export function ProjectPhaseDrawer({ projectSlug, open, onOpenChange, phaseId, i
                 <Textarea id="phase-description" value={data.description} onChange={(event) => setData('description', event.target.value)} placeholder="Contá qué se logró en este hito" rows={3} />
                 <FormError message={errors.description} />
             </div>
+
+            <PhaseImageInput
+                file={data.image}
+                existingImage={data.image ? null : initialValues.image}
+                onFileChange={(file) => setData('image', file)}
+                error={errors.image}
+            />
 
             <div className="flex flex-col gap-2">
                 <Label htmlFor="phase-completed-at">Fecha de cierre</Label>

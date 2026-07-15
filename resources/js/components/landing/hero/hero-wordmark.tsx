@@ -1,12 +1,9 @@
-import type { HeroWordmarkProps } from './types';
+import type { HeroWordmarkProps } from './types'
+import { cn } from '@/lib/utils'
 
 export function HeroWordmark({ className }: HeroWordmarkProps) {
     return (
-        <div
-            className={`font-mono text-center text-2xl md:text-3xl lg:text-4xl font-bold leading-tight ${className ?? ''}`}
-        >
-            <div className="mt-1 text-sm md:text-base font-normal text-muted-foreground opacity-60">
-            </div>
+        <div className={cn('inline-flex flex-col items-center gap-2 text-center', className)}>
         </div>
-    );
+    )
 }

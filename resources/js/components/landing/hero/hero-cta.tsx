@@ -1,29 +1,45 @@
-import { Link } from '@inertiajs/react';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { HeroCtaProps } from './types';
+import { Link } from '@inertiajs/react'
+import { ArrowRight } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import type { HeroCtaProps } from './types'
 
 export function HeroCta({ auth, className }: HeroCtaProps) {
-    const isAuthed = auth.user !== null;
-    const primaryHref = isAuthed ? route('projects.create') : route('register');
-    const primaryLabel = isAuthed ? 'Crear proyecto' : 'Crear mi perfil';
+    const isAuthed = auth.user !== null
+    const primaryHref = isAuthed ? route('projects.create') : route('register')
+    const primaryLabel = isAuthed ? 'Crear proyecto' : 'Crear mi perfil'
 
-    const baseClasses = 'min-h-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+    const baseClasses =
+        'min-h-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
 
     return (
-        <div className={cn('flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mx-auto w-full max-w-sm', className)}>
+        <div
+            className={cn(
+                'flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mx-auto w-full max-w-sm',
+                className,
+            )}
+        >
             <Link
                 href={primaryHref}
-                className={cn(buttonVariants({ variant: 'cta', size: 'lg' }), baseClasses, 'sm:flex-1')}
+                className={cn(
+                    buttonVariants({ variant: 'cta', size: 'lg' }),
+                    baseClasses,
+                    'gap-2 sm:flex-1',
+                )}
             >
-                {primaryLabel}
+                <span>{primaryLabel}</span>
+                <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
             <Link
                 href={route('projects.index')}
-                className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), baseClasses, 'sm:flex-1')}
+                className={cn(
+                    buttonVariants({ variant: 'outline', size: 'lg' }),
+                    baseClasses,
+                    'sm:flex-1',
+                )}
             >
                 Ver proyectos
             </Link>
         </div>
-    );
+    )
 }

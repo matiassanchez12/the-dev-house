@@ -15,6 +15,11 @@ use Illuminate\Support\Collection;
  */
 class ApiResourceTransformer
 {
+    private static function mediaDisk(): string
+    {
+        return config('filesystems.media_disk', 'public');
+    }
+
     /**
      * Transform a project model to array with disk-aware image URLs.
      * Creator and participants are scrubbed to safe fields only.
@@ -31,7 +36,7 @@ class ApiResourceTransformer
             $data['images'] = array_map(
                 fn ($img) => [
                     'path' => $img,
-                    'url' => StorageUrlHelper::url($img),
+                    'url' => StorageUrlHelper::url($img, self::mediaDisk()),
                 ],
                 $data['images']
             );
@@ -87,6 +92,15 @@ class ApiResourceTransformer
             $data['project'] = self::project($data['project']);
         }
 
+        if (isset($data['image_path'])) {
+            $data['image'] = [
+                'path' => $data['image_path'],
+                'url' => StorageUrlHelper::url($data['image_path'], self::mediaDisk()),
+            ];
+        } else {
+            $data['image'] = null;
+        }
+
         return array_intersect_key($data, array_flip([
             'id',
             'title',
@@ -95,6 +109,7 @@ class ApiResourceTransformer
             'created_at',
             'updated_at',
             'project',
+            'image',
         ]));
     }
 
@@ -292,9 +307,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of projects.
-     *
-     * @param Collection|LengthAwarePaginator $projects
-     * @return array
      */
     public static function projects(Collection|LengthAwarePaginator $projects): array
     {
@@ -303,9 +315,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of project invitations.
-     *
-     * @param Collection|LengthAwarePaginator $invitations
-     * @return array
      */
     public static function projectInvitations(Collection|LengthAwarePaginator $invitations): array
     {
@@ -329,9 +338,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of collaborator suggestions.
-     *
-     * @param Collection|LengthAwarePaginator $suggestions
-     * @return array
      */
     public static function collaboratorSuggestions(Collection|LengthAwarePaginator $suggestions): array
     {
@@ -355,9 +361,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of users.
-     *
-     * @param Collection|LengthAwarePaginator $users
-     * @return array
      */
     public static function users(Collection|LengthAwarePaginator $users): array
     {
@@ -381,9 +384,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of join requests.
-     *
-     * @param Collection|LengthAwarePaginator $requests
-     * @return array
      */
     public static function joinRequests(Collection|LengthAwarePaginator $requests): array
     {
@@ -421,9 +421,6 @@ class ApiResourceTransformer
 
     /**
      * Transform a collection/paginator of techs.
-     *
-     * @param Collection|LengthAwarePaginator $techs
-     * @return array
      */
     public static function techs(Collection|LengthAwarePaginator $techs): array
     {

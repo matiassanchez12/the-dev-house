@@ -11,6 +11,11 @@ use Illuminate\Support\Str;
 
 class ProjectService
 {
+    private function mediaDisk(): string
+    {
+        return config('filesystems.media_disk', 'public');
+    }
+
     public function viewerRole(Project $project, ?User $viewer): string
     {
         if ($viewer === null) {
@@ -152,7 +157,7 @@ class ProjectService
      */
     public function uploadImages(array $files): array
     {
-        $disk = config('filesystems.default', 'public');
+        $disk = $this->mediaDisk();
         $paths = [];
         foreach ($files as $file) {
             $path = $file->store('projects', $disk);
@@ -174,7 +179,7 @@ class ProjectService
      */
     public function deleteImages(array $paths): void
     {
-        $disk = config('filesystems.default', 'public');
+        $disk = $this->mediaDisk();
         foreach ($paths as $path) {
             if (! $this->isSafeImagePath($path)) {
                 continue;

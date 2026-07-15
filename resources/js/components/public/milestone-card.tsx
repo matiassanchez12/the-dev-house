@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { CheckCircle2, ExternalLink } from 'lucide-react';
 import type { Phase, Project, User } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
 
 type Milestone = Phase & {
     project: Project & {
@@ -26,6 +28,8 @@ function formatDate(value: string | null | undefined): string {
 }
 
 export function MilestoneCard({ milestone }: Props) {
+    const [galleryOpen, setGalleryOpen] = useState(false);
+
     return (
         <Card className="border-border/60 bg-card shadow-sm transition-all duration-200 hover:shadow-md">
             <CardHeader>
@@ -57,6 +61,20 @@ export function MilestoneCard({ milestone }: Props) {
                 ) : (
                     <p className="text-sm text-muted-foreground">Sin descripción</p>
                 )}
+
+                {milestone.image && (
+                    <button
+                        type="button"
+                        onClick={() => setGalleryOpen(true)}
+                        className="w-fit cursor-pointer"
+                    >
+                        <img
+                            src={milestone.image.url}
+                            alt={milestone.title}
+                            className="h-16 w-16 rounded-lg object-cover hover:opacity-90 transition-opacity"
+                        />
+                    </button>
+                )}
             </CardContent>
 
             <CardFooter className="justify-end border-t border-border/50 bg-muted/20 pt-4">
@@ -67,6 +85,15 @@ export function MilestoneCard({ milestone }: Props) {
                     </Button>
                 </Link>
             </CardFooter>
+
+            {milestone.image && (
+                <ImageGalleryDialog
+                    images={[milestone.image.url]}
+                    open={galleryOpen}
+                    initialIndex={0}
+                    onOpenChange={setGalleryOpen}
+                />
+            )}
         </Card>
     );
 }

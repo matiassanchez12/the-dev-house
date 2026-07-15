@@ -20,7 +20,7 @@ class PhaseController extends Controller
     {
         Gate::authorize('create', [Phase::class, $project]);
 
-        $this->phaseService->create($project, $request->validated());
+        $this->phaseService->create($project, $request->validated(), $request->file('image'));
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Hito creado exitosamente.');
@@ -30,7 +30,7 @@ class PhaseController extends Controller
     {
         Gate::authorize('update', $phase);
 
-        $this->phaseService->update($phase, $request->validated());
+        $this->phaseService->update($phase, $request->validated(), $request->file('image'));
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Hito actualizado exitosamente.');

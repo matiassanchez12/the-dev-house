@@ -17,6 +17,7 @@ class StorePhaseRequest extends FormRequest
             'title' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:2000'],
             'completed_at' => ['nullable', 'date'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

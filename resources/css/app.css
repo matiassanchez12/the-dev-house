@@ -159,6 +159,7 @@
     --animate-fade-in-up: fade-in-up 0.5s ease-out both;
     --animate-fade-in: fade-in 0.5s ease-out both;
     --animate-float: float 6s ease-in-out infinite;
+    --animate-float-slow: float-slow 10s ease-in-out infinite;
     --animate-float-delayed: float 6s ease-in-out 2s infinite;
     --animate-bob: bob 3s ease-in-out infinite;
 }
@@ -336,6 +337,16 @@
     }
     50% {
         transform: translateY(-20px);
+    }
+}
+
+@keyframes float-slow {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
     }
 }
 

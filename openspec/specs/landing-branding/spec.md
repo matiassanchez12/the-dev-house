@@ -88,20 +88,21 @@ The landing page hero MUST feature an animated background with staggered content
 
 ### Requirement: Real Database Stats
 
-The stats section MUST display real counts from the database, not hardcoded values. Counts SHALL animate (count-up) when the section enters the viewport.
+The landing page MUST display real counts from the database, not hardcoded values. The stats section MUST keep its existing count-up behavior and MUST visually receive the hero bleed through a softened top edge or equivalent overlay. The top of the stats section MUST NOT read as a hard horizontal seam against the hero. Counts SHALL animate when the section enters the viewport.
+(Previously: the stats section animated real counts but its top edge did not blend with the hero above.)
 
-#### Scenario: LandingController passes real counts
+#### Scenario: Stats section blends with the hero
 
-- GIVEN the `LandingController` handles a GET request to `/`
-- WHEN it renders the landing Inertia view
-- THEN the props MUST include `project_count`, `user_count`, and `collaboration_count`
-- AND each value MUST reflect the current database count
+- GIVEN the landing page is rendered
+- WHEN the hero and stats sections are viewed together
+- THEN the top of the stats section MUST blend smoothly with the hero above
+- AND no abrupt color break MUST be visible between sections
 
-#### Scenario: Stats animate on scroll into view
+#### Scenario: Counts still animate once on entry
 
-- GIVEN the stats section is initially below the viewport
-- WHEN the user scrolls and the section enters the viewport
-- THEN each stat number MUST animate from 0 to its actual value (count-up)
+- GIVEN the stats section enters the viewport
+- WHEN the counts animate
+- THEN each count MUST reflect controller-provided data
 - AND the animation MUST trigger only once per page load
 
 ### Requirement: How It Works Section
