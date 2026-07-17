@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $show_phone
  * @property bool $is_discoverable
  * @property bool $show_activity
+ * @property bool $email_notifications_enabled
+ * @deprecated Use UserNotificationSetting::collaboration_emails instead.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -34,6 +36,7 @@ class UserPrivacySetting extends Model
         'show_phone' => false,
         'is_discoverable' => true,
         'show_activity' => true,
+        'email_notifications_enabled' => true,
     ];
 
     protected $table = 'user_privacy_settings';
@@ -46,6 +49,7 @@ class UserPrivacySetting extends Model
         'show_activity',
         'show_email',
         'show_phone',
+        'email_notifications_enabled',
         'user_id',
     ];
 
@@ -59,6 +63,7 @@ class UserPrivacySetting extends Model
             'show_activity' => 'boolean',
             'show_email' => 'boolean',
             'show_phone' => 'boolean',
+            'email_notifications_enabled' => 'boolean',
         ];
     }
 

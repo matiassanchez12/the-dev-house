@@ -30,6 +30,18 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
+    public function test_reset_password_link_is_sent_when_optional_collaboration_emails_are_disabled(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $user->notificationSetting()->create(['collaboration_emails' => false]);
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class);
+    }
+
     public function test_reset_password_screen_can_be_rendered(): void
     {
         Notification::fake();

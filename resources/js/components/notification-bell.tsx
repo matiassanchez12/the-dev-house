@@ -1,20 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
-import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dropdown } from '@/components/ui/dropdown';
 import { NotificationList, type NotificationItem } from '@/components/notification-list';
+import type { SharedPageProps, User } from '@/types';
 
-interface User {
-    id: number;
-    name: string;
-    slug: string;
-    unread_notifications_count: number;
-}
-
-interface PageProps extends InertiaPageProps {
+interface PageProps extends SharedPageProps {
     auth?: { user: User | null };
     notifications?: NotificationItem[] | { data: NotificationItem[] };
     url?: string;

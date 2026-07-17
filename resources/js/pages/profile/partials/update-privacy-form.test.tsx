@@ -37,8 +37,11 @@ const mockState = vi.hoisted((): MockState => ({
     },
     recentlySuccessful: false,
     post: vi.fn(),
-    setData: vi.fn((field: string, value: unknown) => {
-        (mockState.formData as Record<string, unknown>)[field] = value;
+    setData: vi.fn(<K extends keyof MockFormData>(field: K, value: MockFormData[K]) => {
+        mockState.formData = {
+            ...mockState.formData,
+            [field]: value,
+        };
     }),
     transform: vi.fn((callback: (data: MockFormData) => MockFormData) => {
         mockState.formData = callback({ ...mockState.formData });
@@ -125,6 +128,7 @@ describe('UpdatePrivacyForm', () => {
         expect(screen.getByText(/tu teléfono será visible/i)).toBeInTheDocument();
         expect(screen.getByText(/aparecer en el directorio/i)).toBeInTheDocument();
         expect(screen.getByText(/tu actividad pública podrá mostrarse/i)).toBeInTheDocument();
+        expect(screen.queryByText(/recibir emails opcionales de colaboración/i)).not.toBeInTheDocument();
     });
 
     it('updates privacy toggles and normalizes a blank phone on submit', async () => {
@@ -191,15 +195,16 @@ describe('UpdatePrivacyForm', () => {
 });
 
 function buildPrivacySetting(overrides: Partial<PrivacySetting> = {}): PrivacySetting {
-    return {
-        id: 1,
-        user_id: 1,
-        show_email: true,
-        show_phone: false,
-        is_discoverable: true,
-        show_activity: false,
-        created_at: '2026-07-07T00:00:00.000Z',
-        updated_at: '2026-07-07T00:00:00.000Z',
-        ...overrides,
-    };
-}
+        return {
+            id: 1,
+            user_id: 1,
+            show_email: true,
+            email_notifications_enabled: true,
+            show_phone: false,
+            is_discoverable: true,
+            show_activity: false,
+            created_at: '2026-07-07T00:00:00.000Z',
+            updated_at: '2026-07-07T00:00:00.000Z',
+            ...overrides,
+        };
+    }

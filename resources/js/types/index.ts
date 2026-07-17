@@ -1,5 +1,3 @@
-import type { PageProps as InertiaPageProps } from '@inertiajs/core'
-
 export interface User {
     id: number
     name: string
@@ -13,7 +11,8 @@ export interface User {
     updated_at: string
 }
 
-export interface SharedPageProps extends InertiaPageProps {
+export interface SharedPageProps {
+    [key: string]: unknown
     auth?: { user: User | null }
     flash: {
         success?: string
@@ -159,6 +158,16 @@ export interface PrivacySetting {
     show_phone: boolean
     is_discoverable: boolean
     show_activity: boolean
+    /** @deprecated Use NotificationSetting.collaboration_emails. */
+    email_notifications_enabled: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface NotificationSetting {
+    id: number
+    user_id: number
+    collaboration_emails: boolean
     created_at: string
     updated_at: string
 }

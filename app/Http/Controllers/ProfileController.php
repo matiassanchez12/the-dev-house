@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Profile\UpdateCompleteProfileRequest;
+use App\Http\Requests\Profile\UpdateNotificationSettingsRequest;
 use App\Http\Requests\Profile\UpdateSocialLinksRequest;
 use App\Http\Requests\Profile\UpdatePrivacyRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\SocialLink;
 use App\Services\ProfileService;
+use App\Services\UserNotificationService;
 use App\Services\UserPrivacyService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +23,7 @@ class ProfileController extends Controller
 {
     public function __construct(
         private ProfileService $profileService,
+        private UserNotificationService $userNotificationService,
         private UserPrivacyService $userPrivacyService,
     ) {}
 
@@ -41,6 +44,7 @@ class ProfileController extends Controller
             'emailVerifiedAt' => $user->email_verified_at,
             'phone' => $user->phone,
             'privacySetting' => $this->userPrivacyService->getFor($user),
+            'notificationSetting' => $this->userNotificationService->getFor($user),
             'userTechs' => $userTechs,
             'socialLinks' => $socialLinks,
         ]);
@@ -201,5 +205,16 @@ class ProfileController extends Controller
         $this->userPrivacyService->update($user, $request->validated());
 
         return Redirect::route('profile.edit')->with('success', 'Preferencias de privacidad actualizadas!');
+    }
+
+    /**
+     * Update the user's optional collaboration email settings.
+     */
+    public function updateNotificationSettings(UpdateNotificationSettingsRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $this->userNotificationService->update($user, $request->validated());
+
+        return Redirect::route('profile.edit')->with('success', 'Preferencias de notificación actualizadas!');
     }
 }
