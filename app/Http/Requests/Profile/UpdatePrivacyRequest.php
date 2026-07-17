@@ -39,6 +39,7 @@ class UpdatePrivacyRequest extends FormRequest
     {
         return [
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s()]+$/'],
+            'email_notifications_enabled' => ['prohibited'],
             'show_email' => ['sometimes', 'boolean'],
             'show_phone' => ['sometimes', 'boolean'],
             'is_discoverable' => ['sometimes', 'boolean'],
@@ -54,6 +55,7 @@ class UpdatePrivacyRequest extends FormRequest
         return [
             'phone.max' => 'El teléfono no puede exceder 30 caracteres.',
             'phone.regex' => 'El teléfono solo puede contener números, espacios, paréntesis, + y -.',
+            'email_notifications_enabled.prohibited' => 'The email_notifications_enabled field is no longer accepted on the privacy endpoint.',
             'show_email.boolean' => 'El valor de "mostrar email" debe ser verdadero o falso.',
             'show_phone.boolean' => 'El valor de "mostrar teléfono" debe ser verdadero o falso.',
             'is_discoverable.boolean' => 'El valor de "visible en el directorio" debe ser verdadero o falso.',

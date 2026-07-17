@@ -143,12 +143,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Optional collaboration email preferences (1:1).
+     */
+    public function notificationSetting(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserNotificationSetting::class);
+    }
+
+    /**
      * Si el usuario aparece en el directorio público. Default true si nunca
      * creó una fila de preferencias (back-compat con usuarios existentes).
      */
     public function isDiscoverable(): bool
     {
         return $this->privacySetting?->is_discoverable ?? true;
+    }
+
+    /**
+     * Whether the user wants optional product emails.
+     */
+    public function receivesOptionalEmailNotifications(): bool
+    {
+        return $this->notificationSetting?->collaboration_emails
+            ?? $this->privacySetting?->email_notifications_enabled
+            ?? true;
     }
 
     /**

@@ -23,6 +23,23 @@ final class ProjectInvitationReceivedTest extends TestCase
         self::assertSame(['database', 'mail', 'broadcast'], $notification->via($payload['invited_user']));
     }
 
+    public function test_project_invitation_received_skips_mail_when_user_disables_optional_emails(): void
+    {
+        $payload = $this->makeNotificationPayload(notificationSettings: ['collaboration_emails' => false]);
+
+        self::assertSame(['database', 'broadcast'], $payload['notification']->via($payload['invited_user']));
+    }
+
+    public function test_project_invitation_received_prefers_new_notification_settings_over_legacy_privacy_settings(): void
+    {
+        $payload = $this->makeNotificationPayload(
+            privacySettings: ['email_notifications_enabled' => false],
+            notificationSettings: ['collaboration_emails' => true],
+        );
+
+        self::assertSame(['database', 'mail', 'broadcast'], $payload['notification']->via($payload['invited_user']));
+    }
+
     public function test_project_invitation_received_payload_includes_project_and_inviter_data(): void
     {
         $payload = $this->makeNotificationPayload();
@@ -49,7 +66,7 @@ final class ProjectInvitationReceivedTest extends TestCase
         self::assertSame('emails.project-invitation-received', $mailMessage->view);
     }
 
-    private function makeNotificationPayload(): array
+    private function makeNotificationPayload(array $privacySettings = [], array $notificationSettings = []): array
     {
         $owner = User::factory()->create();
         $project = Project::factory()->create([
@@ -57,6 +74,14 @@ final class ProjectInvitationReceivedTest extends TestCase
             'status' => 'open',
         ]);
         $invitedUser = User::factory()->create();
+
+        if ($privacySettings !== []) {
+            $invitedUser->privacySetting()->create($privacySettings);
+        }
+
+        if ($notificationSettings !== []) {
+            $invitedUser->notificationSetting()->create($notificationSettings);
+        }
 
         $invitation = ProjectInvitation::create([
             'project_id' => $project->id,

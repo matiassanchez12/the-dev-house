@@ -62,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        Vite::useBuildDirectory('build-assets');
         Vite::prefetch(concurrency: 3);
     }
 }

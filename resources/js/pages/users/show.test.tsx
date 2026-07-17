@@ -51,7 +51,7 @@ describe('Users/Show', () => {
                 user={buildUser({
                     email: 'ada@example.com',
                     phone: '555-1234',
-                    privacySetting: { show_activity: false },
+                    privacySetting: { email_notifications_enabled: true, show_activity: false },
                 })}
             />,
         )
@@ -59,7 +59,7 @@ describe('Users/Show', () => {
         expect(mockState.headerUser).toMatchObject({
             email: 'ada@example.com',
             phone: '555-1234',
-            privacySetting: { show_activity: false },
+            privacySetting: { email_notifications_enabled: true, show_activity: false },
         })
         expect(mockState.showcaseProps).toMatchObject({
             showActivity: false,
