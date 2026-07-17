@@ -35,7 +35,51 @@ jobs:
       - name: Run backend tests
         run: composer run test
 
+<<<<<<< HEAD
       - name: Verify Docker build assets path
         run: |
           docker build --target backend -t devcollab-backend:test .
           docker run --rm devcollab-backend:test test -d /var/www/html/public/build-assets
+
+  postgres-migration-regression:
+    name: postgres-migration-regression
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: devcollab_test
+          POSTGRES_USER: devcollab
+          POSTGRES_PASSWORD: devcollab
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U devcollab -d devcollab_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pgsql, pdo_pgsql, sqlite3
+          tools: composer
+          coverage: none
+          cache: composer
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare Laravel application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run PostgreSQL migration regression
+        run: vendor/bin/phpunit --configuration=phpunit.pgsql.xml --filter UserNotificationSettingsMigrationTest

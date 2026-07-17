@@ -20,7 +20,7 @@ return new class extends Migration
             ->leftJoin('user_privacy_settings', 'user_privacy_settings.user_id', '=', 'users.id')
             ->select([
                 'users.id as user_id',
-                DB::raw('CASE WHEN user_privacy_settings.email_notifications_enabled = 0 THEN 0 ELSE 1 END as collaboration_emails'),
+                DB::raw('COALESCE(user_privacy_settings.email_notifications_enabled, TRUE) as collaboration_emails'),
                 DB::raw('CURRENT_TIMESTAMP as created_at'),
                 DB::raw('CURRENT_TIMESTAMP as updated_at'),
             ])
