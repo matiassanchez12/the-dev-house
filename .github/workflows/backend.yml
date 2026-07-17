@@ -34,3 +34,8 @@ jobs:
 
       - name: Run backend tests
         run: composer run test
+
+      - name: Verify Docker build assets path
+        run: |
+          docker build --target backend -t devcollab-backend:test .
+          docker run --rm devcollab-backend:test test -d /var/www/html/public/build-assets
