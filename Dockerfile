@@ -58,7 +58,7 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/fra
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwX storage bootstrap/cache
 
-COPY --from=frontend /app/public/build ./public/build
+COPY --from=frontend /app/public/build-assets ./public/build-assets
 
 COPY docker/nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
