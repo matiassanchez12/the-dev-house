@@ -12,7 +12,6 @@ class PublicMilestoneController extends Controller
     {
         $milestones = Phase::query()
             ->with(['project.creator'])
-            ->orderByDesc('completed_at')
             ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
