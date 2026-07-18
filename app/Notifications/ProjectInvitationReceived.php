@@ -31,8 +31,8 @@ final class ProjectInvitationReceived extends Notification implements ShouldBroa
     {
         $invitation = $this->projectInvitation;
 
-        return (new MailMessage())
-            ->subject("Project invitation: {$invitation->project->title}")
+        return (new MailMessage)
+            ->subject("The Dev House: invitación para {$invitation->project->title}")
             ->view('emails.project-invitation-received', ['projectInvitation' => $invitation]);
     }
 

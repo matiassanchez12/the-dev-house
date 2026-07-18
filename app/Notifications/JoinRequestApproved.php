@@ -29,8 +29,8 @@ class JoinRequestApproved extends Notification implements ShouldBroadcastNow
     {
         $jr = $this->joinRequest;
 
-        return (new MailMessage())
-            ->subject("Solicitud aprobada: {$jr->project->title}")
+        return (new MailMessage)
+            ->subject("The Dev House: acceso aprobado para {$jr->project->title}")
             ->view('emails.join-request-approved', ['joinRequest' => $jr]);
     }
 

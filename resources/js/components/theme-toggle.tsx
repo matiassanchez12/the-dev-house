@@ -69,7 +69,6 @@ export default function ThemeToggle({ appearance = 'icon', className }: ThemeTog
     return (
         <Button
             variant="ghost"
-            size="icon"
             onClick={toggleTheme}
             title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
             className={className}

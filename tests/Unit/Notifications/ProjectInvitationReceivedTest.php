@@ -61,12 +61,31 @@ final class ProjectInvitationReceivedTest extends TestCase
         $notification = $payload['notification'];
 
         $mailMessage = $notification->toMail($payload['invited_user']);
+        $html = $mailMessage->render();
 
-        self::assertStringContainsString($payload['project']->title, $mailMessage->subject);
+        self::assertSame("The Dev House: invitación para {$payload['project']->title}", $mailMessage->subject);
         self::assertSame('emails.project-invitation-received', $mailMessage->view);
+        self::assertStringContainsString('The Dev House', $html);
+        self::assertStringContainsString('Te invitaron a un proyecto', $html);
+        self::assertStringContainsString($payload['project']->creator->name, $html);
+        self::assertStringContainsString($payload['project']->title, $html);
+        self::assertStringContainsString('We would like to work with you.', $html);
+        self::assertStringContainsString('Abrir proyecto', $html);
+        self::assertStringContainsString(route('projects.show', (string) $payload['project']->slug), $html);
     }
 
-    private function makeNotificationPayload(array $privacySettings = [], array $notificationSettings = []): array
+    public function test_project_invitation_received_hides_message_block_when_message_is_missing(): void
+    {
+        $payload = $this->makeNotificationPayload(null);
+
+        $html = $payload['notification']->toMail($payload['invited_user'])->render();
+
+        self::assertStringNotContainsString('Mensaje', $html);
+        self::assertStringNotContainsString('We would like to work with you.', $html);
+        self::assertStringContainsString($payload['project']->creator->name, $html);
+    }
+
+    private function makeNotificationPayload(?string $message = 'We would like to work with you.', array $privacySettings = [], array $notificationSettings = []): array
     {
         $owner = User::factory()->create();
         $project = Project::factory()->create([
@@ -86,7 +105,7 @@ final class ProjectInvitationReceivedTest extends TestCase
         $invitation = ProjectInvitation::create([
             'project_id' => $project->id,
             'invited_user_id' => $invitedUser->id,
-            'message' => 'We would like to work with you.',
+            'message' => $message,
             'status' => 'pending',
         ]);
 

@@ -29,8 +29,8 @@ class JoinRequestReceived extends Notification implements ShouldBroadcastNow
     {
         $jr = $this->joinRequest;
 
-        return (new MailMessage())
-            ->subject("Nueva solicitud: {$jr->project->title}")
+        return (new MailMessage)
+            ->subject("The Dev House: nueva solicitud para {$jr->project->title}")
             ->view('emails.join-request-received', ['joinRequest' => $jr]);
     }
 
