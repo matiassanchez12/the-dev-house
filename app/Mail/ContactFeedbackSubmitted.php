@@ -20,7 +20,7 @@ class ContactFeedbackSubmitted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nuevo feedback de The Dev House',
+            subject: 'The Dev House: feedback recibido',
             replyTo: [
                 new Address($this->contactMessage->email, $this->contactMessage->name),
             ],
