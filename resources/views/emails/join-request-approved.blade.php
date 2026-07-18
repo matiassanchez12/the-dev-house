@@ -18,8 +18,8 @@
 >
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0;">
         <tr>
-            <td style="padding:0;border-radius:12px;background-color:#111827;">
-                <div style="font-size:14px;line-height:1.6;color:#e2e8f0;">
+            <td style="padding:0;border-radius:12px;background-color:#171717;">
+                <div style="font-size:14px;line-height:1.6;color:#d4d4d4;">
                     Ya figurás dentro del equipo y podés entrar al proyecto cuando quieras.
                 </div>
             </td>

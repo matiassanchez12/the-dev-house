@@ -10,6 +10,7 @@ use App\Notifications\JoinRequestReceived;
 use App\Notifications\JoinRequestRejected;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
@@ -225,7 +226,7 @@ class NotificationTest extends TestCase
         $mailMessage = (new JoinRequestReceived($jr))->toMail($creator);
 
         $this->assertNotEmpty($mailMessage->subject);
-        $this->assertStringContainsString('Test Project Beta', $mailMessage->subject);
+        $this->assertSame('The Dev House: nueva solicitud para Test Project Beta', $mailMessage->subject);
         $this->assertEquals('emails.join-request-received', $mailMessage->view);
     }
 
@@ -245,7 +246,7 @@ class NotificationTest extends TestCase
         $mailMessage = (new JoinRequestApproved($joinRequest))->toMail($applicant);
 
         $this->assertEquals('emails.join-request-approved', $mailMessage->view);
-        $this->assertStringContainsString($project->title, $mailMessage->subject);
+        $this->assertSame('The Dev House: acceso aprobado para '.$project->title, $mailMessage->subject);
     }
 
     public function test_join_request_rejected_to_mail_uses_custom_view(): void
@@ -264,7 +265,7 @@ class NotificationTest extends TestCase
         $mailMessage = (new JoinRequestRejected($joinRequest))->toMail($applicant);
 
         $this->assertEquals('emails.join-request-rejected', $mailMessage->view);
-        $this->assertStringContainsString($project->title, $mailMessage->subject);
+        $this->assertSame('The Dev House: solicitud rechazada para '.$project->title, $mailMessage->subject);
     }
 
     public function test_join_request_received_mail_renders_minimal_tech_layout(): void
@@ -288,7 +289,7 @@ class NotificationTest extends TestCase
             'joinRequest' => $joinRequest,
         ])->render();
 
-        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('The Dev House', $html);
         $this->assertStringContainsString('Nueva solicitud de acceso', $html);
         $this->assertStringContainsString('Abrir solicitud', $html);
         $this->assertStringContainsString(route('projects.show', $project->slug), $html);
@@ -315,9 +316,10 @@ class NotificationTest extends TestCase
             'joinRequest' => $joinRequest,
         ])->render();
 
-        $this->assertStringContainsString('background-color:#020617', $html);
-        $this->assertStringContainsString('background-color:#0b1220', $html);
-        $this->assertStringContainsString('background-color:#38bdf8', $html);
+        $this->assertStringContainsString('The Dev House', $html);
+        $this->assertStringContainsString('Nueva solicitud de acceso', $html);
+        $this->assertStringContainsString('Abrir solicitud', $html);
+        $this->assertStringContainsString('Email automático de The Dev House para Test Project Dark.', $html);
     }
 
     public function test_join_request_approved_mail_renders_minimal_tech_layout(): void
@@ -337,7 +339,7 @@ class NotificationTest extends TestCase
             'joinRequest' => $joinRequest,
         ])->render();
 
-        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('The Dev House', $html);
         $this->assertStringContainsString('Acceso aprobado', $html);
         $this->assertStringContainsString('Abrir proyecto', $html);
         $this->assertStringContainsString(route('projects.show', $project->slug), $html);
@@ -360,7 +362,7 @@ class NotificationTest extends TestCase
             'joinRequest' => $joinRequest,
         ])->render();
 
-        $this->assertStringContainsString('SYSTEM NOTIFICATION', $html);
+        $this->assertStringContainsString('The Dev House', $html);
         $this->assertStringContainsString('Solicitud no aprobada', $html);
         $this->assertStringContainsString('Explorar proyectos', $html);
         $this->assertStringContainsString(route('projects.index'), $html);
@@ -390,7 +392,7 @@ class NotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $notification = $user->notifications()->create([
-            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'id' => Str::uuid()->toString(),
             'type' => 'App\\Notifications\\JoinRequestReceived',
             'data' => ['type' => 'join_request_received'],
         ]);
@@ -409,12 +411,12 @@ class NotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $n1 = $user->notifications()->create([
-            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'id' => Str::uuid()->toString(),
             'type' => 'App\\Notifications\\JoinRequestReceived',
             'data' => ['type' => 'join_request_received'],
         ]);
         $n2 = $user->notifications()->create([
-            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'id' => Str::uuid()->toString(),
             'type' => 'App\\Notifications\\JoinRequestApproved',
             'data' => ['type' => 'join_request_approved'],
         ]);
@@ -435,7 +437,7 @@ class NotificationTest extends TestCase
         $user = User::factory()->create();
         for ($i = 0; $i < 3; $i++) {
             $user->notifications()->create([
-                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
                 'type' => 'App\\Notifications\\JoinRequestReceived',
                 'data' => ['type' => 'join_request_received'],
             ]);
@@ -454,7 +456,7 @@ class NotificationTest extends TestCase
 
         for ($i = 1; $i <= 6; $i++) {
             $user->notifications()->create([
-                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
                 'type' => 'App\\Notifications\\JoinRequestReceived',
                 'data' => [
                     'type' => 'join_request_received',
@@ -484,13 +486,13 @@ class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertEquals(
-            'user.' . $user->id,
-            $user->routeNotificationForBroadcast(new \stdClass()),
+            'user.'.$user->id,
+            $user->routeNotificationForBroadcast(new \stdClass),
         );
 
         $this->assertEquals(
-            'user.' . $user->id,
-            $user->receivesBroadcastNotificationsOn(new \stdClass()),
+            'user.'.$user->id,
+            $user->receivesBroadcastNotificationsOn(new \stdClass),
         );
     }
 
@@ -500,10 +502,10 @@ class NotificationTest extends TestCase
 
         $csrf = 'test-csrf-token';
         $socketId = '123.456';
-        $channelName = 'private-user.' . $user->id;
-        $expectedAuth = config('broadcasting.connections.testing.key') . ':' . hash_hmac(
+        $channelName = 'private-user.'.$user->id;
+        $expectedAuth = config('broadcasting.connections.testing.key').':'.hash_hmac(
             'sha256',
-            $socketId . ':' . $channelName,
+            $socketId.':'.$channelName,
             config('broadcasting.connections.testing.secret'),
         );
 
@@ -531,7 +533,7 @@ class NotificationTest extends TestCase
             ->withHeader('X-CSRF-TOKEN', $csrf)
             ->post('/broadcasting/auth', [
                 'socket_id' => '123.456',
-                'channel_name' => 'private-user.' . $otherUser->id,
+                'channel_name' => 'private-user.'.$otherUser->id,
             ]);
 
         $response->assertForbidden();
