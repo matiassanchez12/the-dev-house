@@ -96,6 +96,7 @@ export default function NotificationBell() {
                     type="button"
                     aria-label="Notificaciones"
                     variant="ghost"
+                    className="relative"
                 >
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
