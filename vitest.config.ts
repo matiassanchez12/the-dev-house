@@ -13,6 +13,7 @@ export default defineConfig({
         setupFiles: ['./resources/js/test/setup.ts'],
         css: false,
         globals: false,
+        forbidOnly: Boolean(process.env.CI),
         include: ['resources/js/**/*.{test,spec}.{ts,tsx}'],
     },
     resolve: {

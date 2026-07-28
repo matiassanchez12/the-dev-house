@@ -34,6 +34,26 @@ class UserDiscoveryTest extends TestCase
         );
     }
 
+    public function test_discovery_tech_catalog_includes_categories(): void
+    {
+        Tech::factory()->create([
+            'category' => 'frontend',
+            'name' => 'React',
+            'slug' => 'react',
+        ]);
+
+        $response = $this->get('/users');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('techs', 1)
+                ->where('techs.0.name', 'React')
+                ->where('techs.0.slug', 'react')
+                ->where('techs.0.category', 'frontend')
+        );
+    }
+
     /**
      * TEST 2: Search by name returns matching users
      */

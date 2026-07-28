@@ -1,51 +1,54 @@
-import { Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { FormError } from '@/components/ui/form-error';
-import { ImageUploader } from '@/components/projects/image-uploader';
-import { Tech, Project as ProjectType } from '@/types';
-import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Separator } from '@/components/ui/separator'
+import { FormError } from '@/components/ui/form-error'
+import { ImageUploader } from '@/components/projects/image-uploader'
+import { groupTechsByCategory } from '@/lib/tech-catalog'
+import { Tech, Project as ProjectType } from '@/types'
+import { cn } from '@/lib/utils'
 
 interface ProjectFormProps {
-    mode: 'create' | 'edit';
-    project?: ProjectType & { techs?: Tech[] };
-    techs: Tech[];
-    form: ReturnType<typeof import('@inertiajs/react').useForm<{
-        title: string;
-        description: string;
-        vision: string;
-        techs: number[];
-        repository_url: string;
-        demo_url: string;
-        images: File[];
-        remove_images?: string[];
-    }>>;
-    onSubmit: (e: React.FormEvent) => void;
-    cancelUrl: string;
-    submitLabel: string;
+    mode: 'create' | 'edit'
+    project?: ProjectType & { techs?: Tech[] }
+    techs: Tech[]
+    form: ReturnType<
+        typeof import('@inertiajs/react').useForm<{
+            title: string
+            description: string
+            vision: string
+            techs: number[]
+            repository_url: string
+            demo_url: string
+            images: File[]
+            remove_images?: string[]
+        }>
+    >
+    onSubmit: (e: React.FormEvent) => void
+    cancelUrl: string
+    submitLabel: string
 }
 
-const TITLE_MAX = 255;
-const DESCRIPTION_MAX = 1000;
+const TITLE_MAX = 255
+const DESCRIPTION_MAX = 1000
 
 function Counter({ current, max }: { current: number; max: number }) {
-    const ratio = current / max;
-    const isNearLimit = ratio >= 0.9;
+    const ratio = current / max
+    const isNearLimit = ratio >= 0.9
 
     return (
         <p
             className={cn(
                 'mt-1 text-xs text-muted-foreground transition-colors',
-                isNearLimit && 'text-destructive'
+                isNearLimit && 'text-destructive',
             )}
         >
             {current} / {max}
         </p>
-    );
+    )
 }
 
 export function ProjectForm({
@@ -57,23 +60,27 @@ export function ProjectForm({
     cancelUrl,
     submitLabel,
 }: ProjectFormProps) {
-    const { data, setData, processing, errors } = form;
+    const { data, setData, processing, errors } = form
+    const techGroups = groupTechsByCategory(techs)
 
     const handleTechChange = (techId: number, checked: boolean) => {
         if (checked) {
-            setData('techs', [...data.techs, techId]);
+            setData('techs', [...data.techs, techId])
         } else {
-            setData('techs', data.techs.filter((id) => id !== techId));
+            setData(
+                'techs',
+                data.techs.filter((id) => id !== techId),
+            )
         }
-    };
+    }
 
     const handleImagesChange = (files: File[]) => {
-        setData('images', files);
-    };
+        setData('images', files)
+    }
 
     const handleRemoveExistingImage = (imagePath: string) => {
-        setData('remove_images', [...(data.remove_images ?? []), imagePath]);
-    };
+        setData('remove_images', [...(data.remove_images ?? []), imagePath])
+    }
 
     return (
         <form onSubmit={onSubmit} className="flex flex-col gap-6">
@@ -132,28 +139,40 @@ export function ProjectForm({
                         </span>
                     )}
                 </div>
-                <div className="max-h-48 overflow-y-auto rounded-md border p-3">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {techs.map((tech) => {
-                            const isChecked = data.techs.includes(tech.id);
-                            return (
-                                <label
-                                    key={tech.id}
-                                    htmlFor={`tech-${tech.id}`}
-                                    className="flex items-center gap-2 rounded-md p-2 cursor-pointer hover:bg-muted transition-colors"
-                                >
-                                    <Checkbox
-                                        id={`tech-${tech.id}`}
-                                        checked={isChecked}
-                                        onCheckedChange={(checked) =>
-                                            handleTechChange(tech.id, checked === true)
-                                        }
-                                    />
-                                    <span className="text-sm select-none">{tech.name}</span>
-                                </label>
-                            );
-                        })}
-                    </div>
+                <div className="max-h-96 space-y-4 overflow-y-auto rounded-md border p-3">
+                    {techGroups.map((group) => (
+                        <section key={group.key} className="rounded-md border bg-muted/20 p-3">
+                            <div className="mb-3 flex items-center justify-between gap-3">
+                                <p className="text-sm font-medium text-foreground">{group.label}</p>
+                                <span className="text-xs text-muted-foreground">
+                                    {group.techs.length} tech{group.techs.length !== 1 ? 's' : ''}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                {group.techs.map((tech) => {
+                                    const isChecked = data.techs.includes(tech.id)
+
+                                    return (
+                                        <label
+                                            key={tech.id}
+                                            htmlFor={`tech-${tech.id}`}
+                                            className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-muted"
+                                        >
+                                            <Checkbox
+                                                id={`tech-${tech.id}`}
+                                                checked={isChecked}
+                                                onCheckedChange={(checked) =>
+                                                    handleTechChange(tech.id, checked === true)
+                                                }
+                                            />
+                                            <span className="text-sm select-none">{tech.name}</span>
+                                        </label>
+                                    )
+                                })}
+                            </div>
+                        </section>
+                    ))}
                 </div>
                 <FormError message={errors.techs} />
             </div>
@@ -198,14 +217,12 @@ export function ProjectForm({
                     existingImages={
                         mode === 'edit'
                             ? (project?.images ?? []).filter(
-                                  (img) => !(data.remove_images ?? []).includes(img.path)
+                                  (img) => !(data.remove_images ?? []).includes(img.path),
                               )
                             : []
                     }
                     onFilesChange={handleImagesChange}
-                    onRemoveExisting={
-                        mode === 'edit' ? handleRemoveExistingImage : undefined
-                    }
+                    onRemoveExisting={mode === 'edit' ? handleRemoveExistingImage : undefined}
                     error={errors.images}
                 />
             </div>
@@ -222,5 +239,5 @@ export function ProjectForm({
                 </Link>
             </div>
         </form>
-    );
+    )
 }

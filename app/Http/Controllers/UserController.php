@@ -26,7 +26,7 @@ class UserController extends Controller
         ];
 
         $users = $this->userService->getDiscoverableUsers($filters);
-        $techs = Tech::orderBy('name')->get(['id', 'name', 'slug']);
+        $techs = Tech::orderBy('name')->get(['id', 'name', 'slug', 'category']);
 
         return Inertia::render('users/index', [
             'users' => ApiResourceTransformer::users($users),

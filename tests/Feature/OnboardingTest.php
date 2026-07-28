@@ -28,9 +28,18 @@ class OnboardingTest extends TestCase
     public function test_user_can_view_onboarding_page(): void
     {
         $user = User::factory()->create();
+        $tech = \App\Models\Tech::factory()->create([
+            'category' => 'frontend',
+            'slug' => 'react',
+        ]);
 
         $response = $this->actingAs($user)->get('/onboarding');
+
         $response->assertStatus(200);
+
+        $allTechs = collect($response->viewData('page')['props']['allTechs']);
+
+        $this->assertTrue($allTechs->contains(fn (array $item): bool => $item['id'] === $tech->id && $item['category'] === 'frontend'));
     }
 
     /**

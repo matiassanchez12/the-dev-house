@@ -1,16 +1,25 @@
-import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import UpdateProfileCompleteForm from './update-profile-complete-form';
+import { render, screen } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import UpdateProfileCompleteForm from './update-profile-complete-form'
 
 const mockState = vi.hoisted(() => ({
     setData: vi.fn(),
     post: vi.fn(),
     transform: vi.fn(),
     props: {
-        auth: { user: { id: 1, name: 'Ada Lovelace', avatar: null, bio: '', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' } },
+        auth: {
+            user: {
+                id: 1,
+                name: 'Ada Lovelace',
+                avatar: null,
+                bio: '',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+            },
+        },
     },
-}));
+}))
 
 vi.mock('@inertiajs/react', () => ({
     usePage: () => ({ props: mockState.props }),
@@ -27,21 +36,21 @@ vi.mock('@inertiajs/react', () => ({
         recentlySuccessful: false,
         transform: mockState.transform,
     }),
-}));
+}))
 
 vi.mock('@/components/projects/project-utils', () => ({
     avatarUrl: () => null,
-}));
+}))
 
 vi.mock('@/components/ui/avatar', () => ({
     Avatar: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     AvatarFallback: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     AvatarImage: ({ alt }: { alt: string }) => <img alt={alt} />,
-}));
+}))
 
 vi.mock('sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn() },
-}));
+}))
 
 describe('UpdateProfileCompleteForm', () => {
     it('wires the bio field and keeps the tech proficiency slider accessible', async () => {
@@ -52,23 +61,45 @@ describe('UpdateProfileCompleteForm', () => {
                         id: 1,
                         name: 'React',
                         slug: 'react',
+                        category: 'frontend',
                         created_at: '2024-01-01T00:00:00Z',
                         updated_at: '2024-01-01T00:00:00Z',
                         pivot: { years_experience: 3, proficiency: 'advanced' },
                     },
                 ]}
                 allTechs={[
-                    { id: 1, name: 'React', slug: 'react', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' },
+                    {
+                        id: 1,
+                        name: 'React',
+                        slug: 'react',
+                        category: 'frontend',
+                        created_at: '2024-01-01T00:00:00Z',
+                        updated_at: '2024-01-01T00:00:00Z',
+                    },
+                    {
+                        id: 2,
+                        name: 'Laravel',
+                        slug: 'laravel',
+                        category: 'backend',
+                        created_at: '2024-01-01T00:00:00Z',
+                        updated_at: '2024-01-01T00:00:00Z',
+                    },
                 ]}
             />,
-        );
+        )
 
-        const bio = screen.getByLabelText('Biografía');
+        const bio = screen.getByLabelText('Biografía')
 
-        expect(bio).toHaveAttribute('aria-invalid', 'true');
-        expect(bio).toHaveAttribute('aria-describedby', 'bio-error');
-        expect(screen.getByRole('alert')).toHaveTextContent('La biografía es obligatoria');
+        expect(bio).toHaveAttribute('aria-invalid', 'true')
+        expect(bio).toHaveAttribute('aria-describedby', 'bio-error')
+        expect(screen.getByRole('alert')).toHaveTextContent('La biografía es obligatoria')
 
-        expect(screen.getByRole('slider', { name: /react.*nivel/i })).toHaveValue('3');
-    });
-});
+        const frontendGroup = screen.getByText('Frontend').closest('details')
+        const backendGroup = screen.getByText('Backend').closest('details')
+
+        expect(frontendGroup).toHaveAttribute('open')
+        expect(backendGroup).not.toHaveAttribute('open')
+
+        expect(screen.getByRole('slider', { name: /react.*nivel/i })).toHaveValue('3')
+    })
+})

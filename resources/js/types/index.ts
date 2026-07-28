@@ -23,10 +23,21 @@ export interface SharedPageProps {
     errors: Record<string, string>
 }
 
+export type TechCategory =
+    | 'frontend'
+    | 'backend'
+    | 'languages'
+    | 'mobile'
+    | 'data'
+    | 'devops-cloud'
+    | 'api-integration'
+    | 'design-tooling'
+
 export interface Tech {
     id: number
     name: string
     slug: string
+    category?: TechCategory | null
     icon?: string | null
     created_at: string
     updated_at: string
@@ -86,7 +97,7 @@ export interface Project {
         status: 'pending' | 'approved' | 'rejected'
         message?: string
     } | null
-    viewerPendingInvitation?: ProjectInvitation | null;
+    viewerPendingInvitation?: ProjectInvitation | null
 }
 
 export interface ProjectInvitation {

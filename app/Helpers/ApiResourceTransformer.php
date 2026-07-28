@@ -296,6 +296,7 @@ class ApiResourceTransformer
         $data = $tech instanceof Model ? $tech->toArray() : $tech;
 
         return array_intersect_key($data, array_flip([
+            'category',
             'id',
             'name',
             'slug',

@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Tech extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'techs';
 
     protected $fillable = [
+        'category',
+        'icon',
         'name',
         'slug',
-        'icon',
     ];
 
     /**
@@ -24,8 +25,8 @@ class Tech extends Model
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class, 'project_tech')
-                    ->withPivot('level')
-                    ->withTimestamps();
+            ->withPivot('level')
+            ->withTimestamps();
     }
 
     /**
@@ -34,8 +35,8 @@ class Tech extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_tech')
-                    ->using(UserTech::class)
-                    ->withPivot('years_experience', 'proficiency')
-                    ->withTimestamps();
+            ->using(UserTech::class)
+            ->withPivot('years_experience', 'proficiency')
+            ->withTimestamps();
     }
 }
