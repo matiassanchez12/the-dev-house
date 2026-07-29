@@ -246,7 +246,6 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                             return (
                                 <details
                                     key={group.key}
-                                    open={expandedGroups.has(group.key)}
                                     onToggle={(event) => {
                                         const isOpen = event.currentTarget.open
 
