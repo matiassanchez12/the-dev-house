@@ -48,16 +48,14 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                     {/* Información básica */}
-                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            name={name}
-                            email={email}
-                            emailVerifiedAt={emailVerifiedAt}
-                            className="max-w-xl"
-                        />
-                    </div>
+                    <UpdateProfileInformationForm
+                        mustVerifyEmail={mustVerifyEmail}
+                        status={status}
+                        name={name}
+                        email={email}
+                        emailVerifiedAt={emailVerifiedAt}
+                        className="max-w-xl"
+                    />
 
                     {/* Perfil completo: bio, avatar, techs */}
                     <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
@@ -96,14 +94,10 @@ export default function Edit({ mustVerifyEmail, status, name, email, emailVerifi
                     )}
 
                     {/* Password */}
-                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+                    <UpdatePasswordForm className="max-w-xl" />
 
                     {/* Delete Account */}
-                    <div className="bg-card p-4 shadow sm:rounded-lg sm:p-8">
-                        <DeleteUserForm className="max-w-xl" />
-                    </div>
+                    <DeleteUserForm className="max-w-xl" />
                 </div>
             </div>
         </AppLayout>

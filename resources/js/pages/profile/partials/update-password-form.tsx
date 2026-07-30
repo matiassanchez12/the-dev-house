@@ -1,3 +1,11 @@
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,58 +61,57 @@ export default function UpdatePasswordForm({ className = '' }: Props) {
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-foreground">
-                    Actualizar Contraseña
-                </h2>
-
-                <p className="mt-1 text-sm text-muted-foreground">
+        <Card className={className}>
+            <CardHeader>
+                <CardTitle>Actualizar Contraseña</CardTitle>
+                <CardDescription>
                     Asegurate de que tu cuenta use una contraseña larga y aleatoria para mantenerte seguro.
-                </p>
-            </header>
+                </CardDescription>
+            </CardHeader>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <Field id="current_password" label="Contraseña Actual" error={errors.current_password}>
-                    <Input
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) =>
-                            setData('current_password', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
-                </Field>
+            <form onSubmit={updatePassword} className="flex flex-col gap-6">
+                <CardContent className="flex flex-col gap-6">
+                    <Field id="current_password" label="Contraseña Actual" error={errors.current_password}>
+                        <Input
+                            id="current_password"
+                            ref={currentPasswordInput}
+                            value={data.current_password}
+                            onChange={(e) =>
+                                setData('current_password', e.target.value)
+                            }
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="current-password"
+                        />
+                    </Field>
 
-                <Field id="password" label="Nueva Contraseña" error={errors.password}>
-                    <Input
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-                </Field>
+                    <Field id="password" label="Nueva Contraseña" error={errors.password}>
+                        <Input
+                            id="password"
+                            ref={passwordInput}
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="new-password"
+                        />
+                    </Field>
 
-                <Field id="password_confirmation" label="Confirmar Contraseña" error={errors.password_confirmation}>
-                    <Input
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-                </Field>
+                    <Field id="password_confirmation" label="Confirmar Contraseña" error={errors.password_confirmation}>
+                        <Input
+                            id="password_confirmation"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData('password_confirmation', e.target.value)
+                            }
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="new-password"
+                        />
+                    </Field>
+                </CardContent>
 
-                <div className="flex items-center gap-4">
+                <CardFooter className="gap-4">
                     <Button type="submit" disabled={processing}>Guardar</Button>
 
                     <Transition
@@ -118,8 +125,8 @@ export default function UpdatePasswordForm({ className = '' }: Props) {
                             Guardado.
                         </p>
                     </Transition>
-                </div>
+                </CardFooter>
             </form>
-        </section>
+        </Card>
     );
 }

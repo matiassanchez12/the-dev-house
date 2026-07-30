@@ -1,3 +1,11 @@
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,65 +46,64 @@ export default function UpdateProfileInformation({
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-foreground">
-                    Información del Perfil
-                </h2>
-
-                <p className="mt-1 text-sm text-muted-foreground">
+        <Card className={className}>
+            <CardHeader>
+                <CardTitle>Información del Perfil</CardTitle>
+                <CardDescription>
                     Actualizá la información de tu perfil y correo electrónico.
-                </p>
-            </header>
+                </CardDescription>
+            </CardHeader>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <Field id="name" label="Nombre" error={errors.name}>
-                    <Input
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        autoFocus
-                        autoComplete="name"
-                    />
-                </Field>
+            <form onSubmit={submit} className="flex flex-col gap-6">
+                <CardContent className="flex flex-col gap-6">
+                    <Field id="name" label="Nombre" error={errors.name}>
+                        <Input
+                            id="name"
+                            className="mt-1 block w-full"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            required
+                            autoFocus
+                            autoComplete="name"
+                        />
+                    </Field>
 
-                <Field id="email" label="Correo electrónico" error={errors.email}>
-                    <Input
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
-                </Field>
+                    <Field id="email" label="Correo electrónico" error={errors.email}>
+                        <Input
+                            id="email"
+                            type="email"
+                            className="mt-1 block w-full"
+                            value={data.email}
+                            onChange={(e) => setData('email', e.target.value)}
+                            required
+                            autoComplete="username"
+                        />
+                    </Field>
 
-                {mustVerifyEmail && emailVerifiedAt === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Tu correo electrónico no está verificado.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="rounded-md text-sm text-muted-foreground underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                            >
-                                Hacé clic aquí para reenviar el correo de verificación.
-                            </Link>
-                        </p>
+                    {mustVerifyEmail && emailVerifiedAt === null && (
+                        <div>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                Tu correo electrónico no está verificado.
+                                <Link
+                                    href={route('verification.send')}
+                                    method="post"
+                                    as="button"
+                                    className="rounded-md text-sm text-muted-foreground underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                >
+                                    Hacé clic aquí para reenviar el correo de verificación.
+                                </Link>
+                            </p>
 
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-primary">
-                                Se envió un nuevo enlace de verificación a tu correo electrónico.
-                            </div>
-                        )}
-                    </div>
-                )}
+                            {status === 'verification-link-sent' && (
+                                <div className="mt-2 text-sm font-medium text-primary">
+                                    Se envió un nuevo enlace de verificación a tu correo electrónico.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </CardContent>
 
-                <div className="flex items-center gap-4">
+                <CardFooter className="gap-4">
                     <Button type="submit" disabled={processing}>Guardar</Button>
 
                     <Transition
@@ -110,8 +117,8 @@ export default function UpdateProfileInformation({
                             Guardado.
                         </p>
                     </Transition>
-                </div>
+                </CardFooter>
             </form>
-        </section>
+        </Card>
     );
 }

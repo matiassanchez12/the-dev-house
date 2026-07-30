@@ -1,7 +1,22 @@
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -52,38 +67,50 @@ export default function DeleteUserForm({ className = '' }: Props) {
     };
 
     return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-foreground">
-                    Eliminar Cuenta
-                </h2>
-
-                <p className="mt-1 text-sm text-muted-foreground">
+        <Card className={className}>
+            <CardHeader>
+                <CardTitle>Eliminar Cuenta</CardTitle>
+                <CardDescription>
                     Una vez eliminada tu cuenta, todos sus recursos y datos se
                     eliminarán permanentemente. Antes de eliminar tu cuenta,
                     descargá cualquier dato o información que quieras conservar.
-                </p>
-            </header>
+                </CardDescription>
+            </CardHeader>
 
-            <Button variant="destructive" onClick={confirmUserDeletion}>
-                Eliminar Cuenta
-            </Button>
+            <CardContent>
+                <Button variant="destructive" onClick={confirmUserDeletion}>
+                    Eliminar Cuenta
+                </Button>
+            </CardContent>
 
-            <Dialog open={confirmingUserDeletion} onOpenChange={setConfirmingUserDeletion}>
+            <Dialog
+                open={confirmingUserDeletion}
+                onOpenChange={(open) => {
+                    if (open) {
+                        setConfirmingUserDeletion(true);
+
+                        return;
+                    }
+
+                    closeModal();
+                }}
+            >
                 <DialogContent>
-                    <form onSubmit={deleteUser} className="p-6">
-                        <h2 className="text-lg font-medium text-foreground">
-                            ¿Estás seguro de que querés eliminar tu cuenta?
-                        </h2>
+                    <form onSubmit={deleteUser} className="flex flex-col gap-6 p-2">
+                        <DialogHeader>
+                            <DialogTitle>
+                                ¿Estás seguro de que querés eliminar tu cuenta?
+                            </DialogTitle>
 
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Una vez eliminada tu cuenta, todos sus recursos y
-                            datos se eliminarán permanentemente. Ingresá tu
-                            contraseña para confirmar que querés eliminar
-                            permanentemente tu cuenta.
-                        </p>
+                            <DialogDescription>
+                                Una vez eliminada tu cuenta, todos sus recursos y
+                                datos se eliminarán permanentemente. Ingresá tu
+                                contraseña para confirmar que querés eliminar
+                                permanentemente tu cuenta.
+                            </DialogDescription>
+                        </DialogHeader>
 
-                        <div className="mt-6">
+                        <CardContent className="px-0">
                             <Field id="password" label="Contraseña" labelClassName="sr-only" error={errors.password}>
                                 <Input
                                     id="password"
@@ -99,20 +126,20 @@ export default function DeleteUserForm({ className = '' }: Props) {
                                     placeholder="Contraseña"
                                 />
                             </Field>
-                        </div>
+                        </CardContent>
 
-                        <div className="mt-6 flex justify-end">
-                            <Button variant="secondary" onClick={closeModal}>
+                        <DialogFooter>
+                            <Button type="button" variant="secondary" onClick={closeModal}>
                                 Cancelar
                             </Button>
 
-                            <Button type="submit" variant="destructive" className="ms-3" disabled={processing}>
+                            <Button type="submit" variant="destructive" disabled={processing}>
                                 Eliminar Cuenta
                             </Button>
-                        </div>
+                        </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
-        </section>
+        </Card>
     );
 }
