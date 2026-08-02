@@ -90,6 +90,10 @@ export interface Project {
     phases?: Phase[]
     participants_count?: number
     messages_count?: number
+    followers_count?: number
+    is_followed_by_viewer?: boolean
+    has_unread_public_updates?: boolean
+    followers_preview?: User[]
     messages?: Message[]
     viewer_role?: ProjectViewerRole
     viewerJoinRequest?: {

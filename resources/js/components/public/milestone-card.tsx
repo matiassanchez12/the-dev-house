@@ -29,6 +29,7 @@ function formatDate(value: string | null | undefined): string {
 
 export function MilestoneCard({ milestone }: Props) {
     const [galleryOpen, setGalleryOpen] = useState(false);
+    const hasUnreadPublicUpdates = milestone.project.has_unread_public_updates ?? false;
 
     return (
         <Card className="border-border/60 bg-card shadow-sm transition-all duration-200 hover:shadow-md">
@@ -43,6 +44,12 @@ export function MilestoneCard({ milestone }: Props) {
                         {milestone.completed_at ? `Completado el ${formatDate(milestone.completed_at)}` : 'Publicado'}
                     </Badge>
                 </div>
+
+                {hasUnreadPublicUpdates && (
+                    <Badge variant="secondary" className="w-fit">
+                        New updates
+                    </Badge>
+                )}
 
                 <CardDescription>
                     Logro de{' '}

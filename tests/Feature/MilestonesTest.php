@@ -33,6 +33,8 @@ class MilestonesTest extends TestCase
             'title' => 'Old milestone',
             'description' => 'Already shipped',
             'completed_at' => now()->subDays(2),
+            'created_at' => now()->subDays(2),
+            'updated_at' => now()->subDays(2),
         ]);
 
         Phase::factory()->create([
@@ -40,6 +42,8 @@ class MilestonesTest extends TestCase
             'title' => 'Newest milestone',
             'description' => 'Latest release',
             'completed_at' => now()->subDay(),
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
         ]);
 
         Phase::factory()->create([
@@ -47,6 +51,8 @@ class MilestonesTest extends TestCase
             'title' => 'Pending milestone',
             'description' => 'Not finished yet',
             'completed_at' => null,
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDays(3),
         ]);
 
         $response = $this->get(route('milestones.index'));

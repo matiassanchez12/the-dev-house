@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Phase;
 use App\Models\Project;
+use App\Notifications\ProjectUpdateNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -23,12 +24,16 @@ class PhaseService
             $imagePath = $image->store('phases', $this->mediaDisk());
         }
 
-        return $project->phases()->create([
+        $phase = $project->phases()->create([
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
             'completed_at' => $data['completed_at'] ?? null,
             'image_path' => $imagePath,
         ]);
+
+        $this->notifyFollowers($phase);
+
+        return $phase;
     }
 
     public function update(Phase $phase, array $data, ?UploadedFile $image = null): Phase
@@ -46,6 +51,8 @@ class PhaseService
 
         $phase->update($updateData);
 
+        $this->notifyFollowers($phase);
+
         return $phase->refresh();
     }
 
@@ -58,6 +65,15 @@ class PhaseService
     public function listFor(Project $project): Collection
     {
         return $project->phases()->orderByDesc('created_at')->get();
+    }
+
+    private function notifyFollowers(Phase $phase): void
+    {
+        $phase->load('project');
+
+        $phase->project->followers()->each(function ($follower) use ($phase) {
+            $follower->notify(new ProjectUpdateNotification($phase));
+        });
     }
 
     private function deleteImageFile(?string $path): void

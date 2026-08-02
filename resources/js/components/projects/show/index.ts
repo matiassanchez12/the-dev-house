@@ -6,6 +6,7 @@ export { ProjectParticipants } from './project-participants';
 export { ProjectCreatorCard } from './project-creator-card';
 export { ProjectTechsCard } from './project-techs-card';
 export { ProjectLinksCard } from './project-links-card';
+export { ProjectFollowCard } from './project-follow-card';
 export { ProjectJoinForm } from './project-join-form';
 export { ProjectChat } from './project-chat';
 export { ProjectChatSummary } from './project-chat-summary';

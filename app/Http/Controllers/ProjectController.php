@@ -8,6 +8,7 @@ use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\ProjectInvitation;
 use App\Services\JoinRequestService;
+use App\Services\ProjectFollowService;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,7 @@ class ProjectController extends Controller
     public function __construct(
         private ProjectService $projectService,
         private JoinRequestService $joinRequestService,
+        private ProjectFollowService $projectFollowService,
     ) {}
 
     /**
@@ -98,6 +100,8 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $project->load(['creator.techs', 'techs', 'participants', 'phases']);
+        $project->loadCount('followers');
+        $project->load(['followers' => fn ($q) => $q->limit(3)]);
         $viewer = Auth::user();
         $viewerRole = $this->projectService->viewerRole($project, $viewer);
 
@@ -114,11 +118,22 @@ class ProjectController extends Controller
         $viewerPendingInvitation = null;
 
         if ($viewer !== null) {
+            $isFollowing = $this->projectFollowService->isFollowing($project, $viewer);
+
             $viewerPendingInvitation = $viewer->receivedInvitations()
                 ->where('project_id', $project->id)
                 ->where('status', ProjectInvitation::STATUS_PENDING)
                 ->latest()
                 ->first();
+            $project->setAttribute(
+                'is_followed_by_viewer',
+                $isFollowing
+            );
+            $project->setAttribute(
+                'has_unread_public_updates',
+                $isFollowing ? $this->projectFollowService->hasUnreadPublicUpdates($project, $viewer) : false,
+            );
+            $project->setAttribute('followers_preview', $project->followers->toArray());
         }
 
         return Inertia::render('projects/show', [
