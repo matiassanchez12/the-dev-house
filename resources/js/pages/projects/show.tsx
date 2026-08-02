@@ -43,11 +43,12 @@ interface Props {
 }
 
 export default function Show({ auth, project }: Props) {
-    const fallbackViewerRole = auth.user === null
+    const currentUser = auth.user;
+    const fallbackViewerRole = currentUser === null
         ? 'guest'
-        : project.creator.id === auth.user.id || project.user_id === auth.user.id
+        : project.creator.id === currentUser.id || project.user_id === currentUser.id
             ? 'creator'
-            : project.participants?.some((participant) => participant.id === auth.user.id)
+            : project.participants?.some((participant) => participant.id === currentUser.id)
                 ? 'member'
                 : 'guest';
     const viewerRole = project.viewer_role ?? fallbackViewerRole;

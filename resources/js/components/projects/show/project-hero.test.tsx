@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { cloneElement, isValidElement, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProjectFollowCard } from './project-follow-card';
 import { ProjectHero } from './project-hero';
@@ -45,9 +45,9 @@ vi.mock('@/components/ui/dialog', () => ({
     DialogDescription: ({ children }: { children: ReactNode }) => <p>{children}</p>,
     DialogHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     DialogTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
-    DialogTrigger: ({ children, render: RenderEl }: { children: ReactNode; render?: React.ReactElement }) => {
-        if (RenderEl) {
-            return <RenderEl.type {...RenderEl.props}>{children}</RenderEl.type>;
+    DialogTrigger: ({ children, render: renderEl }: { children: ReactNode; render?: React.ReactElement<{ children?: ReactNode }> }) => {
+        if (renderEl && isValidElement<{ children?: ReactNode }>(renderEl)) {
+            return cloneElement(renderEl, undefined, children);
         }
         return <span>{children}</span>;
     },

@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { forwardRef } from 'react';
+import { cloneElement, forwardRef, isValidElement } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProjectFollowCard } from './project-follow-card';
@@ -52,9 +52,9 @@ vi.mock('@/components/ui/dialog', () => ({
     DialogDescription: ({ children }: { children: ReactNode }) => <p>{children}</p>,
     DialogHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     DialogTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
-    DialogTrigger: ({ children, render: RenderEl }: { children: ReactNode; render?: React.ReactElement }) => {
-        if (RenderEl) {
-            return <RenderEl.type {...RenderEl.props}>{children}</RenderEl.type>;
+    DialogTrigger: ({ children, render: renderEl }: { children: ReactNode; render?: React.ReactElement<{ children?: ReactNode }> }) => {
+        if (renderEl && isValidElement<{ children?: ReactNode }>(renderEl)) {
+            return cloneElement(renderEl, undefined, children);
         }
         return <span>{children}</span>;
     },
@@ -99,7 +99,7 @@ describe('ProjectFollowCard', () => {
         expect(screen.getByRole('button', { name: /Seguir/ })).toBeInTheDocument();
     });
 
-    it('shows follower count and names when followers exist', () => {
+    it('shows follower count and avatar preview when followers exist', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -118,7 +118,9 @@ describe('ProjectFollowCard', () => {
         );
 
         expect(screen.getByText('3 seguidores')).toBeInTheDocument();
-        expect(screen.getByText(/Ada Lovelace, Grace Hopper y 1 más/)).toBeInTheDocument();
+        expect(screen.getByText('AL')).toBeInTheDocument();
+        expect(screen.getByText('GH')).toBeInTheDocument();
+        expect(screen.getByText('+1')).toBeInTheDocument();
     });
 
     it('shows "Vos sos el único" when viewer is the only follower', () => {
@@ -228,7 +230,7 @@ describe('ProjectFollowCard', () => {
         expect(deleteMock).not.toHaveBeenCalled();
     });
 
-    it('renders a read-only summary for creators without follow actions', () => {
+    it('renders a read-only avatar summary for creators without follow actions', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -248,11 +250,13 @@ describe('ProjectFollowCard', () => {
         );
 
         expect(screen.getByText('3 seguidores')).toBeInTheDocument();
-        expect(screen.getByText(/Ada Lovelace, Grace Hopper y 1 más/)).toBeInTheDocument();
+        expect(screen.getByText('AL')).toBeInTheDocument();
+        expect(screen.getByText('GH')).toBeInTheDocument();
+        expect(screen.getByText('+1')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Seguir|Siguiendo/ })).not.toBeInTheDocument();
     });
 
-    it('shows a generic fallback when follower preview data is missing', () => {
+    it('shows the follower count even when preview data is missing', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -268,10 +272,11 @@ describe('ProjectFollowCard', () => {
         );
 
         expect(screen.getByText('3 seguidores')).toBeInTheDocument();
-        expect(screen.getByText('3 personas siguen este proyecto')).toBeInTheDocument();
+        expect(screen.queryByText('AL')).not.toBeInTheDocument();
+        expect(screen.queryByText('+1')).not.toBeInTheDocument();
     });
 
-    it('shows a partial preview summary without blank follower text', () => {
+    it('shows a partial avatar preview when only some follower data is available', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -289,6 +294,7 @@ describe('ProjectFollowCard', () => {
         );
 
         expect(screen.getByText('2 seguidores')).toBeInTheDocument();
-        expect(screen.getByText('Ada Lovelace y 1 más')).toBeInTheDocument();
+        expect(screen.getByText('AL')).toBeInTheDocument();
+        expect(screen.getByText('+1')).toBeInTheDocument();
     });
 });

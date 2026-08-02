@@ -41,6 +41,7 @@ describe('MilestoneCard unread state', () => {
             <MilestoneCard
                 milestone={{
                     id: 1,
+                    project_id: 7,
                     title: 'Ship it',
                     description: 'Release day',
                     created_at: '2026-07-30T10:00:00.000Z',
@@ -72,6 +73,7 @@ describe('MilestoneCard unread state', () => {
             <MilestoneCard
                 milestone={{
                     id: 1,
+                    project_id: 7,
                     title: 'Ship it',
                     description: 'Release day',
                     created_at: '2026-07-30T10:00:00.000Z',
