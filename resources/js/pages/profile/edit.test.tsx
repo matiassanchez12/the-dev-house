@@ -127,7 +127,9 @@ describe('Edit', () => {
     })
 
     it('renders the approved profile edit sections in order and groups forms inside them', () => {
-        renderEdit()
+        const { container } = renderEdit()
+
+        expect(container.querySelector('div.mx-auto.max-w-4xl')).toBeInTheDocument()
 
         expect(
             screen

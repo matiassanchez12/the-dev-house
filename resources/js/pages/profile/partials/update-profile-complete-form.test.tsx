@@ -120,7 +120,7 @@ describe('UpdateProfileCompleteForm', () => {
     it('maps initial form data from user.bio and userTechs', () => {
         mockState.props.auth.user = buildAuthUser({ bio: 'Construyo productos para developers' })
 
-        render(
+        const { container } = render(
             <UpdateProfileCompleteForm
                 userTechs={buildUserTechs([
                     {
@@ -144,6 +144,26 @@ describe('UpdateProfileCompleteForm', () => {
                 ]}
             />,
         )
+
+        const submitButton = screen.getByRole('button', { name: 'Guardar Cambios' })
+        const primaryCard = screen.getByTestId('profile-complete-card')
+        const cardContent = screen.getByTestId('profile-complete-content')
+        const cardFooter = screen.getByTestId('profile-complete-footer')
+        const contentChildren = Array.from(cardContent?.children ?? [])
+
+        expect(contentChildren.filter((element) => element.tagName === 'SECTION')).toHaveLength(3)
+        expect(
+            contentChildren.filter((element) => element.getAttribute('data-slot') === 'separator'),
+        ).toHaveLength(2)
+
+        expect(primaryCard).toContainElement(screen.getByRole('heading', { level: 3, name: 'Biografía' }))
+        expect(primaryCard).toContainElement(
+            screen.getByRole('heading', { level: 3, name: 'Foto de Perfil' }),
+        )
+        expect(primaryCard).toContainElement(
+            screen.getByRole('heading', { level: 3, name: 'Stack Tecnológico' }),
+        )
+        expect(cardFooter).toContainElement(submitButton)
 
         const bio = screen.getByLabelText('Biografía')
         const reactSlider = screen.getByRole('slider', { name: /nivel de experiencia en react/i })
@@ -169,6 +189,10 @@ describe('UpdateProfileCompleteForm', () => {
         ).toBeInTheDocument()
         expect(
             screen.getByRole('heading', { level: 3, name: 'Stack Tecnológico' }),
+        ).toBeInTheDocument()
+        expect(screen.getByText('JPG, PNG o GIF. Máximo 2MB.')).toBeInTheDocument()
+        expect(
+            screen.getByText('Seleccioná las tecnologías que conocés y tu nivel de experiencia'),
         ).toBeInTheDocument()
         expect(bio).toHaveValue('Construyo productos para developers')
         expect(bio).toHaveAttribute('aria-invalid', 'true')
@@ -410,6 +434,20 @@ describe('UpdateProfileCompleteForm', () => {
                 { id: 3, years_experience: 5, proficiency: 'expert' },
             ]),
         })
+    })
+
+    it('shows the inline success feedback when the form was saved recently', () => {
+        mockState.errors = {}
+        mockState.recentlySuccessful = true
+
+        render(
+            <UpdateProfileCompleteForm
+                userTechs={[]}
+                allTechs={[buildTech({ id: 1, name: 'React', category: 'frontend' })]}
+            />,
+        )
+
+        expect(screen.getByText('Guardado.')).toBeInTheDocument()
     })
 })
 

@@ -1,7 +1,6 @@
 import Seo from '@/components/seo'
 import AppLayout from '@/layouts/app-layout'
 import DeleteUserForm from './partials/delete-user-form'
-import ProfileSectionCard from './partials/profile-section-card'
 import ProfileSection from './partials/profile-section'
 import SocialLinksEditForm from './partials/social-links-edit-form'
 import UpdateNotificationSettingsForm from './partials/update-notification-settings-form'
@@ -60,7 +59,7 @@ export default function Edit({
             />
 
             <div className="py-12">
-                <div className="mx-auto flex max-w-7xl flex-col gap-10 sm:px-6 lg:px-8">
+                <div className="mx-auto flex max-w-4xl flex-col gap-10 sm:px-6 lg:px-8">
                     <ProfileSection title="Perfil público">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
@@ -68,41 +67,35 @@ export default function Edit({
                             name={name}
                             email={email}
                             emailVerifiedAt={emailVerifiedAt}
-                            className="max-w-xl"
+                            className="w-full"
                         />
 
-                        <ProfileSectionCard>
-                            <UpdateProfileCompleteForm
-                                userTechs={userTechs}
-                                allTechs={techs}
-                                className="max-w-3xl"
-                            />
-                        </ProfileSectionCard>
+                        <UpdateProfileCompleteForm userTechs={userTechs} allTechs={techs} className="w-full" />
 
                         {socialLinks !== undefined ? (
-                            <SocialLinksEditForm socialLinks={socialLinks} className="max-w-xl" />
+                            <SocialLinksEditForm socialLinks={socialLinks} className="w-full" />
                         ) : null}
                     </ProfileSection>
 
                     <ProfileSection title="Cuenta y seguridad">
-                        <UpdatePasswordForm className="max-w-xl" />
+                        <UpdatePasswordForm className="w-full" />
                     </ProfileSection>
 
                     <ProfileSection title="Privacidad y notificaciones">
                         <UpdatePrivacyForm
                             phone={phone}
                             privacySetting={privacySetting}
-                            className="max-w-xl"
+                            className="w-full"
                         />
 
                         <UpdateNotificationSettingsForm
                             notificationSetting={notificationSetting}
-                            className="max-w-xl"
+                            className="w-full"
                         />
                     </ProfileSection>
 
                     <ProfileSection title="Zona de peligro">
-                        <DeleteUserForm className="max-w-xl" />
+                        <DeleteUserForm className="w-full" />
                     </ProfileSection>
                 </div>
             </div>

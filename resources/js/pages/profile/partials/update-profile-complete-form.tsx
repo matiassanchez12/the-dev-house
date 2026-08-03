@@ -1,8 +1,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { avatarUrl } from '@/components/projects/project-utils'
 import {
@@ -134,15 +142,24 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
     }
 
     return (
-        <section className={className}>
+        <Card className={className} data-testid="profile-complete-card">
+            <CardHeader className="sr-only">
+                <CardTitle>Perfil completo</CardTitle>
+                <CardDescription>Biografía, foto de perfil y stack tecnológico.</CardDescription>
+            </CardHeader>
+
             <form onSubmit={submit} className="flex flex-col gap-6">
-                <Card size="sm">
-                    <CardHeader>
-                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
-                            Biografía
-                        </h3>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-2">
+                <CardContent className="flex flex-col gap-6" data-testid="profile-complete-content">
+                    <section className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1">
+                            <h3
+                                id="profile-bio-heading"
+                                className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm"
+                            >
+                                Biografía
+                            </h3>
+                        </div>
+
                         <Field
                             id="bio"
                             label="Biografía"
@@ -159,47 +176,61 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                         <p className="text-sm text-muted-foreground">
                             {data.bio.length}/1000 caracteres
                         </p>
-                    </CardContent>
-                </Card>
+                    </section>
 
-                <Card size="sm">
-                    <CardHeader>
-                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
-                            Foto de Perfil
-                        </h3>
-                        <CardDescription>JPG, PNG o GIF. Máximo 2MB.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <Avatar size="lg">
-                            {previewAvatar ? (
-                                <AvatarImage src={previewAvatar} alt="Vista previa del avatar" />
-                            ) : null}
-                            <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
+                    <Separator />
 
-                        <div className="min-w-0 flex-1">
-                            <Field
-                                id="avatar"
-                                label="Foto de perfil"
-                                labelClassName="sr-only"
-                                error={errors.avatar}
+                    <section className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1">
+                            <h3
+                                id="profile-avatar-heading"
+                                className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm"
                             >
-                                <Input type="file" accept="image/*" onChange={handleAvatarChange} />
-                            </Field>
+                                Foto de Perfil
+                            </h3>
+                            <p className="text-sm text-muted-foreground">JPG, PNG o GIF. Máximo 2MB.</p>
                         </div>
-                    </CardContent>
-                </Card>
 
-                <Card size="sm">
-                    <CardHeader>
-                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
-                            Stack Tecnológico
-                        </h3>
-                        <CardDescription>
-                            Seleccioná las tecnologías que conocés y tu nivel de experiencia
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                            <Avatar size="lg">
+                                {previewAvatar ? (
+                                    <AvatarImage src={previewAvatar} alt="Vista previa del avatar" />
+                                ) : null}
+                                <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+
+                            <div className="min-w-0 flex-1">
+                                <Field
+                                    id="avatar"
+                                    label="Foto de perfil"
+                                    labelClassName="sr-only"
+                                    error={errors.avatar}
+                                >
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarChange}
+                                    />
+                                </Field>
+                            </div>
+                        </div>
+                    </section>
+
+                    <Separator />
+
+                    <section className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1">
+                            <h3
+                                id="profile-tech-heading"
+                                className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm"
+                            >
+                                Stack Tecnológico
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Seleccioná las tecnologías que conocés y tu nivel de experiencia
+                            </p>
+                        </div>
+
                         <ProfileTechSelector
                             allTechs={allTechs}
                             selectedTechs={data.techs}
@@ -207,10 +238,10 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                             onToggleTech={handleTechToggle}
                             onUpdateTech={handleTechUpdate}
                         />
-                    </CardContent>
-                </Card>
+                    </section>
+                </CardContent>
 
-                <div className="flex items-center gap-4">
+                <CardFooter className="flex-wrap gap-4" data-testid="profile-complete-footer">
                     <Button type="submit" disabled={processing}>
                         Guardar Cambios
                     </Button>
@@ -224,8 +255,8 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
                     >
                         <p className="text-sm text-muted-foreground">Guardado.</p>
                     </Transition>
-                </div>
+                </CardFooter>
             </form>
-        </section>
+        </Card>
     )
 }
