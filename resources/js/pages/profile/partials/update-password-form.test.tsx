@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UpdatePasswordForm from './update-password-form';
 
@@ -57,6 +58,8 @@ beforeEach(() => {
     mockState.put.mockClear();
     mockState.reset.mockClear();
     mockState.setData.mockClear();
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
 
     Object.defineProperty(globalThis, 'route', {
         configurable: true,
@@ -68,7 +71,9 @@ describe('UpdatePasswordForm', () => {
     it('renders the password section copy, fields, and submit action', () => {
         render(<UpdatePasswordForm />);
 
-        expect(screen.getByText('Actualizar Contraseña')).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { level: 3, name: 'Actualizar Contraseña' }),
+        ).toBeInTheDocument();
         expect(screen.getByText('Asegurate de que tu cuenta use una contraseña larga y aleatoria para mantenerte seguro.')).toBeInTheDocument();
         expect(screen.getByLabelText('Contraseña Actual')).toBeInTheDocument();
         expect(screen.getByLabelText('Nueva Contraseña')).toBeInTheDocument();
@@ -109,5 +114,23 @@ describe('UpdatePasswordForm', () => {
 
         expect(mockState.reset).toHaveBeenCalledWith('current_password');
         expect(focusSpy).toHaveBeenCalled();
+    });
+
+    it('resets the form after a successful update without adding duplicate success feedback', async () => {
+        const user = userEvent.setup();
+
+        const { rerender } = render(<UpdatePasswordForm />);
+
+        await user.click(screen.getByRole('button', { name: 'Guardar' }));
+
+        const [, options] = mockState.put.mock.calls[0] as [string, { onSuccess: () => void }];
+
+        options.onSuccess();
+        mockState.recentlySuccessful = true;
+        rerender(<UpdatePasswordForm />);
+
+        expect(mockState.reset).toHaveBeenCalledWith();
+        expect(screen.getByText('Guardado.')).toBeInTheDocument();
+        expect(toast.success).not.toHaveBeenCalled();
     });
 });

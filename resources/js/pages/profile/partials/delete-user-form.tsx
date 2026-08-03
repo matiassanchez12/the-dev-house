@@ -1,14 +1,5 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Field } from '@/components/ui/field';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     Dialog,
     DialogContent,
@@ -16,18 +7,21 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
-import { useForm } from '@inertiajs/react';
-import { useRef, useState } from 'react';
-import { toast } from 'sonner';
+} from '@/components/ui/dialog'
+import { Field } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { useForm } from '@inertiajs/react'
+import { type FormEvent, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 interface Props {
-    className?: string;
+    className?: string
 }
 
 export default function DeleteUserForm({ className = '' }: Props) {
-    const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
-    const passwordInput = useRef<HTMLInputElement>(null);
+    const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false)
+    const passwordInput = useRef<HTMLInputElement>(null)
 
     const {
         data,
@@ -39,37 +33,39 @@ export default function DeleteUserForm({ className = '' }: Props) {
         clearErrors,
     } = useForm({
         password: '',
-    });
+    })
 
     const confirmUserDeletion = () => {
-        setConfirmingUserDeletion(true);
-    };
+        setConfirmingUserDeletion(true)
+    }
 
-    const deleteUser = (e: React.FormEvent) => {
-        e.preventDefault();
+    const deleteUser = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
 
         destroy(route('profile.destroy'), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onError: () => {
-                toast.error('Error al eliminar la cuenta. Verificá tu contraseña.');
-                passwordInput.current?.focus();
+                toast.error('Error al eliminar la cuenta. Verificá tu contraseña.')
+                passwordInput.current?.focus()
             },
             onFinish: () => reset(),
-        });
-    };
+        })
+    }
 
     const closeModal = () => {
-        setConfirmingUserDeletion(false);
+        setConfirmingUserDeletion(false)
 
-        clearErrors();
-        reset();
-    };
+        clearErrors()
+        reset()
+    }
 
     return (
-        <Card className={className}>
+        <Card size="sm" className={className}>
             <CardHeader>
-                <CardTitle>Eliminar Cuenta</CardTitle>
+                <CardTitle role="heading" aria-level={3}>
+                    Eliminar Cuenta
+                </CardTitle>
                 <CardDescription>
                     Una vez eliminada tu cuenta, todos sus recursos y datos se
                     eliminarán permanentemente. Antes de eliminar tu cuenta,
@@ -77,28 +73,28 @@ export default function DeleteUserForm({ className = '' }: Props) {
                 </CardDescription>
             </CardHeader>
 
-            <CardContent>
-                <Button variant="destructive" onClick={confirmUserDeletion}>
+            <CardFooter className="justify-start">
+                <Button type="button" variant="destructive" onClick={confirmUserDeletion}>
                     Eliminar Cuenta
                 </Button>
-            </CardContent>
+            </CardFooter>
 
             <Dialog
                 open={confirmingUserDeletion}
                 onOpenChange={(open) => {
                     if (open) {
-                        setConfirmingUserDeletion(true);
+                        setConfirmingUserDeletion(true)
 
-                        return;
+                        return
                     }
 
-                    closeModal();
+                    closeModal()
                 }}
             >
-                <DialogContent>
-                    <form onSubmit={deleteUser} className="flex flex-col gap-6 p-2">
-                        <DialogHeader>
-                            <DialogTitle>
+                <DialogContent className="sm:max-w-md">
+                    <form onSubmit={deleteUser} className="flex flex-col gap-6">
+                        <DialogHeader className="gap-2">
+                            <DialogTitle className="text-destructive">
                                 ¿Estás seguro de que querés eliminar tu cuenta?
                             </DialogTitle>
 
@@ -110,25 +106,29 @@ export default function DeleteUserForm({ className = '' }: Props) {
                             </DialogDescription>
                         </DialogHeader>
 
-                        <CardContent className="px-0">
-                            <Field id="password" label="Contraseña" labelClassName="sr-only" error={errors.password}>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) =>
-                                        setData('password', e.target.value)
-                                    }
-                                    className="mt-1 block w-3/4"
-                                    autoFocus
-                                    placeholder="Contraseña"
-                                />
-                            </Field>
-                        </CardContent>
+                        <Separator />
 
-                        <DialogFooter>
+                        <Field
+                            id="password"
+                            label="Contraseña"
+                            labelClassName="sr-only"
+                            error={errors.password}
+                            className="max-w-sm"
+                        >
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                className="w-full"
+                                autoFocus
+                                placeholder="Contraseña"
+                            />
+                        </Field>
+
+                        <DialogFooter className="border-t pt-4">
                             <Button type="button" variant="secondary" onClick={closeModal}>
                                 Cancelar
                             </Button>
@@ -141,5 +141,5 @@ export default function DeleteUserForm({ className = '' }: Props) {
                 </DialogContent>
             </Dialog>
         </Card>
-    );
+    )
 }

@@ -53,6 +53,9 @@ describe('DeleteUserForm', () => {
 
         render(<DeleteUserForm />);
 
+        expect(
+            screen.getByRole('heading', { level: 3, name: 'Eliminar Cuenta' }),
+        ).toBeInTheDocument();
         expect(screen.getByText('Una vez eliminada tu cuenta, todos sus recursos y datos se eliminarán permanentemente. Antes de eliminar tu cuenta, descargá cualquier dato o información que quieras conservar.')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Eliminar Cuenta' })).toBeInTheDocument();
 
