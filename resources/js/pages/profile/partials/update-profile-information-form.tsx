@@ -5,21 +5,21 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
-import { Field } from '@/components/ui/field';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Transition } from '@headlessui/react';
-import { Link, useForm } from '@inertiajs/react';
-import { toast } from 'sonner';
+} from '@/components/ui/card'
+import { Field } from '@/components/ui/field'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Transition } from '@headlessui/react'
+import { Link, useForm } from '@inertiajs/react'
+import { toast } from 'sonner'
 
 interface Props {
-    mustVerifyEmail: boolean;
-    status?: string;
-    name: string;
-    email: string;
-    emailVerifiedAt: string | null;
-    className?: string;
+    mustVerifyEmail: boolean
+    status?: string
+    name: string
+    email: string
+    emailVerifiedAt: string | null
+    className?: string
 }
 
 export default function UpdateProfileInformation({
@@ -30,25 +30,26 @@ export default function UpdateProfileInformation({
     emailVerifiedAt,
     className = '',
 }: Props) {
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: name,
-            email: email,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name,
+        email,
+    })
 
     const submit = (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
 
         patch(route('profile.update'), {
             onSuccess: () => toast.success('Perfil actualizado exitosamente'),
             onError: () => toast.error('Error al actualizar el perfil'),
-        });
-    };
+        })
+    }
 
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle>Información del Perfil</CardTitle>
+                <CardTitle role="heading" aria-level={3}>
+                    Información del Perfil
+                </CardTitle>
                 <CardDescription>
                     Actualizá la información de tu perfil y correo electrónico.
                 </CardDescription>
@@ -58,8 +59,6 @@ export default function UpdateProfileInformation({
                 <CardContent className="flex flex-col gap-6">
                     <Field id="name" label="Nombre" error={errors.name}>
                         <Input
-                            id="name"
-                            className="mt-1 block w-full"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required
@@ -70,9 +69,7 @@ export default function UpdateProfileInformation({
 
                     <Field id="email" label="Correo electrónico" error={errors.email}>
                         <Input
-                            id="email"
                             type="email"
-                            className="mt-1 block w-full"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             required
@@ -81,9 +78,12 @@ export default function UpdateProfileInformation({
                     </Field>
 
                     {mustVerifyEmail && emailVerifiedAt === null && (
-                        <div>
-                            <p className="mt-2 text-sm text-muted-foreground">
+                        <div className="flex flex-col gap-3 rounded-none border border-border/60 bg-muted/20 p-4">
+                            <p className="text-sm text-muted-foreground">
                                 Tu correo electrónico no está verificado.
+                            </p>
+
+                            <p>
                                 <Link
                                     href={route('verification.send')}
                                     method="post"
@@ -95,16 +95,19 @@ export default function UpdateProfileInformation({
                             </p>
 
                             {status === 'verification-link-sent' && (
-                                <div className="mt-2 text-sm font-medium text-primary">
-                                    Se envió un nuevo enlace de verificación a tu correo electrónico.
+                                <div className="text-sm font-medium text-primary">
+                                    Se envió un nuevo enlace de verificación a tu correo
+                                    electrónico.
                                 </div>
                             )}
                         </div>
                     )}
                 </CardContent>
 
-                <CardFooter className="gap-4">
-                    <Button type="submit" disabled={processing}>Guardar</Button>
+                <CardFooter className="flex-wrap gap-4">
+                    <Button type="submit" disabled={processing}>
+                        Guardar
+                    </Button>
 
                     <Transition
                         show={recentlySuccessful}
@@ -113,12 +116,10 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-muted-foreground">
-                            Guardado.
-                        </p>
+                        <p className="text-sm text-muted-foreground">Guardado.</p>
                     </Transition>
                 </CardFooter>
             </form>
         </Card>
-    );
+    )
 }

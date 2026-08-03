@@ -80,12 +80,7 @@ export default function Edit({
                         </ProfileSectionCard>
 
                         {socialLinks !== undefined ? (
-                            <ProfileSectionCard>
-                                <SocialLinksEditForm
-                                    socialLinks={socialLinks}
-                                    className="max-w-xl"
-                                />
-                            </ProfileSectionCard>
+                            <SocialLinksEditForm socialLinks={socialLinks} className="max-w-xl" />
                         ) : null}
                     </ProfileSection>
 
@@ -94,20 +89,16 @@ export default function Edit({
                     </ProfileSection>
 
                     <ProfileSection title="Privacidad y notificaciones">
-                        <ProfileSectionCard>
-                            <UpdatePrivacyForm
-                                phone={phone}
-                                privacySetting={privacySetting}
-                                className="max-w-xl"
-                            />
-                        </ProfileSectionCard>
+                        <UpdatePrivacyForm
+                            phone={phone}
+                            privacySetting={privacySetting}
+                            className="max-w-xl"
+                        />
 
-                        <ProfileSectionCard>
-                            <UpdateNotificationSettingsForm
-                                notificationSetting={notificationSetting}
-                                className="max-w-xl"
-                            />
-                        </ProfileSectionCard>
+                        <UpdateNotificationSettingsForm
+                            notificationSetting={notificationSetting}
+                            className="max-w-xl"
+                        />
                     </ProfileSection>
 
                     <ProfileSection title="Zona de peligro">
