@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -138,9 +138,9 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
             <form onSubmit={submit} className="flex flex-col gap-6">
                 <Card size="sm">
                     <CardHeader>
-                        <CardTitle role="heading" aria-level={3}>
+                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                             Biografía
-                        </CardTitle>
+                        </h3>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-2">
                         <Field
@@ -164,9 +164,9 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
 
                 <Card size="sm">
                     <CardHeader>
-                        <CardTitle role="heading" aria-level={3}>
+                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                             Foto de Perfil
-                        </CardTitle>
+                        </h3>
                         <CardDescription>JPG, PNG o GIF. Máximo 2MB.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -192,9 +192,9 @@ export default function UpdateProfileCompleteForm({ className = '', userTechs, a
 
                 <Card size="sm">
                     <CardHeader>
-                        <CardTitle role="heading" aria-level={3}>
+                        <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                             Stack Tecnológico
-                        </CardTitle>
+                        </h3>
                         <CardDescription>
                             Seleccioná las tecnologías que conocés y tu nivel de experiencia
                         </CardDescription>

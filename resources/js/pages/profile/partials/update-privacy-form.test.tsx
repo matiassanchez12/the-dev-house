@@ -128,6 +128,9 @@ describe('UpdatePrivacyForm', () => {
     it('renders the current phone and privacy state with helper copy', () => {
         render(<UpdatePrivacyForm phone="555-1234" privacySetting={buildPrivacySetting()} />)
 
+        expect(
+            screen.getByRole('heading', { name: 'Privacidad y contacto', level: 3 }),
+        ).toBeInTheDocument()
         expect(screen.getByLabelText('Teléfono')).toHaveValue('555-1234')
         expect(screen.getByRole('checkbox', { name: /Mostrar correo electrónico/i })).toBeChecked()
         expect(screen.getByRole('checkbox', { name: /Mostrar teléfono/i })).not.toBeChecked()

@@ -79,7 +79,7 @@ describe('UpdateNotificationSettingsForm', () => {
         render(<UpdateNotificationSettingsForm notificationSetting={buildNotificationSetting()} />)
 
         expect(
-            screen.getByRole('heading', { name: 'Notificaciones opcionales' }),
+            screen.getByRole('heading', { name: 'Notificaciones opcionales', level: 3 }),
         ).toBeInTheDocument()
         expect(
             screen.getByRole('checkbox', { name: /Recibir emails opcionales de colaboración/i }),

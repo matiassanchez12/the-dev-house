@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card'
 import {
     Dialog,
     DialogContent,
@@ -63,9 +63,9 @@ export default function DeleteUserForm({ className = '' }: Props) {
     return (
         <Card size="sm" className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Eliminar Cuenta
-                </CardTitle>
+                </h3>
                 <CardDescription>
                     Una vez eliminada tu cuenta, todos sus recursos y datos se
                     eliminarán permanentemente. Antes de eliminar tu cuenta,

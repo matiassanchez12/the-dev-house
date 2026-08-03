@@ -4,7 +4,6 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import { Field } from '@/components/ui/field'
 import { Button } from '@/components/ui/button'
@@ -47,9 +46,9 @@ export default function UpdateProfileInformation({
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Información del Perfil
-                </CardTitle>
+                </h3>
                 <CardDescription>
                     Actualizá la información de tu perfil y correo electrónico.
                 </CardDescription>

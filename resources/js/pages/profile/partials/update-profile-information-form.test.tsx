@@ -73,7 +73,9 @@ describe('UpdateProfileInformationForm', () => {
             />,
         );
 
-        expect(screen.getByText('Información del Perfil')).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { name: 'Información del Perfil', level: 3 }),
+        ).toBeInTheDocument();
         expect(screen.getByText('Se envió un nuevo enlace de verificación a tu correo electrónico.')).toBeInTheDocument();
         expect(screen.getAllByText('Actualizá la información de tu perfil y correo electrónico.')).toHaveLength(1);
         expect(screen.getByLabelText('Nombre')).toBeInTheDocument();

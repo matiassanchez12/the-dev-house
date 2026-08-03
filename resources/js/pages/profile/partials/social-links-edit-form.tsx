@@ -5,7 +5,6 @@ import {
     CardContent,
     CardFooter,
     CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import { FormError } from '@/components/ui/form-error'
 import { Input } from '@/components/ui/input'
@@ -98,9 +97,9 @@ export default function SocialLinksEditForm({ socialLinks, className = '' }: Pro
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Links Sociales
-                </CardTitle>
+                </h3>
                 <CardAction>
                     <Button type="button" variant="outline" size="sm" onClick={addLink}>
                         <Plus data-icon="inline-start" />

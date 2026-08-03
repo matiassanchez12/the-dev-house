@@ -5,7 +5,6 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -64,9 +63,9 @@ export default function UpdatePasswordForm({ className = '' }: Props) {
     return (
         <Card size="sm" className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Actualizar Contraseña
-                </CardTitle>
+                </h3>
                 <CardDescription>
                     Asegurate de que tu cuenta use una contraseña larga y aleatoria para mantenerte seguro.
                 </CardDescription>

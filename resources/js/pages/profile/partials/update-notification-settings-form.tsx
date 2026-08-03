@@ -5,7 +5,6 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FormError } from '@/components/ui/form-error'
@@ -48,9 +47,9 @@ export default function UpdateNotificationSettingsForm({
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Notificaciones opcionales
-                </CardTitle>
+                </h3>
                 <CardDescription>
                     Definí si querés recibir correos opcionales de colaboración como invitaciones y
                     actualizaciones de solicitudes.

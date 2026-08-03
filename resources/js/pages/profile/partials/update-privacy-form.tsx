@@ -5,7 +5,6 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field } from '@/components/ui/field'
@@ -87,9 +86,9 @@ export default function UpdatePrivacyForm({ phone, privacySetting, className = '
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle role="heading" aria-level={3}>
+                <h3 className="font-heading text-sm font-medium group-data-[size=sm]/card:text-sm">
                     Privacidad y contacto
-                </CardTitle>
+                </h3>
                 <CardDescription>
                     Definí qué datos pueden ver las personas que visitan tu perfil.
                 </CardDescription>
