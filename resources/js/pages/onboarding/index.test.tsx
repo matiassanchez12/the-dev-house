@@ -10,10 +10,11 @@ const mockState = vi.hoisted(() => ({
         auth: { user: { id: 1, name: 'Ada Lovelace' } },
         user: { bio: null, avatar: null },
         allTechs: [
-            { id: 1, name: 'React', slug: 'react' },
-            { id: 2, name: 'Laravel', slug: 'laravel' },
-            { id: 3, name: 'TypeScript', slug: 'typescript' },
-            { id: 4, name: 'Python', slug: 'python' },
+            { id: 1, name: 'React', slug: 'react', category: 'frontend' },
+            { id: 2, name: 'Laravel', slug: 'laravel', category: 'backend' },
+            { id: 3, name: 'TypeScript', slug: 'typescript', category: 'languages' },
+            { id: 4, name: 'Python', slug: 'python', category: 'languages' },
+            { id: 5, name: 'Zig', slug: 'zig', category: null },
         ],
         userTechs: [],
         totalSteps: 5,
@@ -72,17 +73,22 @@ vi.mock('sonner', () => ({
 }));
 
 describe('OnboardingIndex', () => {
-    it('caps tech selection at 3 and shows the visible counter', async () => {
+    it('groups techs by category, falls back uncategorized entries, and caps selection at 3', async () => {
         const user = userEvent.setup();
 
         render(<OnboardingIndex />);
 
         expect(screen.getByText('0 de 3 elegidas')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Frontend' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Backend' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Other' })).toBeInTheDocument();
 
         const reactButton = screen.getByRole('button', { name: 'React' });
         const laravelButton = screen.getByRole('button', { name: 'Laravel' });
         const tsButton = screen.getByRole('button', { name: 'TypeScript' });
         const pythonButton = screen.getByRole('button', { name: 'Python' });
+        const zigButton = screen.getByRole('button', { name: 'Zig' });
 
         await user.click(reactButton);
         await user.click(laravelButton);
@@ -90,6 +96,7 @@ describe('OnboardingIndex', () => {
 
         expect(screen.getByText('3 de 3 elegidas')).toBeInTheDocument();
         expect(pythonButton).toBeDisabled();
+        expect(zigButton).toBeDisabled();
     });
 
     it('opens a confirmation dialog before running the destructive skip', async () => {

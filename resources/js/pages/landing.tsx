@@ -2,7 +2,6 @@ import Seo from '@/components/seo'
 import { Project as ProjectType, LandingPageProps, User } from '@/types'
 import LandingNav from '@/components/landing/landing-nav'
 import LandingHero from '@/components/landing/landing-hero'
-import LandingStats from '@/components/landing/landing-stats'
 import LandingHowItWorks from '@/components/landing/landing-how-it-works'
 import LandingManifesto from '@/components/landing/landing-manifesto'
 import LandingFooter from '@/components/landing/landing-footer'
@@ -28,8 +27,6 @@ export default function Landing({
     auth,
     projects,
     user_count,
-    project_count,
-    collaboration_count,
     users,
     techs,
 }: Props) {
@@ -45,13 +42,6 @@ export default function Landing({
 
                 {/* Hero */}
                 <LandingHero auth={auth} techs={techs} user_count={user_count} />
-
-                {/* <LandingStats
-                    user_count={user_count}
-                    project_count={project_count}
-                    collaboration_count={collaboration_count}
-                />
-                */}
 
                 {/* Manifesto */}
                 <LandingManifesto />

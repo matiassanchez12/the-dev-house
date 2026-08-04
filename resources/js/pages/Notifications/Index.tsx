@@ -8,12 +8,14 @@ interface Notification {
     id: string;
     type: string;
     data: {
-        type: 'join_request_received' | 'join_request_approved' | 'join_request_rejected';
+        type: 'join_request_received' | 'join_request_approved' | 'join_request_rejected' | 'project_update';
         project_id: number;
         project_slug: string;
         project_title: string;
         applicant_id?: number;
         applicant_name?: string;
+        phase_id?: number;
+        phase_title?: string;
     };
     read_at: string | null;
     created_at: string;
@@ -21,8 +23,9 @@ interface Notification {
 
 const typeLabels: Record<Notification['data']['type'], string> = {
     join_request_received: 'Nueva solicitud de unirse a tu proyecto',
-    join_request_approved: 'Tu solicitud fue aprobida',
+    join_request_approved: 'Tu solicitud fue aprobada',
     join_request_rejected: 'Tu solicitud fue rechazada',
+    project_update: 'Nuevo hito en un proyecto que seguís',
 };
 
 export default function Index({ notifications }: { notifications: Notification[] }) {

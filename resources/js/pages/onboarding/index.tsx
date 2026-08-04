@@ -1,17 +1,17 @@
-import Seo from '@/components/seo';
-import { router, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
-import type { SharedPageProps } from '@/types';
-import { toast } from 'sonner';
-import OnboardingLayout from '@/layouts/onboarding';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Field } from '@/components/ui/field';
-import { FormError } from '@/components/ui/form-error';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import Seo from '@/components/seo'
+import { router, usePage } from '@inertiajs/react'
+import { useState, useEffect } from 'react'
+import type { SharedPageProps } from '@/types'
+import { toast } from 'sonner'
+import OnboardingLayout from '@/layouts/onboarding'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field } from '@/components/ui/field'
+import { FormError } from '@/components/ui/form-error'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
     Dialog,
     DialogContent,
@@ -19,23 +19,24 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
-import { User, Tech, Platform, SocialLink } from '@/types';
-import { avatarUrl } from '@/components/projects/project-utils';
+} from '@/components/ui/dialog'
+import { User, Tech, Platform, SocialLink } from '@/types'
+import { avatarUrl } from '@/components/projects/project-utils'
+import { groupTechsByCategory } from '@/lib/tech-catalog'
 
-const MAX_SELECTED_TECHS = 3;
+const MAX_SELECTED_TECHS = 3
 
 interface OnboardingProps extends SharedPageProps {
     auth: {
-        user: User;
-    };
+        user: User
+    }
     user: {
-        bio: string | null;
-        avatar: string | null;
-    };
-    allTechs: Tech[];
-    userTechs: (Tech & { pivot?: { proficiency?: string } })[];
-    totalSteps: number;
+        bio: string | null
+        avatar: string | null
+    }
+    allTechs: Tech[]
+    userTechs: (Tech & { pivot?: { proficiency?: string } })[]
+    totalSteps: number
 }
 
 const PROFICIENCY_MAP: Record<number, string> = {
@@ -44,7 +45,7 @@ const PROFICIENCY_MAP: Record<number, string> = {
     3: 'Intermedio',
     4: 'Avanzado',
     5: 'Experto',
-};
+}
 
 const PROFICIENCY_REVERSE_MAP: Record<string, number> = {
     basic: 2,
@@ -52,30 +53,31 @@ const PROFICIENCY_REVERSE_MAP: Record<string, number> = {
     advanced: 4,
     expert: 5,
     master: 5,
-};
+}
 
 interface SelectedTech {
-    id: number;
-    name: string;
-    slug: string;
-    proficiency: number;
+    id: number
+    name: string
+    slug: string
+    proficiency: number
 }
 
 interface Recommendation {
-    id: number;
-    title: string;
-    description: string;
-    slug: string;
-    techs: { id: number; name: string }[];
-    creator: { id: number; name: string } | null;
+    id: number
+    title: string
+    description: string
+    slug: string
+    techs: { id: number; name: string }[]
+    creator: { id: number; name: string } | null
 }
 
 export default function OnboardingIndex() {
-    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps>().props;
+    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps>().props
+    const techGroups = groupTechsByCategory(allTechs)
 
-    const [currentStep, setCurrentStep] = useState(1);
-    const [processing, setProcessing] = useState(false);
-    const [confirmingSkip, setConfirmingSkip] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1)
+    const [processing, setProcessing] = useState(false)
+    const [confirmingSkip, setConfirmingSkip] = useState(false)
 
     // Step 1: Tech selection
     const [selectedTechs, setSelectedTechs] = useState<SelectedTech[]>(() => {
@@ -84,31 +86,29 @@ export default function OnboardingIndex() {
             name: tech.name,
             slug: tech.slug,
             proficiency: PROFICIENCY_REVERSE_MAP[tech.pivot?.proficiency || 'advanced'] ?? 3,
-        }));
-    });
+        }))
+    })
 
     const toggleTech = (tech: Tech) => {
         setSelectedTechs((prev) => {
-            const exists = prev.find((t) => t.id === tech.id);
+            const exists = prev.find((t) => t.id === tech.id)
             if (exists) {
-                return prev.filter((t) => t.id !== tech.id);
+                return prev.filter((t) => t.id !== tech.id)
             }
             if (prev.length >= MAX_SELECTED_TECHS) {
-                toast.error(`Podés elegir hasta ${MAX_SELECTED_TECHS} tecnologías.`);
-                return prev;
+                toast.error(`Podés elegir hasta ${MAX_SELECTED_TECHS} tecnologías.`)
+                return prev
             }
-            return [...prev, { id: tech.id, name: tech.name, slug: tech.slug, proficiency: 3 }];
-        });
-    };
+            return [...prev, { id: tech.id, name: tech.name, slug: tech.slug, proficiency: 3 }]
+        })
+    }
 
     const updateTechProficiency = (techId: number, proficiency: number) => {
-        setSelectedTechs((prev) =>
-            prev.map((t) => (t.id === techId ? { ...t, proficiency } : t))
-        );
-    };
+        setSelectedTechs((prev) => prev.map((t) => (t.id === techId ? { ...t, proficiency } : t)))
+    }
 
     // Step 2: Bio
-    const [bio, setBio] = useState(user.bio || '');
+    const [bio, setBio] = useState(user.bio || '')
 
     // Step 3: Social Links
     const [socialLinks, setSocialLinks] = useState<Partial<Record<Platform, string>>>({
@@ -116,7 +116,7 @@ export default function OnboardingIndex() {
         linkedin: '',
         twitter: '',
         website: '',
-    });
+    })
 
     const PLATFORM_ICONS: Partial<Record<Platform, React.ReactNode>> = {
         github: (
@@ -135,202 +135,230 @@ export default function OnboardingIndex() {
             </svg>
         ),
         website: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+            >
                 <circle cx="12" cy="12" r="10" />
                 <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
             </svg>
         ),
-    };
+    }
 
     const PLATFORM_LABELS: Partial<Record<Platform, string>> = {
         github: 'GitHub',
         linkedin: 'LinkedIn',
         twitter: 'X (Twitter)',
         website: 'Sitio Web',
-    };
+    }
 
     // Step 3: Avatar
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null)
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
     useEffect(() => {
         if (avatarFile) {
-            const url = URL.createObjectURL(avatarFile);
-            setAvatarPreview(url);
-            return () => URL.revokeObjectURL(url);
+            const url = URL.createObjectURL(avatarFile)
+            setAvatarPreview(url)
+            return () => URL.revokeObjectURL(url)
         }
-    }, [avatarFile]);
+    }, [avatarFile])
 
     // Step 5: Recommendations
-    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-    const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
-    const [loadingRecommendations, setLoadingRecommendations] = useState(false);
-    const [loadRecommendationsError, setLoadRecommendationsError] = useState(false);
-    const [recommendationsAttempt, setRecommendationsAttempt] = useState(0);
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+    const [selectedProjects, setSelectedProjects] = useState<number[]>([])
+    const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+    const [loadRecommendationsError, setLoadRecommendationsError] = useState(false)
+    const [recommendationsAttempt, setRecommendationsAttempt] = useState(0)
 
     useEffect(() => {
         if (currentStep !== 5) {
-            return;
+            return
         }
         if (recommendations.length > 0 || loadRecommendationsError) {
-            return;
+            return
         }
-        setLoadingRecommendations(true);
-        setLoadRecommendationsError(false);
+        setLoadingRecommendations(true)
+        setLoadRecommendationsError(false)
         fetch('/onboarding/recommendations')
             .then((res) => {
                 if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
+                    throw new Error(`HTTP ${res.status}`)
                 }
-                return res.json();
+                return res.json()
             })
             .then((data) => {
-                setRecommendations(data.projects || []);
-                setLoadingRecommendations(false);
+                setRecommendations(data.projects || [])
+                setLoadingRecommendations(false)
             })
             .catch(() => {
-                setLoadingRecommendations(false);
-                setLoadRecommendationsError(true);
-            });
-    }, [currentStep, recommendationsAttempt]);
+                setLoadingRecommendations(false)
+                setLoadRecommendationsError(true)
+            })
+    }, [currentStep, recommendationsAttempt])
 
     const retryRecommendations = () => {
-        setLoadRecommendationsError(false);
-        setRecommendations([]);
-        setRecommendationsAttempt((prev) => prev + 1);
-    };
+        setLoadRecommendationsError(false)
+        setRecommendations([])
+        setRecommendationsAttempt((prev) => prev + 1)
+    }
 
     const toggleProject = (projectId: number) => {
         setSelectedProjects((prev) =>
-            prev.includes(projectId)
-                ? prev.filter((id) => id !== projectId)
-                : [...prev, projectId]
-        );
-    };
+            prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId],
+        )
+    }
 
     const handleNext = () => {
-        if (processing) return;
+        if (processing) return
 
         if (currentStep === 1) {
-            setProcessing(true);
+            setProcessing(true)
             router.post(
                 '/onboarding/step-1',
                 { techs: selectedTechs.map((t) => ({ id: t.id, proficiency: t.proficiency })) },
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(2),
-                    onError: () => toast.error('No pudimos guardar tu stack. Revisá tu conexión e intentá de nuevo.'),
+                    onError: () =>
+                        toast.error(
+                            'No pudimos guardar tu stack. Revisá tu conexión e intentá de nuevo.',
+                        ),
                     onFinish: () => setProcessing(false),
-                }
-            );
+                },
+            )
         } else if (currentStep === 2) {
-            setProcessing(true);
+            setProcessing(true)
             router.post(
                 '/onboarding/step-2',
                 { bio },
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(3),
-                    onError: () => toast.error('No pudimos guardar tu objetivo. Revisá tu conexión e intentá de nuevo.'),
+                    onError: () =>
+                        toast.error(
+                            'No pudimos guardar tu objetivo. Revisá tu conexión e intentá de nuevo.',
+                        ),
                     onFinish: () => setProcessing(false),
-                }
-            );
+                },
+            )
         } else if (currentStep === 3) {
             const links = Object.entries(socialLinks)
                 .filter(([, url]) => url.trim() !== '')
-                .map(([platform, url]) => ({ platform: platform as Platform, url }));
+                .map(([platform, url]) => ({ platform: platform as Platform, url }))
 
             if (links.length === 0) {
-                setCurrentStep(4);
-                return;
+                setCurrentStep(4)
+                return
             }
 
-            setProcessing(true);
+            setProcessing(true)
             router.post(
                 '/onboarding/step-social-links',
                 { links: links.map((l) => ({ platform: l.platform, url: l.url })) },
                 {
                     preserveScroll: true,
                     onSuccess: () => setCurrentStep(4),
-                    onError: () => toast.error('No pudimos guardar tus links. Revisá tu conexión e intentá de nuevo.'),
+                    onError: () =>
+                        toast.error(
+                            'No pudimos guardar tus links. Revisá tu conexión e intentá de nuevo.',
+                        ),
                     onFinish: () => setProcessing(false),
-                }
-            );
+                },
+            )
         } else if (currentStep === 4) {
             if (!avatarFile) {
-                setCurrentStep(5);
-                return;
+                setCurrentStep(5)
+                return
             }
 
-            const formData = new FormData();
-            formData.append('avatar', avatarFile);
-            setProcessing(true);
+            const formData = new FormData()
+            formData.append('avatar', avatarFile)
+            setProcessing(true)
             router.post('/onboarding/step-3', formData, {
                 forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => setCurrentStep(5),
-                onError: () => toast.error('No pudimos subir tu foto. Revisá tu conexión e intentá de nuevo.'),
+                onError: () =>
+                    toast.error('No pudimos subir tu foto. Revisá tu conexión e intentá de nuevo.'),
                 onFinish: () => setProcessing(false),
-            });
+            })
         } else if (currentStep === 5) {
-            setProcessing(true);
+            setProcessing(true)
             router.post(
                 '/onboarding/step-4',
                 { join_requests: selectedProjects },
                 {
                     preserveScroll: true,
-                    onError: () => toast.error('No pudimos guardar tu selección. Revisá tu conexión e intentá de nuevo.'),
+                    onError: () =>
+                        toast.error(
+                            'No pudimos guardar tu selección. Revisá tu conexión e intentá de nuevo.',
+                        ),
                     onFinish: () => setProcessing(false),
-                }
-            );
+                },
+            )
         }
-    };
+    }
 
     const handleBack = () => {
-        if (processing) return;
+        if (processing) return
         if (currentStep > 1) {
-            setCurrentStep((prev) => prev - 1);
+            setCurrentStep((prev) => prev - 1)
         }
-    };
+    }
 
     const requestSkip = () => {
-        if (processing) return;
-        setConfirmingSkip(true);
-    };
+        if (processing) return
+        setConfirmingSkip(true)
+    }
 
     const confirmSkip = () => {
-        if (processing) return;
-        setProcessing(true);
-        setConfirmingSkip(false);
-        router.post('/onboarding/skip', {}, {
-            preserveScroll: true,
-            onError: () => {
-                setProcessing(false);
-                toast.error('No pudimos finalizar el onboarding. Revisá tu conexión e intentá de nuevo.');
+        if (processing) return
+        setProcessing(true)
+        setConfirmingSkip(false)
+        router.post(
+            '/onboarding/skip',
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setProcessing(false)
+                    toast.error(
+                        'No pudimos finalizar el onboarding. Revisá tu conexión e intentá de nuevo.',
+                    )
+                },
+                onFinish: () => setProcessing(false),
             },
-            onFinish: () => setProcessing(false),
-        });
-    };
+        )
+    }
 
     const cancelSkip = () => {
-        if (processing) return;
-        setConfirmingSkip(false);
-    };
+        if (processing) return
+        setConfirmingSkip(false)
+    }
 
     const stepErrors = (prefix: string) =>
-        Object.entries(errors).filter(
-            ([key]) => key === prefix || key.startsWith(`${prefix}.`)
-        );
+        Object.entries(errors).filter(([key]) => key === prefix || key.startsWith(`${prefix}.`))
 
-    const techsErrorId = 'techs-error';
-    const joinRequestsErrorId = 'join-requests-error';
-    const techsError = stepErrors('techs')[0]?.[1];
-    const joinRequestsError = stepErrors('join_requests')[0]?.[1];
+    const techsErrorId = 'techs-error'
+    const joinRequestsErrorId = 'join-requests-error'
+    const techsError = stepErrors('techs')[0]?.[1]
+    const joinRequestsError = stepErrors('join_requests')[0]?.[1]
 
     return (
         <>
-            <Seo title="Configurá tu perfil inicial" description="Completá lo mínimo para que otros developers entiendan tu stack, tu nivel y qué tipo de proyectos querés construir." />
-            <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps} onSkipRequest={requestSkip}>
+            <Seo
+                title="Configurá tu perfil inicial"
+                description="Completá lo mínimo para que otros developers entiendan tu stack, tu nivel y qué tipo de proyectos querés construir."
+            />
+            <OnboardingLayout
+                currentStep={currentStep}
+                totalSteps={totalSteps}
+                onSkipRequest={requestSkip}
+            >
                 <Card>
                     <CardHeader>
                         <CardTitle>
@@ -341,11 +369,16 @@ export default function OnboardingIndex() {
                             {currentStep === 5 && 'Elegí proyectos para explorar'}
                         </CardTitle>
                         <CardDescription>
-                            {currentStep === 1 && `Este es el único paso obligatorio: elegí hasta ${MAX_SELECTED_TECHS} tecnologías que mejor te representen.`}
-                            {currentStep === 2 && 'Opcional: una frase clara alcanza para que otros entiendan tu objetivo.'}
-                            {currentStep === 3 && 'Opcional: GitHub o LinkedIn ayudan a validar tu trabajo sin pedirte más datos.'}
-                            {currentStep === 4 && 'Opcional: podés dejarlo para después desde tu perfil.'}
-                            {currentStep === 5 && 'Opcional: marcá proyectos que te interesen o finalizá ahora.'}
+                            {currentStep === 1 &&
+                                `Este es el único paso obligatorio: elegí hasta ${MAX_SELECTED_TECHS} tecnologías que mejor te representen.`}
+                            {currentStep === 2 &&
+                                'Opcional: una frase clara alcanza para que otros entiendan tu objetivo.'}
+                            {currentStep === 3 &&
+                                'Opcional: GitHub o LinkedIn ayudan a validar tu trabajo sin pedirte más datos.'}
+                            {currentStep === 4 &&
+                                'Opcional: podés dejarlo para después desde tu perfil.'}
+                            {currentStep === 5 &&
+                                'Opcional: marcá proyectos que te interesen o finalizá ahora.'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -358,33 +391,61 @@ export default function OnboardingIndex() {
                                     {selectedTechs.length} de {MAX_SELECTED_TECHS} elegidas
                                 </p>
 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {allTechs.map((tech) => {
-                                        const isSelected = selectedTechs.some((t) => t.id === tech.id);
-                                        const atCap = !isSelected && selectedTechs.length >= MAX_SELECTED_TECHS;
-                                        return (
-                                            <button
-                                                key={tech.id}
-                                                type="button"
-                                                onClick={() => toggleTech(tech)}
-                                                aria-pressed={isSelected}
-                                                aria-invalid={Boolean(techsError)}
-                                                aria-describedby={techsError ? techsErrorId : undefined}
-                                                disabled={atCap}
-                                                className={`p-3 rounded-lg border text-left transition-colors ${
-                                                    isSelected
-                                                        ? 'border-primary bg-primary/10'
-                                                        : atCap
-                                                          ? 'border-border opacity-50 cursor-not-allowed'
-                                                          : 'border-border hover:border-primary/50'
-                                                }`}
-                                            >
-                                                <span className="text-sm font-medium text-foreground">
-                                                    {tech.name}
+                                <div className="space-y-4">
+                                    {techGroups.map((group) => (
+                                        <section
+                                            key={group.key}
+                                            className="space-y-3 rounded-lg border border-border p-4"
+                                        >
+                                            <div className="flex items-center justify-between gap-3">
+                                                <h4 className="text-sm font-medium text-foreground">
+                                                    {group.label}
+                                                </h4>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {group.techs.length} tech
+                                                    {group.techs.length !== 1 ? 's' : ''}
                                                 </span>
-                                            </button>
-                                        );
-                                    })}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                                                {group.techs.map((tech) => {
+                                                    const isSelected = selectedTechs.some(
+                                                        (t) => t.id === tech.id,
+                                                    )
+                                                    const atCap =
+                                                        !isSelected &&
+                                                        selectedTechs.length >= MAX_SELECTED_TECHS
+
+                                                    return (
+                                                        <button
+                                                            key={tech.id}
+                                                            type="button"
+                                                            onClick={() => toggleTech(tech)}
+                                                            aria-pressed={isSelected}
+                                                            aria-invalid={Boolean(techsError)}
+                                                            aria-describedby={
+                                                                techsError
+                                                                    ? techsErrorId
+                                                                    : undefined
+                                                            }
+                                                            disabled={atCap}
+                                                            className={`rounded-lg border p-3 text-left transition-colors ${
+                                                                isSelected
+                                                                    ? 'border-primary bg-primary/10'
+                                                                    : atCap
+                                                                      ? 'cursor-not-allowed border-border opacity-50'
+                                                                      : 'border-border hover:border-primary/50'
+                                                            }`}
+                                                        >
+                                                            <span className="text-sm font-medium text-foreground">
+                                                                {tech.name}
+                                                            </span>
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+                                        </section>
+                                    ))}
                                 </div>
 
                                 {selectedTechs.length > 0 && (
@@ -393,7 +454,8 @@ export default function OnboardingIndex() {
                                             Nivel actual en cada tecnología
                                         </label>
                                         <p className="text-sm text-muted-foreground">
-                                            Usamos este dato para mostrarte proyectos acordes a tu momento, no para excluirte.
+                                            Usamos este dato para mostrarte proyectos acordes a tu
+                                            momento, no para excluirte.
                                         </p>
                                         {selectedTechs.map((tech) => (
                                             <div
@@ -413,7 +475,7 @@ export default function OnboardingIndex() {
                                                         onChange={(e) =>
                                                             updateTechProficiency(
                                                                 tech.id,
-                                                                parseInt(e.target.value)
+                                                                parseInt(e.target.value),
                                                             )
                                                         }
                                                         className="rounded-md border border-input bg-background px-2 py-1 text-sm"
@@ -426,7 +488,7 @@ export default function OnboardingIndex() {
                                                                 >
                                                                     {label}
                                                                 </option>
-                                                            )
+                                                            ),
                                                         )}
                                                     </select>
                                                 </Field>
@@ -463,13 +525,21 @@ export default function OnboardingIndex() {
                         {currentStep === 3 && (
                             <div className="space-y-4">
                                 {/* General social links errors */}
-                                {errors.links && <FormError id="links-error" message={errors.links} className="mb-2" />}
+                                {errors.links && (
+                                    <FormError
+                                        id="links-error"
+                                        message={errors.links}
+                                        className="mb-2"
+                                    />
+                                )}
                                 <p className="text-sm text-muted-foreground">
-                                    Agregá solo los perfiles que ya tengas listos. GitHub o LinkedIn suelen ser suficientes para empezar.
+                                    Agregá solo los perfiles que ya tengas listos. GitHub o LinkedIn
+                                    suelen ser suficientes para empezar.
                                 </p>
                                 {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => {
-                                    const platformIndex = Object.keys(PLATFORM_LABELS).indexOf(platform);
-                                    const urlError = errors[`links.${platformIndex}.url`];
+                                    const platformIndex =
+                                        Object.keys(PLATFORM_LABELS).indexOf(platform)
+                                    const urlError = errors[`links.${platformIndex}.url`]
 
                                     return (
                                         <div key={platform} className="flex items-center gap-3">
@@ -493,8 +563,12 @@ export default function OnboardingIndex() {
                                                             }))
                                                         }
                                                         placeholder={`https://...`}
-                                                        aria-invalid={Boolean(urlError || errors.links)}
-                                                        aria-describedby={errors.links ? 'links-error' : undefined}
+                                                        aria-invalid={Boolean(
+                                                            urlError || errors.links,
+                                                        )}
+                                                        aria-describedby={
+                                                            errors.links ? 'links-error' : undefined
+                                                        }
                                                     />
                                                 </Field>
                                             </div>
@@ -502,13 +576,17 @@ export default function OnboardingIndex() {
                                                 {PLATFORM_LABELS[platform]}
                                             </span>
                                         </div>
-                                    );
+                                    )
                                 })}
 
                                 {/* Preview */}
-                                {Object.values(socialLinks).some((url) => (url ?? '').trim() !== '') && (
+                                {Object.values(socialLinks).some(
+                                    (url) => (url ?? '').trim() !== '',
+                                ) && (
                                     <div className="pt-2 border-t border-border">
-                                        <p className="text-xs text-muted-foreground mb-2">Vista previa:</p>
+                                        <p className="text-xs text-muted-foreground mb-2">
+                                            Vista previa:
+                                        </p>
                                         <div className="flex flex-wrap gap-2">
                                             {(Object.keys(socialLinks) as Platform[])
                                                 .filter((p) => (socialLinks[p] ?? '').trim() !== '')
@@ -558,13 +636,18 @@ export default function OnboardingIndex() {
                                         )}
                                     </div>
                                     <div>
-                                        <Field id="avatar" label="Avatar" labelClassName="sr-only" error={errors.avatar}>
+                                        <Field
+                                            id="avatar"
+                                            label="Avatar"
+                                            labelClassName="sr-only"
+                                            error={errors.avatar}
+                                        >
                                             <Input
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) setAvatarFile(file);
+                                                    const file = e.target.files?.[0]
+                                                    if (file) setAvatarFile(file)
                                                 }}
                                                 className="text-sm text-muted-foreground"
                                             />
@@ -580,7 +663,12 @@ export default function OnboardingIndex() {
                         {/* Step 5: Recommendations */}
                         {currentStep === 5 && (
                             <div className="space-y-4">
-                                {joinRequestsError && <FormError id={joinRequestsErrorId} message={joinRequestsError} />}
+                                {joinRequestsError && (
+                                    <FormError
+                                        id={joinRequestsErrorId}
+                                        message={joinRequestsError}
+                                    />
+                                )}
                                 {loadingRecommendations ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         Cargando proyectos recomendados...
@@ -588,15 +676,21 @@ export default function OnboardingIndex() {
                                 ) : loadRecommendationsError ? (
                                     <div className="text-center py-8 space-y-3">
                                         <p className="text-muted-foreground">
-                                            No pudimos cargar las recomendaciones. Revisá tu conexión.
+                                            No pudimos cargar las recomendaciones. Revisá tu
+                                            conexión.
                                         </p>
-                                        <Button type="button" variant="outline" onClick={retryRecommendations}>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={retryRecommendations}
+                                        >
                                             Reintentar
                                         </Button>
                                     </div>
                                 ) : recommendations.length === 0 ? (
                                     <div className="text-center py-8 text-muted-foreground">
-                                        No hay proyectos recomendados por ahora. Podés finalizar y explorar más tarde.
+                                        No hay proyectos recomendados por ahora. Podés finalizar y
+                                        explorar más tarde.
                                     </div>
                                 ) : (
                                     recommendations.map((project) => (
@@ -604,14 +698,18 @@ export default function OnboardingIndex() {
                                             key={project.id}
                                             className="flex items-start gap-3 p-4 rounded-lg border border-border"
                                         >
-                                    <Checkbox
-                                        id={`project-${project.id}`}
-                                        checked={selectedProjects.includes(project.id)}
-                                        onCheckedChange={() => toggleProject(project.id)}
-                                        className="mt-1"
-                                        aria-invalid={Boolean(joinRequestsError)}
-                                        aria-describedby={joinRequestsError ? joinRequestsErrorId : undefined}
-                                    />
+                                            <Checkbox
+                                                id={`project-${project.id}`}
+                                                checked={selectedProjects.includes(project.id)}
+                                                onCheckedChange={() => toggleProject(project.id)}
+                                                className="mt-1"
+                                                aria-invalid={Boolean(joinRequestsError)}
+                                                aria-describedby={
+                                                    joinRequestsError
+                                                        ? joinRequestsErrorId
+                                                        : undefined
+                                                }
+                                            />
                                             <label
                                                 htmlFor={`project-${project.id}`}
                                                 className="flex-1 cursor-pointer"
@@ -623,8 +721,10 @@ export default function OnboardingIndex() {
                                                         </h4>
                                                         <p className="text-sm text-muted-foreground mt-1">
                                                             {project.description.length > 120
-                                                                ? project.description.slice(0, 120) +
-                                                                  '...'
+                                                                ? project.description.slice(
+                                                                      0,
+                                                                      120,
+                                                                  ) + '...'
                                                                 : project.description}
                                                         </p>
                                                     </div>
@@ -673,14 +773,26 @@ export default function OnboardingIndex() {
                         <DialogHeader>
                             <DialogTitle>¿Finalizar el onboarding ahora?</DialogTitle>
                             <DialogDescription>
-                                Vas a salir del wizard y tu perfil quedará marcado como completo. Si más adelante querés volver, tendrás que pedirle a un administrador que lo reinicie.
+                                Vas a salir del wizard y tu perfil quedará marcado como completo. Si
+                                más adelante querés volver, tendrás que pedirle a un administrador
+                                que lo reinicie.
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
-                            <Button type="button" variant="secondary" onClick={cancelSkip} disabled={processing}>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={cancelSkip}
+                                disabled={processing}
+                            >
                                 Cancelar
                             </Button>
-                            <Button type="button" variant="destructive" onClick={confirmSkip} disabled={processing}>
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={confirmSkip}
+                                disabled={processing}
+                            >
                                 Sí, finalizar
                             </Button>
                         </DialogFooter>
@@ -688,5 +800,5 @@ export default function OnboardingIndex() {
                 </Dialog>
             </OnboardingLayout>
         </>
-    );
+    )
 }

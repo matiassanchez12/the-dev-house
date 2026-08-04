@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -183,6 +184,34 @@ class ProfileTest extends TestCase
             'tech_id' => $tech2->id,
             'years_experience' => 1,
         ]);
+    }
+
+    public function test_profile_edit_exposes_categories_for_user_techs_and_catalog(): void
+    {
+        $user = User::factory()->create();
+        $tech = Tech::factory()->create([
+            'category' => 'frontend',
+            'name' => 'React',
+            'slug' => 'react',
+        ]);
+
+        $user->techs()->attach($tech->id, [
+            'years_experience' => 3,
+            'proficiency' => 'expert',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/profile');
+
+        $response->assertOk();
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('userTechs.0.name', 'React')
+                ->where('userTechs.0.category', 'frontend')
+                ->where('techs.0.name', 'React')
+                ->where('techs.0.category', 'frontend')
+        );
     }
 
     /**

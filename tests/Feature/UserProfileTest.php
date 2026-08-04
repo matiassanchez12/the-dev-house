@@ -51,6 +51,8 @@ class UserProfileTest extends TestCase
                 ->where('user.name', 'Juan Pérez')
                 ->where('user.bio', 'Desarrollador full-stack con 5 años de experiencia')
                 ->where('user.avatar', Storage::disk('public')->url('avatars/juan.jpg'))
+                ->where('user.techs.0.category', $tech->category)
+                ->where('user.createdProjects.0.techs.0.category', $tech->category)
                 ->missing('user.email') // email should NOT be exposed
         );
     }
@@ -149,12 +151,14 @@ class UserProfileTest extends TestCase
         // Arrange
         $user = User::factory()->create(['name' => 'Ana Participant']);
         $otherUser = User::factory()->create(['name' => 'Project Owner']);
+        $tech = Tech::factory()->create(['name' => 'React', 'category' => 'frontend']);
 
         $project = Project::factory()->create([
             'user_id' => $otherUser->id,
             'title' => 'Collaborative Project',
             'slug' => 'collab-project',
         ]);
+        $project->techs()->attach($tech->id);
         $project->participants()->attach($user->id, ['role' => 'developer', 'joined_at' => now()]);
 
         // Act
@@ -166,6 +170,8 @@ class UserProfileTest extends TestCase
             fn ($page) => $page
                 ->has('user.participatingProjects', 1)
                 ->where('user.participatingProjects.0.title', 'Collaborative Project')
+                ->where('user.participatingProjects.0.techs.0.name', 'React')
+                ->where('user.participatingProjects.0.techs.0.category', 'frontend')
         );
     }
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectStatusController;
+use App\Http\Controllers\ProjectFollowController;
 use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\PublicMilestoneController;
@@ -42,6 +43,8 @@ Route::get('/milestones', [PublicMilestoneController::class, 'index'])->name('mi
 Route::middleware('auth')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::post('/projects/{project:slug}/follow', [ProjectFollowController::class, 'store'])->name('projects.follow');
+    Route::delete('/projects/{project:slug}/follow', [ProjectFollowController::class, 'destroy'])->name('projects.unfollow');
     Route::get('/projects/{project:slug}/collaborators', [ProjectCollaboratorController::class, 'index'])->name('projects.collaborators');
     Route::post('/projects/{project:slug}/invitations', [ProjectInvitationController::class, 'store'])->name('project-invitations.store');
     Route::delete('/project-invitations/{projectInvitation}', [ProjectInvitationController::class, 'destroy'])->name('project-invitations.destroy');

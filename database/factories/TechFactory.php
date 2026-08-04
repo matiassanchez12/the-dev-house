@@ -18,11 +18,21 @@ class TechFactory extends Factory
     public function definition(): array
     {
         $name = fake()->unique()->words(2, true);
-        
+
         return [
+            'category' => fake()->randomElement([
+                'api-integration',
+                'backend',
+                'data',
+                'design-tooling',
+                'devops-cloud',
+                'frontend',
+                'languages',
+                'mobile',
+            ]),
             'name' => ucwords($name),
             'slug' => str($name)->slug(),
-            'icon' => fake()->optional()->word() . '.svg',
+            'icon' => fake()->optional()->word().'.svg',
         ];
     }
 }

@@ -102,6 +102,7 @@ class UserService
                     'avatar' => $project->creator->avatar,
                 ],
                 'techs' => $project->techs->map(fn ($tech) => [
+                    'category' => $tech->category,
                     'id' => $tech->id,
                     'name' => $tech->name,
                     'slug' => $tech->slug,
@@ -125,6 +126,7 @@ class UserService
                     'avatar' => $project->creator->avatar,
                 ],
                 'techs' => $project->techs->map(fn ($tech) => [
+                    'category' => $tech->category,
                     'id' => $tech->id,
                     'name' => $tech->name,
                     'slug' => $tech->slug,
@@ -138,6 +140,7 @@ class UserService
             ->sortByDesc(fn ($tech) => $tech->pivot->years_experience)
             ->values()
             ->map(fn ($tech) => [
+                'category' => $tech->category,
                 'id' => $tech->id,
                 'name' => $tech->name,
                 'slug' => $tech->slug,

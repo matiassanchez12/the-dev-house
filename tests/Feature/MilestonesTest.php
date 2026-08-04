@@ -12,7 +12,7 @@ class MilestonesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_public_milestones_page_shows_recent_completed_phases(): void
+    public function test_public_milestones_page_orders_completed_and_pending_phases_deterministically(): void
     {
         $creator = User::factory()->create(['name' => 'Project Creator']);
 
@@ -28,11 +28,20 @@ class MilestonesTest extends TestCase
             'slug' => 'second-project',
         ]);
 
+        $sharedCompletionTime = now()->subDay()->startOfHour();
+
         Phase::factory()->create([
             'project_id' => $firstProject->id,
-            'title' => 'Old milestone',
-            'description' => 'Already shipped',
-            'completed_at' => now()->subDays(2),
+            'title' => 'Same timestamp older id',
+            'description' => 'Created first with the shared timestamp',
+            'completed_at' => $sharedCompletionTime,
+        ]);
+
+        Phase::factory()->create([
+            'project_id' => $secondProject->id,
+            'title' => 'Same timestamp newer id',
+            'description' => 'Created second with the shared timestamp',
+            'completed_at' => $sharedCompletionTime,
         ]);
 
         Phase::factory()->create([
@@ -40,13 +49,24 @@ class MilestonesTest extends TestCase
             'title' => 'Newest milestone',
             'description' => 'Latest release',
             'completed_at' => now()->subDay(),
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
         ]);
 
         Phase::factory()->create([
             'project_id' => $secondProject->id,
-            'title' => 'Pending milestone',
-            'description' => 'Not finished yet',
+            'title' => 'Older pending milestone',
+            'description' => 'Created first without a completion date',
             'completed_at' => null,
+        ]);
+
+        Phase::factory()->create([
+            'project_id' => $firstProject->id,
+            'title' => 'Newer pending milestone',
+            'description' => 'Created second without a completion date',
+            'completed_at' => null,
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDays(3),
         ]);
 
         $response = $this->get(route('milestones.index'));
@@ -54,12 +74,14 @@ class MilestonesTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('milestones', false)
-            ->has('milestones.data', 3)
+            ->has('milestones.data', 5)
             ->where('milestones.data.0.title', 'Newest milestone')
             ->where('milestones.data.0.project.title', 'Second Project')
             ->where('milestones.data.0.project.creator.name', 'Project Creator')
-            ->where('milestones.data.1.title', 'Old milestone')
-            ->where('milestones.data.2.title', 'Pending milestone')
+            ->where('milestones.data.1.title', 'Same timestamp newer id')
+            ->where('milestones.data.2.title', 'Same timestamp older id')
+            ->where('milestones.data.3.title', 'Newer pending milestone')
+            ->where('milestones.data.4.title', 'Older pending milestone')
         );
     }
 }

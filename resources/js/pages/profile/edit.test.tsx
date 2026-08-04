@@ -1,117 +1,180 @@
-import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import type { NotificationSetting, PrivacySetting, SocialLink } from '@/types';
-import Edit from './edit';
+import { render, screen, within } from '@testing-library/react'
+import type { ComponentProps, ReactNode } from 'react'
+import type { NotificationSetting, PrivacySetting } from '@/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import Edit from './edit'
 
-const mockState = vi.hoisted(() => ({
-    techs: [{ id: 1, name: 'React', slug: 'react' }],
-    privacyProps: undefined as undefined | { phone: string | null; privacySetting: PrivacySetting },
-    notificationProps: undefined as undefined | { notificationSetting: NotificationSetting },
-}));
-
-vi.mock('@inertiajs/react', () => ({
-    usePage: () => ({ props: { techs: mockState.techs } }),
-}));
+const mockForms = vi.hoisted(() => ({
+    capturePrivacyProps: vi.fn(),
+    captureNotificationProps: vi.fn(),
+}))
 
 vi.mock('@/components/seo', () => ({
     default: () => null,
-}));
+}))
 
 vi.mock('@/layouts/app-layout', () => ({
-    default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}));
+    default: ({ header, children }: { header: ReactNode; children: ReactNode }) => (
+        <div>
+            <div>{header}</div>
+            <div>{children}</div>
+        </div>
+    ),
+}))
+
+vi.mock('@inertiajs/react', () => ({
+    usePage: () => ({
+        props: { techs: [] },
+    }),
+}))
 
 vi.mock('./partials/update-profile-information-form', () => ({
-    default: () => <div data-testid="profile-card">Basic profile</div>,
-}));
+    default: () => (
+        <section aria-label="profile information section">Profile information section</section>
+    ),
+}))
+
+vi.mock('./partials/update-password-form', () => ({
+    default: () => <section aria-label="password section">Password section</section>,
+}))
+
+vi.mock('./partials/delete-user-form', () => ({
+    default: () => <section aria-label="delete account section">Delete account section</section>,
+}))
 
 vi.mock('./partials/update-profile-complete-form', () => ({
-    default: () => <div data-testid="profile-card">Complete profile</div>,
-}));
+    default: () => <section aria-label="complete profile form">Complete profile form</section>,
+}))
 
 vi.mock('./partials/update-privacy-form', () => ({
     default: (props: { phone: string | null; privacySetting: PrivacySetting }) => {
-        mockState.privacyProps = props;
+        mockForms.capturePrivacyProps(props)
 
-        return <div data-testid="profile-card">Privacy settings</div>;
+        return <section aria-label="privacy form">Privacy form</section>
     },
-}));
+}))
 
 vi.mock('./partials/update-notification-settings-form', () => ({
     default: (props: { notificationSetting: NotificationSetting }) => {
-        mockState.notificationProps = props;
+        mockForms.captureNotificationProps(props)
 
-        return <div data-testid="profile-card">Notification settings</div>;
+        return <section aria-label="notifications form">Notifications form</section>
     },
-}));
+}))
 
 vi.mock('./partials/social-links-edit-form', () => ({
-    default: () => <div data-testid="profile-card">Social links</div>,
-}));
+    default: () => <section aria-label="social links form">Social links form</section>,
+}))
 
-vi.mock('./partials/update-password-form', () => ({
-    default: () => <div data-testid="profile-card">Password</div>,
-}));
-
-vi.mock('./partials/delete-user-form', () => ({
-    default: () => <div data-testid="profile-card">Delete account</div>,
-}));
-
-function buildPrivacySetting(overrides: Partial<PrivacySetting> = {}): PrivacySetting {
-    return {
-        id: 1,
-        user_id: 1,
-        show_email: true,
-        email_notifications_enabled: true,
-        show_phone: false,
-        is_discoverable: true,
-        show_activity: false,
-        created_at: '2026-07-07T00:00:00.000Z',
-        updated_at: '2026-07-07T00:00:00.000Z',
-        ...overrides,
-    };
+const privacySetting: PrivacySetting = {
+    id: 1,
+    user_id: 1,
+    show_email: false,
+    show_phone: false,
+    is_discoverable: true,
+    show_activity: true,
+    email_notifications_enabled: false,
+    created_at: '2026-07-01T00:00:00Z',
+    updated_at: '2026-07-01T00:00:00Z',
 }
 
-function buildNotificationSetting(overrides: Partial<NotificationSetting> = {}): NotificationSetting {
-    return {
-        id: 1,
-        user_id: 1,
-        collaboration_emails: true,
-        created_at: '2026-07-07T00:00:00.000Z',
-        updated_at: '2026-07-07T00:00:00.000Z',
-        ...overrides,
-    };
+const notificationSetting: NotificationSetting = {
+    id: 1,
+    user_id: 1,
+    collaboration_emails: true,
+    created_at: '2026-07-01T00:00:00Z',
+    updated_at: '2026-07-01T00:00:00Z',
 }
 
-describe('Profile edit page wiring', () => {
-    it('renders the notification card next to the privacy card', () => {
-        const { container } = render(
-            <Edit
-                mustVerifyEmail={false}
-                name="Ada"
-                email="ada@example.com"
-                emailVerifiedAt={null}
-                userTechs={[]}
-                socialLinks={[] as SocialLink[]}
-                phone="555-1234"
-                privacySetting={buildPrivacySetting()}
-                notificationSetting={buildNotificationSetting()}
-            />,
-        );
+function renderEdit(overrides?: Partial<ComponentProps<typeof Edit>>) {
+    return render(
+        <Edit
+            mustVerifyEmail={false}
+            name="Ada"
+            email="ada@example.com"
+            emailVerifiedAt={null}
+            userTechs={[]}
+            phone={null}
+            privacySetting={privacySetting}
+            notificationSetting={notificationSetting}
+            socialLinks={[]}
+            {...overrides}
+        />,
+    )
+}
 
-        expect(Array.from(container.querySelectorAll('[data-testid="profile-card"]')).map((node) => node.textContent)).toEqual([
-            'Basic profile',
-            'Complete profile',
-            'Privacy settings',
-            'Notification settings',
-            'Social links',
-            'Password',
-            'Delete account',
-        ]);
-    });
+function getSection(sectionTitle: string) {
+    return screen.getByRole('region', { name: sectionTitle })
+}
 
-    it('forwards the privacy and notification props to their forms', () => {
+function getSectionFormNames(sectionTitle: string) {
+    return within(getSection(sectionTitle))
+        .getAllByRole('region')
+        .map((region) => region.getAttribute('aria-label'))
+}
+
+describe('Edit', () => {
+    const sectionTitles = [
+        'Perfil público',
+        'Cuenta y seguridad',
+        'Privacidad y notificaciones',
+        'Zona de peligro',
+    ]
+
+    beforeEach(() => {
+        mockForms.capturePrivacyProps.mockClear()
+        mockForms.captureNotificationProps.mockClear()
+    })
+
+    it('renders the approved profile edit sections in order and groups forms inside them', () => {
+        const { container } = renderEdit()
+
+        expect(container.querySelector('div.mx-auto.max-w-4xl')).toBeInTheDocument()
+
+        expect(
+            screen
+                .getAllByRole('heading', { level: 2 })
+                .map((heading) => heading.textContent)
+                .filter((title): title is string => sectionTitles.includes(title ?? '')),
+        ).toEqual(sectionTitles)
+
+        expect(getSectionFormNames('Perfil público')).toEqual([
+            'profile information section',
+            'complete profile form',
+            'social links form',
+        ])
+        expect(getSectionFormNames('Cuenta y seguridad')).toEqual(['password section'])
+        expect(getSectionFormNames('Privacidad y notificaciones')).toEqual([
+            'privacy form',
+            'notifications form',
+        ])
+        expect(getSectionFormNames('Zona de peligro')).toEqual(['delete account section'])
+    })
+
+    it('forwards privacy and notification props to their deferred forms', () => {
+        renderEdit()
+
+        expect(mockForms.capturePrivacyProps).toHaveBeenCalledOnce()
+        expect(mockForms.capturePrivacyProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                phone: null,
+                privacySetting: expect.objectContaining({
+                    is_discoverable: true,
+                    show_activity: true,
+                }),
+            }),
+        )
+        expect(mockForms.captureNotificationProps).toHaveBeenCalledOnce()
+        expect(mockForms.captureNotificationProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                notificationSetting: expect.objectContaining({
+                    collaboration_emails: true,
+                }),
+            }),
+        )
+    })
+
+    it('omits the social links wrapper when socialLinks is undefined', () => {
         render(
             <Edit
                 mustVerifyEmail={false}
@@ -119,23 +182,21 @@ describe('Profile edit page wiring', () => {
                 email="ada@example.com"
                 emailVerifiedAt={null}
                 userTechs={[]}
-                socialLinks={[] as SocialLink[]}
                 phone={null}
-                privacySetting={buildPrivacySetting({ show_phone: true })}
-                notificationSetting={buildNotificationSetting({ collaboration_emails: false })}
+                privacySetting={privacySetting}
+                notificationSetting={notificationSetting}
             />,
-        );
+        )
 
-        expect(mockState.privacyProps).toMatchObject({
-            phone: null,
-            privacySetting: expect.objectContaining({
-                show_phone: true,
-            }),
-        });
-        expect(mockState.notificationProps).toMatchObject({
-            notificationSetting: expect.objectContaining({
-                collaboration_emails: false,
-            }),
-        });
-    });
-});
+        expect(getSectionFormNames('Perfil público')).toEqual([
+            'profile information section',
+            'complete profile form',
+        ])
+        expect(getSectionFormNames('Cuenta y seguridad')).toEqual(['password section'])
+        expect(getSectionFormNames('Privacidad y notificaciones')).toEqual([
+            'privacy form',
+            'notifications form',
+        ])
+        expect(getSectionFormNames('Zona de peligro')).toEqual(['delete account section'])
+    })
+})

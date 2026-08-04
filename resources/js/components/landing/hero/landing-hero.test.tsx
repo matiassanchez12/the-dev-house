@@ -50,11 +50,14 @@ describe('LandingHero', () => {
         expect(section).not.toHaveClass('overflow-hidden')
     })
 
-    it('renders a live trust badge, one headline, both CTAs, and a visible wordmark', () => {
+    it('renders the current headline copy, supporting text, and both CTAs for guests', () => {
         render(<LandingHero auth={{ user: null }} techs={[]} user_count={12} />)
 
-        expect(screen.getByText('+12 developers building now')).toBeVisible()
         expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+            'Construí con otros developers',
+        )
+        expect(screen.getByText(/The Dev House conecta developers para descubrir proyectos reales/i)).toBeVisible()
 
         const primaryCta = screen.getByRole('link', { name: 'Crear mi perfil' })
         const secondaryCta = screen.getByRole('link', { name: 'Ver proyectos' })
@@ -62,17 +65,19 @@ describe('LandingHero', () => {
         expect(primaryCta).toHaveAttribute('href', '/register')
         expect(secondaryCta).toHaveAttribute('href', '/projects.index')
         expect(primaryCta.querySelector('svg')).not.toBeNull()
-        expect(screen.getByText(/build with intent/i)).toBeVisible()
+        expect(screen.queryByText(/developers building now/i)).not.toBeInTheDocument()
     })
 
-    it('keeps the badge valid at zero and switches the primary path for authenticated visitors', () => {
+    it('switches the primary CTA for authenticated visitors without rendering the old trust badge copy', () => {
         render(<LandingHero auth={{ user: { id: 7, name: 'Ada' } }} techs={[]} user_count={0} />)
-
-        expect(screen.getByText('+0 developers building now')).toBeVisible()
 
         const primaryCta = screen.getByRole('link', { name: 'Crear proyecto' })
 
         expect(primaryCta).toHaveAttribute('href', '/projects.create')
-        expect(screen.getByText(/build with intent/i)).toBeVisible()
+        expect(screen.getByRole('link', { name: 'Ver proyectos' })).toHaveAttribute(
+            'href',
+            '/projects.index',
+        )
+        expect(screen.queryByText(/developers building now/i)).not.toBeInTheDocument()
     })
 })
