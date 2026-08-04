@@ -39,7 +39,7 @@ vi.mock('@/components/ui/avatar', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-    Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Card: ({ children, className }: { children: ReactNode; className?: string }) => <div data-testid="follow-card" className={className}>{children}</div>,
     CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
@@ -80,7 +80,7 @@ beforeEach(() => {
 });
 
 describe('ProjectFollowCard', () => {
-    it('shows empty state with "Sé el primero en seguir" when no followers', () => {
+    it('shows the visitor empty state copy when there are no followers', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -94,12 +94,12 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('Sé el primero en seguir')).toBeInTheDocument();
-        expect(screen.getByText('Nadie sigue este proyecto todavía')).toBeInTheDocument();
+        expect(screen.getByText('Sé el primero en seguir este proyecto')).toBeInTheDocument();
+        expect(screen.getByText('Recibí novedades apenas haya actividad')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Seguir/ })).toBeInTheDocument();
     });
 
-    it('shows follower count and avatar preview when followers exist', () => {
+    it('shows the visitor populated state copy and avatar preview when followers exist', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -117,7 +117,8 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('3 seguidores')).toBeInTheDocument();
+        expect(screen.getByText('3 personas siguen este proyecto')).toBeInTheDocument();
+        expect(screen.getByText('Sumate para recibir las novedades')).toBeInTheDocument();
         expect(screen.getByText('AL')).toBeInTheDocument();
         expect(screen.getByText('GH')).toBeInTheDocument();
         expect(screen.getByText('+1')).toBeInTheDocument();
@@ -141,6 +142,7 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
+        expect(screen.getByText('1 persona sigue este proyecto')).toBeInTheDocument();
         expect(screen.getByText('Vos sos el único que sigue este proyecto')).toBeInTheDocument();
     });
 
@@ -217,7 +219,7 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('12 seguidores')).toBeInTheDocument();
+        expect(screen.getByText('12 personas siguen este proyecto')).toBeInTheDocument();
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('button', { name: /Seguir/ }));
@@ -230,7 +232,27 @@ describe('ProjectFollowCard', () => {
         expect(deleteMock).not.toHaveBeenCalled();
     });
 
-    it('renders a read-only avatar summary for creators without follow actions', () => {
+    it('shows the creator empty state copy without follow actions', () => {
+        Object.defineProperty(globalThis, 'route', {
+            configurable: true,
+            value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
+        });
+
+        render(
+            <ProjectFollowCard
+                projectSlug="alpha"
+                followersCount={0}
+                isAuthenticated
+                readOnly
+            />,
+        );
+
+        expect(screen.getByText('Todavía no tenés seguidores')).toBeInTheDocument();
+        expect(screen.getByText('Compartí tu proyecto para que más gente lo descubra y lo siga')).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Seguir|Siguiendo/ })).not.toBeInTheDocument();
+    });
+
+    it('shows the creator populated state copy and avatar preview without follow actions', () => {
         Object.defineProperty(globalThis, 'route', {
             configurable: true,
             value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
@@ -249,11 +271,33 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('3 seguidores')).toBeInTheDocument();
+        expect(screen.getByText('3 personas siguen tu proyecto')).toBeInTheDocument();
+        expect(screen.getByText('Tu proyecto está generando interés')).toBeInTheDocument();
         expect(screen.getByText('AL')).toBeInTheDocument();
         expect(screen.getByText('GH')).toBeInTheDocument();
         expect(screen.getByText('+1')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Seguir|Siguiendo/ })).not.toBeInTheDocument();
+    });
+
+    it('uses the high-contrast image treatment when rendered over a hero image', () => {
+        Object.defineProperty(globalThis, 'route', {
+            configurable: true,
+            value: vi.fn((name: string, slug?: string) => `/${name}/${slug ?? ''}`),
+        });
+
+        render(
+            <ProjectFollowCard
+                projectSlug="alpha"
+                followersCount={3}
+                isAuthenticated={false}
+                onImageBackground
+            />,
+        );
+
+        expect(screen.getByTestId('follow-card')).toHaveClass('bg-black/45', 'text-white');
+        expect(screen.getByText('3 personas siguen este proyecto')).toHaveClass('text-white');
+        expect(screen.getByText('Sumate para recibir las novedades')).toHaveClass('text-white/80');
+        expect(screen.getByRole('button', { name: /Seguir/ })).toHaveClass('border-white/20', 'text-white');
     });
 
     it('shows the follower count even when preview data is missing', () => {
@@ -271,7 +315,7 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('3 seguidores')).toBeInTheDocument();
+        expect(screen.getByText('3 personas siguen este proyecto')).toBeInTheDocument();
         expect(screen.queryByText('AL')).not.toBeInTheDocument();
         expect(screen.queryByText('+1')).not.toBeInTheDocument();
     });
@@ -293,7 +337,7 @@ describe('ProjectFollowCard', () => {
             />,
         );
 
-        expect(screen.getByText('2 seguidores')).toBeInTheDocument();
+        expect(screen.getByText('2 personas siguen este proyecto')).toBeInTheDocument();
         expect(screen.getByText('AL')).toBeInTheDocument();
         expect(screen.getByText('+1')).toBeInTheDocument();
     });

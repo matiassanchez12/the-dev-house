@@ -5,6 +5,7 @@ import type { User } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
     Dialog,
     DialogContent,
@@ -23,6 +24,7 @@ interface ProjectFollowCardProps {
     isAuthenticated: boolean;
     isFollowing?: boolean;
     readOnly?: boolean;
+    onImageBackground?: boolean;
 }
 
 function getInitials(name: string): string {
@@ -34,34 +36,46 @@ function getInitials(name: string): string {
         .toUpperCase();
 }
 
+function getFollowerTitle(followersCount: number, readOnly: boolean): string {
+    if (followersCount === 0) {
+        return readOnly ? 'Todavía no tenés seguidores' : 'Sé el primero en seguir este proyecto';
+    }
+
+    const peopleLabel = followersCount === 1 ? '1 persona sigue' : `${followersCount} personas siguen`;
+
+    return readOnly ? `${peopleLabel} tu proyecto` : `${peopleLabel} este proyecto`;
+}
+
 function FollowerSubtext({
     followersCount,
-    followersPreview,
     isFollowing,
+    readOnly,
+    onImageBackground,
 }: {
     followersCount: number;
-    followersPreview: User[];
     isFollowing: boolean;
+    readOnly: boolean;
+    onImageBackground: boolean;
 }) {
     if (followersCount === 0) {
-        return <p className="text-xs text-muted-foreground">Nadie sigue este proyecto todavía</p>;
+        return (
+            <p className={cn('text-xs', onImageBackground ? 'text-white/80' : 'text-muted-foreground')}>
+                {readOnly
+                    ? 'Compartí tu proyecto para que más gente lo descubra y lo siga'
+                    : 'Recibí novedades apenas haya actividad'}
+            </p>
+        );
     }
 
-    const names = followersPreview.slice(0, Math.min(2, followersCount)).map((f) => f.name);
-    const remaining = Math.max(followersCount - names.length, 0);
-
-    if (followersCount === 1 && isFollowing && names.length === 1) {
-        return <p className="text-xs text-muted-foreground">Vos sos el único que sigue este proyecto</p>;
+    if (readOnly) {
+        return <p className={cn('text-xs', onImageBackground ? 'text-white/80' : 'text-muted-foreground')}>Tu proyecto está generando interés</p>;
     }
 
-    if (remaining === 0) {
-        return <></>;
+    if (followersCount === 1 && isFollowing) {
+        return <p className={cn('text-xs', onImageBackground ? 'text-white/80' : 'text-muted-foreground')}>Vos sos el único que sigue este proyecto</p>;
     }
 
-    return (
-        <p className="text-xs text-muted-foreground">
-        </p>
-    );
+    return <p className={cn('text-xs', onImageBackground ? 'text-white/80' : 'text-muted-foreground')}>Sumate para recibir las novedades</p>;
 }
 
 export function ProjectFollowCard({
@@ -71,6 +85,7 @@ export function ProjectFollowCard({
     isAuthenticated,
     isFollowing = false,
     readOnly = false,
+    onImageBackground = false,
 }: ProjectFollowCardProps) {
     const [processing, setProcessing] = useState(false);
     const [guestDialogOpen, setGuestDialogOpen] = useState(false);
@@ -121,11 +136,23 @@ export function ProjectFollowCard({
     }
 
     return (
-        <Card className="border-border/60 bg-card shadow-sm bg-transparent">
+        <Card
+            className={cn(
+                'shadow-sm backdrop-blur-md',
+                onImageBackground
+                    ? 'border-white/15 bg-black/45 text-white shadow-black/25 supports-[backdrop-filter]:bg-black/35'
+                    : 'border-border/70 bg-background/90 supports-[backdrop-filter]:bg-background/80',
+            )}
+        >
             <CardContent className="flex items-center justify-between gap-3 p-5">
                 <div className="flex items-center gap-3">
                     {followersCount === 0 || visibleFollowers.length === 0 ? (
-                        <div className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <div
+                            className={cn(
+                                'flex size-[38px] shrink-0 items-center justify-center rounded-full',
+                                onImageBackground ? 'bg-white/15 text-white' : 'bg-primary/10 text-primary',
+                            )}
+                        >
                             <Users className="size-5" aria-hidden="true" />
                         </div>
                     ) : (
@@ -143,17 +170,14 @@ export function ProjectFollowCard({
                     )}
 
                     <div>
-                        <p className="text-sm font-medium text-foreground">
-                            {followersCount === 0
-                                ? readOnly
-                                    ? 'Todavía no hay seguidores'
-                                    : 'Sé el primero en seguir'
-                                : `${followersCount} seguidores`}
+                        <p className={cn('text-sm font-medium', onImageBackground ? 'text-white' : 'text-foreground')}>
+                            {getFollowerTitle(followersCount, readOnly)}
                         </p>
                         <FollowerSubtext
                             followersCount={followersCount}
-                            followersPreview={followersPreview}
                             isFollowing={isFollowing}
+                            readOnly={readOnly}
+                            onImageBackground={onImageBackground}
                         />
                     </div>
                 </div>
@@ -164,6 +188,9 @@ export function ProjectFollowCard({
                         variant={isFollowing ? 'default' : 'outline'}
                         size="sm"
                         aria-pressed={isFollowing}
+                        className={cn(
+                            onImageBackground && !isFollowing && 'border-white/20 bg-black/25 text-white hover:bg-black/40 hover:text-white',
+                        )}
                         onClick={isFollowing ? handleUnfollow : handleFollow}
                     >
                         {isFollowing ? (
@@ -180,7 +207,19 @@ export function ProjectFollowCard({
                     </Button>
                 ) : (
                     <Dialog open={guestDialogOpen} onOpenChange={setGuestDialogOpen}>
-                        <DialogTrigger render={<Button type="button" variant="outline" size="sm" onClick={handleGuestFollow} />}>
+                        <DialogTrigger
+                            render={(
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className={cn(
+                                        onImageBackground && 'border-white/20 bg-black/25 text-white hover:bg-black/40 hover:text-white',
+                                    )}
+                                    onClick={handleGuestFollow}
+                                />
+                            )}
+                        >
                             <Bell className="me-1 size-4" aria-hidden="true" />
                             Seguir
                         </DialogTrigger>

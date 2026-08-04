@@ -36,6 +36,7 @@ type FollowCardProps = {
     projectSlug: string;
     isAuthenticated: boolean;
     readOnly?: boolean;
+    onImageBackground?: boolean;
 };
 
 let capturedJoinFormProps: JoinFormProps | undefined;
@@ -183,12 +184,13 @@ describe('Project show page wiring', () => {
 
         const hero = screen.getByRole('region', { name: 'Project hero' });
 
-        expect(within(hero).getByText('3 seguidores')).toBeInTheDocument();
+        expect(within(hero).getByText('3 personas siguen este proyecto')).toBeInTheDocument();
         expect(within(hero).getByRole('button', { name: /Seguir/ })).toBeInTheDocument();
         expect(capturedFollowCardProps).toMatchObject({
             projectSlug: 'collab-app',
             isAuthenticated: false,
             readOnly: false,
+            onImageBackground: false,
         });
     });
 
@@ -204,13 +206,15 @@ describe('Project show page wiring', () => {
 
         const hero = screen.getByRole('region', { name: 'Project hero' });
 
-        expect(within(hero).getByText('8 seguidores')).toBeInTheDocument();
+        expect(within(hero).getByText('8 personas siguen tu proyecto')).toBeInTheDocument();
+        expect(within(hero).getByText('Tu proyecto está generando interés')).toBeInTheDocument();
         expect(within(hero).queryByRole('button', { name: /Seguir/ })).not.toBeInTheDocument();
         expect(within(hero).queryByRole('button', { name: /Siguiendo/ })).not.toBeInTheDocument();
         expect(capturedFollowCardProps).toMatchObject({
             projectSlug: 'collab-app',
             isAuthenticated: true,
             readOnly: true,
+            onImageBackground: false,
         });
     });
 
@@ -229,8 +233,11 @@ describe('Project show page wiring', () => {
         const hero = screen.getByRole('region', { name: 'Project hero' });
 
         expect(within(hero).getByRole('img', { name: 'Collab App' })).toBeInTheDocument();
-        expect(within(hero).getByText('3 seguidores')).toBeInTheDocument();
+        expect(within(hero).getByText('3 personas siguen este proyecto')).toBeInTheDocument();
         expect(within(hero).getByRole('button', { name: /Seguir/ })).toBeInTheDocument();
+        expect(capturedFollowCardProps).toMatchObject({
+            onImageBackground: true,
+        });
     });
 
     it('renders the read-only follow section inside the image-backed hero for creators', () => {
@@ -248,8 +255,12 @@ describe('Project show page wiring', () => {
         const hero = screen.getByRole('region', { name: 'Project hero' });
 
         expect(within(hero).getByRole('img', { name: 'Collab App' })).toBeInTheDocument();
-        expect(within(hero).getByText('8 seguidores')).toBeInTheDocument();
+        expect(within(hero).getByText('8 personas siguen tu proyecto')).toBeInTheDocument();
+        expect(within(hero).getByText('Tu proyecto está generando interés')).toBeInTheDocument();
         expect(within(hero).queryByRole('button', { name: /Seguir/ })).not.toBeInTheDocument();
         expect(within(hero).queryByRole('button', { name: /Siguiendo/ })).not.toBeInTheDocument();
+        expect(capturedFollowCardProps).toMatchObject({
+            onImageBackground: true,
+        });
     });
 });

@@ -106,6 +106,7 @@ export default function Show({ auth, project }: Props) {
                                 isAuthenticated={auth.user !== null}
                                 isFollowing={project.is_followed_by_viewer ?? false}
                                 readOnly={isCreator}
+                                onImageBackground={(project.images?.length ?? 0) > 0}
                             />
                         )}
                     />
