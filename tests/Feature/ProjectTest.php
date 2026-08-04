@@ -617,6 +617,182 @@ class ProjectTest extends TestCase
         $this->assertEquals(['projects/legit.jpg'], $project->fresh()->images);
     }
 
+    public function test_update_rejects_new_images_when_total_image_count_would_exceed_five(): void
+    {
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => [
+                'projects/one.jpg',
+                'projects/two.jpg',
+                'projects/three.jpg',
+                'projects/four.jpg',
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'images' => [
+                    $this->fakePngUpload('five.png'),
+                    $this->fakePngUpload('six.png'),
+                ],
+            ]);
+
+        $response->assertSessionHasErrors('images');
+        $this->assertCount(4, $project->fresh()->images);
+    }
+
+    public function test_update_allows_one_new_image_when_four_existing_images_reach_the_five_image_limit(): void
+    {
+        $disk = 'public';
+        Storage::fake($disk);
+
+        $existingImages = [
+            'projects/one.jpg',
+            'projects/two.jpg',
+            'projects/three.jpg',
+            'projects/four.jpg',
+        ];
+
+        foreach ($existingImages as $path) {
+            Storage::disk($disk)->put($path, 'fake-bytes');
+        }
+
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => $existingImages,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'images' => [
+                    $this->fakePngUpload('five.png'),
+                ],
+            ]);
+
+        $response->assertRedirect();
+
+        $updatedProject = $project->fresh();
+        $newImages = array_values(array_diff($updatedProject->images, $existingImages));
+
+        $this->assertCount(5, $updatedProject->images);
+        $this->assertCount(1, $newImages);
+
+        foreach ($newImages as $path) {
+            Storage::disk($disk)->assertExists($path);
+        }
+    }
+
+    public function test_update_rejects_new_images_when_five_existing_images_are_retained(): void
+    {
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => [
+                'projects/one.jpg',
+                'projects/two.jpg',
+                'projects/three.jpg',
+                'projects/four.jpg',
+                'projects/five.jpg',
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'images' => [
+                    $this->fakePngUpload('six.png'),
+                ],
+            ]);
+
+        $response->assertSessionHasErrors('images');
+        $this->assertCount(5, $project->fresh()->images);
+    }
+
+    public function test_update_allows_new_images_when_removed_images_free_enough_capacity(): void
+    {
+        $disk = 'public';
+        Storage::fake($disk);
+
+        $existingImages = [
+            'projects/one.jpg',
+            'projects/two.jpg',
+            'projects/three.jpg',
+            'projects/four.jpg',
+        ];
+
+        foreach ($existingImages as $path) {
+            Storage::disk($disk)->put($path, 'fake-bytes');
+        }
+
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => $existingImages,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => $project->title,
+                'description' => $project->description,
+                'techs' => $this->techIds,
+                'remove_images' => ['projects/one.jpg'],
+                'images' => [
+                    $this->fakePngUpload('five.png'),
+                    $this->fakePngUpload('six.png'),
+                ],
+            ]);
+
+        $response->assertRedirect();
+
+        $updatedProject = $project->fresh();
+        $newImages = array_values(array_diff($updatedProject->images, $existingImages));
+
+        $this->assertCount(5, $updatedProject->images);
+        $this->assertNotContains('projects/one.jpg', $updatedProject->images);
+        $this->assertCount(2, $newImages);
+        Storage::disk($disk)->assertMissing('projects/one.jpg');
+
+        foreach ($newImages as $path) {
+            Storage::disk($disk)->assertExists($path);
+        }
+    }
+
+    public function test_update_allows_legacy_projects_over_the_image_cap_when_no_new_images_are_uploaded(): void
+    {
+        $project = Project::factory()->create([
+            'user_id' => $this->user->id,
+            'images' => [
+                'projects/one.jpg',
+                'projects/two.jpg',
+                'projects/three.jpg',
+                'projects/four.jpg',
+                'projects/five.jpg',
+                'projects/six.jpg',
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put("/projects/{$project->slug}", [
+                'title' => 'Updated title',
+                'description' => 'Updated description',
+                'techs' => $this->techIds,
+            ]);
+
+        $response->assertRedirect();
+
+        $updatedProject = $project->fresh();
+
+        $this->assertSame('Updated title', $updatedProject->title);
+        $this->assertSame('Updated description', $updatedProject->description);
+        $this->assertCount(6, $updatedProject->images);
+    }
+
     /**
      * TEST 20: deleteImages guard rejects paths outside projects/ prefix
      *
@@ -652,5 +828,13 @@ class ProjectTest extends TestCase
         Storage::disk($disk)->assertExists($victimAvatar);
         Storage::disk($disk)->assertExists($victimRoot);
         Storage::disk($disk)->assertMissing($projectImage);
+    }
+
+    private function fakePngUpload(string $name): UploadedFile
+    {
+        return UploadedFile::fake()->createWithContent(
+            $name,
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Z4r0AAAAASUVORK5CYII=')
+        );
     }
 }

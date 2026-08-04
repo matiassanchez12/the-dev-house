@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type {
     ButtonHTMLAttributes,
     ComponentProps,
@@ -7,6 +8,7 @@ import type {
     ReactNode,
     TextareaHTMLAttributes,
 } from 'react'
+import { createProjectFormData, type ProjectFormData } from './project-form-contract'
 import type { Tech, TechCategory } from '@/types'
 import { describe, expect, it, vi } from 'vitest'
 import { ProjectForm } from './project-form'
@@ -96,23 +98,51 @@ describe('ProjectForm', () => {
         expect(screen.getByLabelText('Laravel')).toBeInTheDocument()
         expect(screen.getByLabelText('TypeScript')).toBeInTheDocument()
     })
+
+    it('adds and removes selected tech ids without changing the payload shape', async () => {
+        const user = userEvent.setup()
+        const setData = vi.fn()
+
+        render(
+            <ProjectForm
+                mode="create"
+                techs={[
+                    buildTech({ id: 1, name: 'React', slug: 'react', category: 'frontend' }),
+                    buildTech({ id: 2, name: 'Laravel', slug: 'laravel', category: 'backend' }),
+                ]}
+                form={buildForm({
+                    setData,
+                    data: {
+                        techs: [1],
+                    },
+                })}
+                onSubmit={vi.fn()}
+                cancelUrl="/projects"
+                submitLabel="Create project"
+            />,
+        )
+
+        await user.click(screen.getByLabelText('Laravel'))
+        expect(setData).toHaveBeenNthCalledWith(1, 'techs', [1, 2])
+
+        await user.click(screen.getByLabelText('React'))
+        expect(setData).toHaveBeenNthCalledWith(2, 'techs', [])
+    })
 })
 
-function buildForm(): ComponentProps<typeof ProjectForm>['form'] {
+function buildForm(
+    overrides: Partial<{
+        data: Partial<ProjectFormData>
+        setData: ComponentProps<typeof ProjectForm>['form']['setData']
+        processing: boolean
+        errors: ComponentProps<typeof ProjectForm>['form']['errors']
+    }> = {},
+): ComponentProps<typeof ProjectForm>['form'] {
     return {
-        data: {
-            title: '',
-            description: '',
-            vision: '',
-            techs: [] as number[],
-            repository_url: '',
-            demo_url: '',
-            images: [] as File[],
-            remove_images: [] as string[],
-        },
-        setData: vi.fn(),
-        processing: false,
-        errors: {},
+        data: createProjectFormData(overrides.data),
+        setData: overrides.setData ?? vi.fn(),
+        processing: overrides.processing ?? false,
+        errors: overrides.errors ?? {},
     } as unknown as ComponentProps<typeof ProjectForm>['form']
 }
 

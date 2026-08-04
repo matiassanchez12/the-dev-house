@@ -1,21 +1,21 @@
-import { useState, useCallback, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog';
-import { FormError } from '@/components/ui/form-error';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import type { ProjectImage } from '@/types';
+import { useState, useCallback, useRef } from 'react'
+import { Button } from '@/components/ui/button'
+import { ImageGalleryDialog } from '@/components/ui/image-gallery-dialog'
+import { FormError } from '@/components/ui/form-error'
+import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import type { ProjectImage } from '@/types'
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const MAX_FILES = 5;
+const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
+const MAX_FILES = 5
 
 interface ImageUploaderProps {
-    files: File[];
-    existingImages?: ProjectImage[];
-    onFilesChange: (files: File[]) => void;
-    onRemoveExisting?: (imagePath: string) => void;
-    error?: string;
+    files: File[]
+    existingImages?: ProjectImage[]
+    onFilesChange: (files: File[]) => void
+    onRemoveExisting?: (imagePath: string) => void
+    error?: string
 }
 
 export function ImageUploader({
@@ -25,91 +25,92 @@ export function ImageUploader({
     onRemoveExisting,
     error,
 }: ImageUploaderProps) {
-    const [isDragOver, setIsDragOver] = useState(false);
-    const [galleryOpen, setGalleryOpen] = useState(false);
-    const [galleryIndex, setGalleryIndex] = useState(0);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [isDragOver, setIsDragOver] = useState(false)
+    const [galleryOpen, setGalleryOpen] = useState(false)
+    const [galleryIndex, setGalleryIndex] = useState(0)
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const validateAndAddFiles = useCallback(
         (newFiles: FileList | File[]) => {
-            const fileArray = Array.from(newFiles);
-            const remainingSlots = MAX_FILES - files.length;
+            const fileArray = Array.from(newFiles)
+            const remainingSlots = MAX_FILES - (files.length + existingImages.length)
 
             if (remainingSlots <= 0) {
-                toast.error(`Máximo ${MAX_FILES} imágenes permitidas`);
-                return;
+                toast.error(`Máximo ${MAX_FILES} imágenes permitidas`)
+                return
             }
 
-            const toAdd = fileArray.slice(0, remainingSlots);
-            const validFiles: File[] = [];
+            const validFiles: File[] = []
 
-            for (const file of toAdd) {
+            for (const file of fileArray) {
+                if (validFiles.length >= remainingSlots) {
+                    break
+                }
+
                 if (!file.type.startsWith('image/')) {
-                    toast.error(`${file.name} no es una imagen válida`);
-                    continue;
+                    toast.error(`${file.name} no es una imagen válida`)
+                    continue
                 }
                 if (file.size > MAX_FILE_SIZE) {
-                    toast.error(
-                        `${file.name} excede el tamaño máximo de 2MB`
-                    );
-                    continue;
+                    toast.error(`${file.name} excede el tamaño máximo de 2MB`)
+                    continue
                 }
-                validFiles.push(file);
+                validFiles.push(file)
             }
 
             if (validFiles.length > 0) {
-                onFilesChange([...files, ...validFiles]);
+                onFilesChange([...files, ...validFiles])
             }
         },
-        [files, onFilesChange]
-    );
+        [existingImages.length, files, onFilesChange],
+    )
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragOver(true);
-    }, []);
+        e.preventDefault()
+        setIsDragOver(true)
+    }, [])
 
     const handleDragLeave = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragOver(false);
-    }, []);
+        e.preventDefault()
+        setIsDragOver(false)
+    }, [])
 
     const handleDrop = useCallback(
         (e: React.DragEvent) => {
-            e.preventDefault();
-            setIsDragOver(false);
+            e.preventDefault()
+            setIsDragOver(false)
             if (e.dataTransfer.files) {
-                validateAndAddFiles(e.dataTransfer.files);
+                validateAndAddFiles(e.dataTransfer.files)
             }
         },
-        [validateAndAddFiles]
-    );
+        [validateAndAddFiles],
+    )
 
     const handleBrowse = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.files) {
-                validateAndAddFiles(e.target.files);
-                e.target.value = '';
+                validateAndAddFiles(e.target.files)
+                e.target.value = ''
             }
         },
-        [validateAndAddFiles]
-    );
+        [validateAndAddFiles],
+    )
 
     const handleRemoveFile = useCallback(
         (index: number) => {
-            onFilesChange(files.filter((_, i) => i !== index));
+            onFilesChange(files.filter((_, i) => i !== index))
         },
-        [files, onFilesChange]
-    );
+        [files, onFilesChange],
+    )
 
     const handleOpenExistingGallery = (index: number) => {
-        setGalleryIndex(index);
-        setGalleryOpen(true);
-    };
+        setGalleryIndex(index)
+        setGalleryOpen(true)
+    }
 
-    const totalImages = files.length + existingImages.length;
+    const totalImages = files.length + existingImages.length
 
-    const existingImageUrls = existingImages.map((img) => img.url);
+    const existingImageUrls = existingImages.map((img) => img.url)
 
     return (
         <>
@@ -124,7 +125,7 @@ export function ImageUploader({
                         'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 cursor-pointer transition-colors',
                         isDragOver
                             ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50',
                     )}
                 >
                     <Upload className="size-8 text-muted-foreground" />
@@ -141,6 +142,7 @@ export function ImageUploader({
                         type="file"
                         accept="image/*"
                         multiple
+                        aria-label="Seleccionar imágenes del proyecto"
                         onChange={handleBrowse}
                         className="hidden"
                     />
@@ -165,9 +167,10 @@ export function ImageUploader({
                                             variant="destructive"
                                             size="icon"
                                             className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            aria-label={`Eliminar imagen actual ${index + 1}`}
                                             onClick={(e) => {
-                                                e.stopPropagation();
-                                                onRemoveExisting(image.path);
+                                                e.stopPropagation()
+                                                onRemoveExisting(image.path)
                                             }}
                                         >
                                             <X className="size-3" />
@@ -195,8 +198,8 @@ export function ImageUploader({
                                             className="size-full object-cover"
                                             onLoad={(e) => {
                                                 URL.revokeObjectURL(
-                                                    (e.target as HTMLImageElement).src
-                                                );
+                                                    (e.target as HTMLImageElement).src,
+                                                )
                                             }}
                                         />
                                     </div>
@@ -205,6 +208,7 @@ export function ImageUploader({
                                         variant="destructive"
                                         size="icon"
                                         className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        aria-label={`Eliminar ${file.name}`}
                                         onClick={() => handleRemoveFile(index)}
                                     >
                                         <X className="size-3" />
@@ -235,5 +239,5 @@ export function ImageUploader({
                 onOpenChange={setGalleryOpen}
             />
         </>
-    );
+    )
 }
