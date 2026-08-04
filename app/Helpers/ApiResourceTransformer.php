@@ -62,6 +62,22 @@ class ApiResourceTransformer
             $data['phases'] = array_map(fn ($phase) => self::phase($phase), $data['phases']);
         }
 
+        if (array_key_exists('followers_count', $data) && $data['followers_count'] !== null) {
+            $data['followers_count'] = (int) $data['followers_count'];
+        }
+
+        if (array_key_exists('is_followed_by_viewer', $data)) {
+            $data['is_followed_by_viewer'] = (bool) $data['is_followed_by_viewer'];
+        }
+
+        if (array_key_exists('has_unread_public_updates', $data)) {
+            $data['has_unread_public_updates'] = (bool) $data['has_unread_public_updates'];
+        }
+
+        if (isset($data['followers_preview']) && is_array($data['followers_preview'])) {
+            $data['followers_preview'] = array_map(fn ($follower) => self::user($follower), $data['followers_preview']);
+        }
+
         if ($viewerRole !== null) {
             $data['viewer_role'] = $viewerRole;
         }

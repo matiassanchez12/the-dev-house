@@ -48,7 +48,9 @@ class MilestonesTest extends TestCase
             'project_id' => $secondProject->id,
             'title' => 'Newest milestone',
             'description' => 'Latest release',
-            'completed_at' => now(),
+            'completed_at' => now()->subDay(),
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
         ]);
 
         Phase::factory()->create([
@@ -63,6 +65,8 @@ class MilestonesTest extends TestCase
             'title' => 'Newer pending milestone',
             'description' => 'Created second without a completion date',
             'completed_at' => null,
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDays(3),
         ]);
 
         $response = $this->get(route('milestones.index'));

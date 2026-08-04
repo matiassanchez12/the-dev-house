@@ -99,4 +99,13 @@ class Project extends Model
         return $this->belongsToMany(User::class, 'project_participants')
                     ->withTimestamps();
     }
+
+    /**
+     * Users following this project.
+     */
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'project_follows')
+            ->withTimestamps();
+    }
 }

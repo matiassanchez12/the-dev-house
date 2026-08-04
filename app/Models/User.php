@@ -84,6 +84,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Projects this user follows.
+     */
+    public function followedProjects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_follows')
+            ->withPivot('seen_at')
+            ->withTimestamps();
+    }
+
+    /**
      * Techs que conoce este usuario
      */
     public function techs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

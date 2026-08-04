@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
 import Seo from '@/components/seo';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Users } from 'lucide-react';
 import { Message, Phase, Project as ProjectType, Tech, User } from '@/types';
 import {
@@ -14,6 +13,7 @@ import {
     ProjectCreatorCard,
     ProjectTechsCard,
     ProjectLinksCard,
+    ProjectFollowCard,
     ProjectJoinForm,
     ProjectChatSummary,
     ProjectPhasesSection,
@@ -36,17 +36,25 @@ interface Props {
         messages?: Message[];
         phases?: Phase[];
         messages_count?: number;
+        followers_count?: number;
+        is_followed_by_viewer?: boolean;
         viewerJoinRequest?: ViewerJoinRequest;
     };
 }
 
 export default function Show({ auth, project }: Props) {
-    const viewerRole = project.viewer_role ?? 'guest';
+    const currentUser = auth.user;
+    const fallbackViewerRole = currentUser === null
+        ? 'guest'
+        : project.creator.id === currentUser.id || project.user_id === currentUser.id
+            ? 'creator'
+            : project.participants?.some((participant) => participant.id === currentUser.id)
+                ? 'member'
+                : 'guest';
+    const viewerRole = project.viewer_role ?? fallbackViewerRole;
     const isCreator = viewerRole === 'creator';
-    const isParticipant = useMemo(
-        () => project.participants?.some((p) => p.id === auth.user?.id) ?? false,
-        [project.participants, auth.user?.id],
-    );
+    const isParticipant = viewerRole === 'member';
+    const hasProjectAccess = isCreator || isParticipant;
     const viewerPendingInvitation = project.viewerPendingInvitation ?? null;
 
     return (
@@ -58,14 +66,18 @@ export default function Show({ auth, project }: Props) {
                     </h2>
                     {isCreator && (
                         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
-                            <Link href={route('projects.collaborators', project.slug)} className="flex-1 sm:flex-none">
-                                <Button variant="ghost" size="sm" className="w-full sm:w-auto">
-                                    <Users className="size-4" />
-                                    Colaboradores
-                                </Button>
+                            <Link
+                                href={route('projects.collaborators', project.slug)}
+                                className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'flex-1 w-full justify-center sm:flex-none sm:w-auto' })}
+                            >
+                                <Users className="size-4" />
+                                Colaboradores
                             </Link>
-                            <Link href={route('projects.edit', project.slug)} className="flex-1 sm:flex-none">
-                                <Button variant="outline" size="sm" className="w-full sm:w-auto">Editar</Button>
+                            <Link
+                                href={route('projects.edit', project.slug)}
+                                className={buttonVariants({ variant: 'outline', size: 'sm', className: 'flex-1 w-full justify-center sm:flex-none sm:w-auto' })}
+                            >
+                                Editar
                             </Link>
                             <div className="flex-1 sm:flex-none [&>button]:w-full sm:[&>button]:w-auto">
                                 <ProjectDeleteDialog
@@ -86,7 +98,16 @@ export default function Show({ auth, project }: Props) {
                         title={project.title}
                         status={project.status}
                         images={project.images}
-                        creatorName={project.creator.name}
+                        followSection={(
+                            <ProjectFollowCard
+                                projectSlug={project.slug}
+                                followersCount={project.followers_count ?? 0}
+                                followersPreview={project.followers_preview ?? []}
+                                isAuthenticated={auth.user !== null}
+                                isFollowing={project.is_followed_by_viewer ?? false}
+                                readOnly={isCreator}
+                            />
+                        )}
                     />
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -129,12 +150,12 @@ export default function Show({ auth, project }: Props) {
                                 user={auth.user}
                                 viewerJoinRequest={project.viewerJoinRequest}
                             />
-                            {(isParticipant || isCreator) && (
-                            <ProjectChatSummary
-                                projectSlug={project.slug}
-                                messagesCount={project.messages_count}
-                                messages={project.messages}
-                            />
+                            {hasProjectAccess && (
+                                <ProjectChatSummary
+                                    projectSlug={project.slug}
+                                    messagesCount={project.messages_count}
+                                    messages={project.messages}
+                                />
                             )}
                         </div>
                     </div>
