@@ -46,12 +46,11 @@ export default function Landing({
                 {/* Hero */}
                 <LandingHero auth={auth} techs={techs} user_count={user_count} />
 
-                {/* <LandingStats
+                <LandingStats
                     user_count={user_count}
                     project_count={project_count}
                     collaboration_count={collaboration_count}
                 />
-                */}
 
                 {/* Manifesto */}
                 <LandingManifesto />
