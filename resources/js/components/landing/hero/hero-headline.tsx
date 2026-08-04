@@ -3,6 +3,10 @@ import type { HeroHeadlineProps } from './types'
 export function HeroHeadline({ userCount }: HeroHeadlineProps) {
     return (
         <div className="text-center max-w-3xl mx-auto space-y-4">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                +{userCount} developers building now
+            </p>
+
             <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
                 Construí con otros developers
                 <br />

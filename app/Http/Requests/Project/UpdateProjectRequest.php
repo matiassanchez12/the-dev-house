@@ -7,6 +7,7 @@ use App\Models\Tech;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateProjectRequest extends FormRequest
 {
@@ -76,6 +77,53 @@ class UpdateProjectRequest extends FormRequest
                 'string',
             ],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->has('images')) {
+                return;
+            }
+
+            $newImagesCount = $this->newImagesCount();
+
+            if ($newImagesCount === 0) {
+                return;
+            }
+
+            $project = $this->route('project');
+            $existingImages = $project instanceof Project ? ($project->images ?? []) : [];
+            $removeImages = $this->validatedRemoveImages();
+            $remainingExistingImages = count($existingImages) - count(array_intersect($existingImages, $removeImages));
+
+            if ($remainingExistingImages + $newImagesCount > 5) {
+                $validator->errors()->add('images', 'No puedes subir más de 5 imágenes.');
+            }
+        });
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function validatedRemoveImages(): array
+    {
+        $removeImages = $this->input('remove_images', []);
+
+        return is_array($removeImages)
+            ? array_values(array_filter($removeImages, fn (mixed $image): bool => is_string($image)))
+            : [];
+    }
+
+    private function newImagesCount(): int
+    {
+        $images = $this->file('images', []);
+
+        if (is_array($images)) {
+            return count($images);
+        }
+
+        return $images === null ? 0 : 1;
     }
 
     /**

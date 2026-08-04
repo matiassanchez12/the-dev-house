@@ -18,7 +18,10 @@ class PublicMilestoneController extends Controller
     {
         $milestones = Phase::query()
             ->with(['project.creator'])
-            ->orderByDesc('created_at')
+            // Keep completed milestones ahead of pending ones across database-specific NULL ordering.
+            ->orderByRaw('case when completed_at is null then 1 else 0 end asc')
+            ->orderByDesc('completed_at')
+            ->orderByDesc('id')
             ->paginate(12)
             ->withQueryString();
 
