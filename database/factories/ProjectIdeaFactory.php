@@ -30,6 +30,7 @@ class ProjectIdeaFactory extends Factory
             'prefill_title' => $title,
             'prefill_description' => fake()->paragraph(),
             'prefill_vision' => fake()->optional()->sentence(),
+            'illustration_path' => null,
             'is_published' => true,
             'sort_order' => fake()->numberBetween(0, 10),
         ];

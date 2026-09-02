@@ -22,6 +22,7 @@ class ProjectIdea extends Model
         'prefill_title',
         'prefill_description',
         'prefill_vision',
+        'illustration_path',
         'is_published',
         'sort_order',
     ];

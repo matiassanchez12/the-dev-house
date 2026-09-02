@@ -6,6 +6,7 @@ use App\Models\ProjectIdea;
 use App\Models\Tech;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectIdeaSeeder extends Seeder
 {
@@ -17,6 +18,9 @@ class ProjectIdeaSeeder extends Seeder
         $timestamp = now();
         $ideas = $this->ideas();
 
+        $existing = ProjectIdea::query()->pluck('illustration_path', 'slug');
+        $illustrations = $this->syncIllustrations(array_column($ideas, 'slug'), $existing);
+
         $rows = array_map(
             fn (array $idea): array => [
                 'slug' => $idea['slug'],
@@ -27,6 +31,7 @@ class ProjectIdeaSeeder extends Seeder
                 'prefill_title' => $idea['title'],
                 'prefill_description' => $idea['prefill_description'],
                 'prefill_vision' => $idea['prefill_vision'],
+                'illustration_path' => $illustrations[$idea['slug']] ?? null,
                 'is_published' => true,
                 'sort_order' => $idea['sort_order'],
                 'created_at' => $timestamp,
@@ -40,7 +45,8 @@ class ProjectIdeaSeeder extends Seeder
             ['slug'],
             [
                 'title', 'summary', 'category', 'difficulty', 'prefill_title',
-                'prefill_description', 'prefill_vision', 'is_published', 'sort_order', 'updated_at',
+                'prefill_description', 'prefill_vision', 'illustration_path',
+                'is_published', 'sort_order', 'updated_at',
             ],
         );
 
@@ -58,6 +64,39 @@ class ProjectIdeaSeeder extends Seeder
                     $techIds->only($idea['techs'])->values()->all()
                 );
         }
+    }
+
+    /**
+     * Copy every present source asset to the media disk and resolve the stored
+     * path per slug. A missing source preserves whatever the row already had, so
+     * a removed asset never nulls a live column.
+     *
+     * @param  array<int, string>  $slugs
+     * @param  Collection<string, string|null>  $existing
+     * @return array<string, string|null>
+     */
+    private function syncIllustrations(array $slugs, Collection $existing): array
+    {
+        $disk = config('filesystems.media_disk', 'public');
+        $resolved = [];
+
+        foreach ($slugs as $slug) {
+            $source = database_path("seeders/assets/project-ideas/{$slug}.webp");
+
+            if (! is_file($source)) {
+                $resolved[$slug] = $existing[$slug] ?? null;
+
+                continue;
+            }
+
+            Storage::disk($disk)->put(
+                "project-ideas/{$slug}.webp",
+                (string) file_get_contents($source),
+            );
+            $resolved[$slug] = "project-ideas/{$slug}.webp";
+        }
+
+        return $resolved;
     }
 
     /**
