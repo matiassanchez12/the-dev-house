@@ -47,7 +47,7 @@ class ProjectController extends Controller
         // Filtro por búsqueda (title, case-insensitive, substring)
         $search = trim((string) $request->input('search', ''));
         if ($search !== '') {
-            $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%'.$search.'%']);
+            $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%' . $search . '%']);
         }
 
         $paginator = $query->paginate(12)->withQueryString();
