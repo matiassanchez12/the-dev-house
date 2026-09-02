@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { ProjectIdea } from '@/types'
 import {
+    PROJECT_IDEA_CATEGORY_GRADIENTS,
+    PROJECT_IDEA_CATEGORY_ICONS,
     PROJECT_IDEA_CATEGORY_LABELS,
     PROJECT_IDEA_CATEGORY_ORDER,
     groupIdeasByCategory,
@@ -17,6 +19,7 @@ function buildIdea(overrides: Partial<ProjectIdea> = {}): ProjectIdea {
         prefillDescription: 'Descripción.',
         prefillVision: '',
         techIds: [],
+        illustrationUrl: null,
         ...overrides,
     }
 }
@@ -55,5 +58,20 @@ describe('project-idea-catalog', () => {
 
     it('returns an empty array when there are no ideas', () => {
         expect(groupIdeasByCategory([])).toEqual([])
+    })
+
+    it('maps exactly one gradient and one icon per ordered category key', () => {
+        expect(Object.keys(PROJECT_IDEA_CATEGORY_GRADIENTS).sort()).toEqual(
+            [...PROJECT_IDEA_CATEGORY_ORDER].sort(),
+        )
+        expect(Object.keys(PROJECT_IDEA_CATEGORY_ICONS).sort()).toEqual(
+            [...PROJECT_IDEA_CATEGORY_ORDER].sort(),
+        )
+
+        for (const category of PROJECT_IDEA_CATEGORY_ORDER) {
+            expect(typeof PROJECT_IDEA_CATEGORY_GRADIENTS[category]).toBe('string')
+            expect(PROJECT_IDEA_CATEGORY_GRADIENTS[category].length).toBeGreaterThan(0)
+            expect(PROJECT_IDEA_CATEGORY_ICONS[category]).toBeDefined()
+        }
     })
 })

@@ -16,6 +16,7 @@ function buildIdea(overrides: Partial<ProjectIdea> = {}): ProjectIdea {
         prefillDescription: 'Descripción de scope.',
         prefillVision: 'Visión del resultado.',
         techIds: [1, 2],
+        illustrationUrl: null,
         ...overrides,
     }
 }
@@ -59,6 +60,78 @@ describe('ProjectIdeaCard', () => {
         )
 
         expect(screen.queryByText('intermedio')).not.toBeInTheDocument()
+    })
+
+    it('renders the illustration image with meaningful Spanish alt text when present', () => {
+        render(
+            <ProjectIdeaCard
+                idea={buildIdea({
+                    title: 'Clon de Trello',
+                    illustrationUrl: 'https://cdn.test/project-ideas/clon-trello-kanban.webp',
+                })}
+                techNames={['React']}
+                onSelect={vi.fn()}
+            />,
+        )
+
+        const image = screen.getByRole('img', { name: /idea/i })
+        expect(image).toHaveAttribute(
+            'src',
+            'https://cdn.test/project-ideas/clon-trello-kanban.webp',
+        )
+        expect(image.getAttribute('alt')).toMatch(/Clon de Trello/)
+        expect(image.getAttribute('alt')?.length ?? 0).toBeGreaterThan(0)
+    })
+
+    it('renders a gradient fallback with an aria-hidden category icon when no illustration', () => {
+        const { container } = render(
+            <ProjectIdeaCard
+                idea={buildIdea({ category: 'clones', illustrationUrl: null })}
+                techNames={['React']}
+                onSelect={vi.fn()}
+            />,
+        )
+
+        expect(screen.queryByRole('img')).not.toBeInTheDocument()
+        const icon = container.querySelector('svg[aria-hidden="true"]')
+        expect(icon).not.toBeNull()
+        expect(container.querySelector('.bg-gradient-to-br')).not.toBeNull()
+    })
+
+    it('clamps the summary to two lines and keeps the full text in a title attribute', () => {
+        const summary =
+            'Un tablero kanban muy largo con listas, tarjetas arrastrables, etiquetas y responsables.'
+
+        render(
+            <ProjectIdeaCard
+                idea={buildIdea({ summary })}
+                techNames={['React']}
+                onSelect={vi.fn()}
+            />,
+        )
+
+        const description = screen.getByText(summary)
+        expect(description).toHaveAttribute('title', summary)
+        // REVIEW(project-idea-illustrations): spec requires two-line clamp which is
+        // only observable via the utility class in jsdom; class assertion is
+        // intentional here despite the general "no CSS class assertion" guidance.
+        expect(description).toHaveClass('line-clamp-2')
+    })
+
+    it('shows a +N badge when an idea has more techs than fit on one line', () => {
+        render(
+            <ProjectIdeaCard
+                idea={buildIdea()}
+                techNames={['React', 'Laravel', 'Postgres', 'Redis', 'Docker']}
+                onSelect={vi.fn()}
+            />,
+        )
+
+        expect(screen.getByText('React')).toBeInTheDocument()
+        expect(screen.getByText('Laravel')).toBeInTheDocument()
+        expect(screen.getByText('Postgres')).toBeInTheDocument()
+        expect(screen.queryByText('Redis')).not.toBeInTheDocument()
+        expect(screen.getByText('+2')).toBeInTheDocument()
     })
 
     it('calls onSelect with the idea when the CTA is pressed', async () => {

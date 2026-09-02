@@ -28,6 +28,7 @@ export default function Create({ auth, techs, projectIdeas = [] }: Props) {
         repository_url: '',
         demo_url: '',
         images: [] as File[],
+        idea_slug: '',
     });
 
     const { data, setData } = form;
@@ -45,6 +46,7 @@ export default function Create({ auth, techs, projectIdeas = [] }: Props) {
             setData('description', idea.prefillDescription);
             setData('vision', idea.prefillVision);
             setData('techs', idea.techIds);
+            setData('idea_slug', idea.slug);
         },
         [setData],
     );
@@ -97,6 +99,10 @@ export default function Create({ auth, techs, projectIdeas = [] }: Props) {
 
         if (current.techs.length === 0) {
             setData('techs', idea.techIds);
+        }
+
+        if (current.idea_slug === '') {
+            setData('idea_slug', idea.slug);
         }
 
         setAnnouncement(`Formulario prellenado con la idea: ${idea.title}`);
