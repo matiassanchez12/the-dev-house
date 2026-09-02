@@ -19,6 +19,9 @@ class ProjectIdeaInspirationTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var list<string> Absolute paths of illustration sources this test created. */
+    private array $createdIllustrationSources = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,6 +41,7 @@ class ProjectIdeaInspirationTest extends TestCase
         }
 
         file_put_contents($path, 'fake-webp-bytes');
+        $this->createdIllustrationSources[] = $path;
     }
 
     private function removeIllustrationSource(string $slug): void
@@ -47,18 +51,23 @@ class ProjectIdeaInspirationTest extends TestCase
         if (is_file($path)) {
             unlink($path);
         }
+
+        $this->createdIllustrationSources = array_values(
+            array_filter($this->createdIllustrationSources, fn ($created) => $created !== $path)
+        );
     }
 
     protected function tearDown(): void
     {
-        // Strip any illustration source a test wrote; the repo ships zero .webp here.
-        $dir = database_path('seeders/assets/project-ideas');
-
-        if (is_dir($dir)) {
-            foreach (glob($dir.'/*.webp') ?: [] as $file) {
+        // Only remove sources this test wrote — never glob the directory, so a
+        // real committed illustration asset can never be deleted by the suite.
+        foreach ($this->createdIllustrationSources as $file) {
+            if (is_file($file)) {
                 @unlink($file);
             }
         }
+
+        $this->createdIllustrationSources = [];
 
         parent::tearDown();
     }

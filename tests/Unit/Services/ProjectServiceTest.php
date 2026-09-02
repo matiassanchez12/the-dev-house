@@ -136,7 +136,13 @@ class ProjectServiceTest extends TestCase
 
         $this->assertCount(1, $project->images);
         $this->assertStringNotContainsString('project-ideas/', $project->images[0]);
-        Storage::disk('public')->assertMissing('projects/'.pathinfo($project->images[0], PATHINFO_FILENAME).'.webp');
+        $this->assertStringEndsWith('.jpg', $project->images[0]);
+        // The idea illustration copy would land as a projects/*.webp file — none should exist.
+        $webpCopies = array_filter(
+            Storage::disk('public')->files('projects'),
+            fn ($file) => str_ends_with($file, '.webp'),
+        );
+        $this->assertSame([], array_values($webpCopies));
     }
 
     /** @test */
