@@ -77,30 +77,30 @@ Chain strategy: stacked-to-main
 
 ## Phase 6: Dependency, types, catalog
 
-- [ ] 6.1 Run `npx shadcn@latest add collapsible` → creates `resources/js/components/ui/collapsible.tsx`.
-- [ ] 6.2 Modify `resources/js/types/index.ts` — add `ProjectIdea` interface (per design payload) + `ProjectIdeaCategory` and `ProjectIdeaDifficulty` string unions.
-- [ ] 6.3 Create `resources/js/lib/project-idea-catalog.ts` — category order array + Spanish `CATEGORY_LABELS` + `groupIdeasByCategory()`, mirroring `lib/tech-catalog.ts`.
+- [x] 6.1 Run `npx shadcn@latest add collapsible` → creates `resources/js/components/ui/collapsible.tsx`.
+- [x] 6.2 Modify `resources/js/types/index.ts` — add `ProjectIdea` interface (per design payload) + `ProjectIdeaCategory` and `ProjectIdeaDifficulty` string unions.
+- [x] 6.3 Create `resources/js/lib/project-idea-catalog.ts` — category order array + Spanish `CATEGORY_LABELS` + `groupIdeasByCategory()`, mirroring `lib/tech-catalog.ts`.
 
 ## Phase 7: Presentational components
 
-- [ ] 7.1 Create `resources/js/components/projects/project-idea-card.tsx` — `Card role="group"` with title, summary, tech names, difficulty `Badge` only when `difficulty` present; single CTA `Button` in `CardFooter` `aria-label="Usar la idea: {title}"`. Props `{ idea, techNames, onSelect }`.
-- [ ] 7.2 Create `resources/js/components/projects/project-idea-category-group.tsx` — category heading + card grid. Props `{ label, ideas, techNamesById, onSelect }`.
-- [ ] 7.3 Create `resources/js/components/projects/project-idea-inspiration.tsx` — collapsed-by-default `Collapsible` above the form; builds `Map<number,string>` `techNamesById` once; omits empty groups; returns `null` when `ideas` is empty. Props `{ ideas, techs, onSelect }`.
+- [x] 7.1 Create `resources/js/components/projects/project-idea-card.tsx` — `Card role="group"` with title, summary, tech names, difficulty `Badge` only when `difficulty` present; single CTA `Button` in `CardFooter` `aria-label="Usar la idea: {title}"`. Props `{ idea, techNames, onSelect }`.
+- [x] 7.2 Create `resources/js/components/projects/project-idea-category-group.tsx` — category heading + card grid. Props `{ label, ideas, techNamesById, onSelect }`.
+- [x] 7.3 Create `resources/js/components/projects/project-idea-inspiration.tsx` — collapsed-by-default `Collapsible` above the form; builds `Map<number,string>` `techNamesById` once; omits empty groups; returns `null` when `ideas` is empty. Props `{ ideas, techs, onSelect }`.
 
 ## Phase 8: Wire `create.tsx`
 
-- [ ] 8.1 Consume `projectIdeas` prop (default `[]`); render `<ProjectIdeaInspiration>` directly above `<ProjectForm>`; `ProjectForm` contract unchanged.
-- [ ] 8.2 Add card-click handler — `setData` for `title`/`description`/`vision`/`techs` from the idea (overwrite regardless of edits); `window.history.replaceState` → `?idea=<slug>` (no navigation); focus `document.getElementById('title')`; announce via an `aria-live` status region. Must NOT touch `repository_url`/`demo_url`/`images`.
-- [ ] 8.3 Add on-mount `?idea=<slug>` effect — `useRef(false)` single-shot; pristine-only per field (`data.title===''`, `data.description===''`, `data.vision===''`, `data.techs.length===0`); unknown/unpublished slug → return silently, no error.
+- [x] 8.1 Consume `projectIdeas` prop (default `[]`); render `<ProjectIdeaInspiration>` directly above `<ProjectForm>`; `ProjectForm` contract unchanged.
+- [x] 8.2 Add card-click handler — `setData` for `title`/`description`/`vision`/`techs` from the idea (overwrite regardless of edits); `window.history.replaceState` → `?idea=<slug>` (no navigation); focus `document.getElementById('title')`; announce via an `aria-live` status region. Must NOT touch `repository_url`/`demo_url`/`images`.
+- [x] 8.3 Add on-mount `?idea=<slug>` effect — `useRef(false)` single-shot; pristine-only per field (`data.title===''`, `data.description===''`, `data.vision===''`, `data.techs.length===0`); unknown/unpublished slug → return silently, no error.
 
 ## Phase 9: Frontend tests (`resources/js/pages/projects/create.test.tsx`)
 
-- [ ] 9.1 Create the file following `show.test.tsx` mocks (`@/components/seo`, `@/layouts/app-layout`, `@inertiajs/react` `useForm` stub with `data`/`setData` spy, `globalThis.route`): block renders collapsed (idea titles absent until trigger click); form submittable without expanding.
-- [ ] 9.2 Add test: expand reveals grouped ideas; empty category groups omitted (ideas for 2 of 5 categories → 2 headings).
-- [ ] 9.3 Add test: card click calls `setData` for exactly `title`/`description`/`vision`/`techs` and never `repository_url`/`demo_url`/`images`; card click overwrites a non-pristine `title`.
-- [ ] 9.4 Add test: `?idea=<slug>` mount prefill fills only pristine fields, runs once (no re-run on rerender); pre-edited `description` left untouched.
-- [ ] 9.5 Add test: unknown slug → zero `setData` calls, no error text.
+- [x] 9.1 Create the file following `show.test.tsx` mocks (`@/components/seo`, `@/layouts/app-layout`, `@inertiajs/react` `useForm` stub with `data`/`setData` spy, `globalThis.route`): block renders collapsed (idea titles absent until trigger click); form submittable without expanding.
+- [x] 9.2 Add test: expand reveals grouped ideas; empty category groups omitted (ideas for 2 of 5 categories → 2 headings).
+- [x] 9.3 Add test: card click calls `setData` for exactly `title`/`description`/`vision`/`techs` and never `repository_url`/`demo_url`/`images`; card click overwrites a non-pristine `title`.
+- [x] 9.4 Add test: `?idea=<slug>` mount prefill fills only pristine fields, runs once (no re-run on rerender); pre-edited `description` left untouched.
+- [x] 9.5 Add test: unknown slug → zero `setData` calls, no error text.
 
 ## Phase 10: Slice 2 acceptance
 
-- [ ] 10.1 `npm test` green; `npm run build` green. Open PR2 against `feat/project-idea-inspiration-backend`.
+- [x] 10.1 `npm test` green; `npm run build` green. Open PR2 against `feat/project-idea-inspiration-backend`.
