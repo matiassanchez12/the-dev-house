@@ -6,6 +6,7 @@ use App\Helpers\ApiResourceTransformer;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
+use App\Models\ProjectIdea;
 use App\Models\ProjectInvitation;
 use App\Services\JoinRequestService;
 use App\Services\ProjectFollowService;
@@ -77,7 +78,14 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return Inertia::render('projects/create');
+        $projectIdeas = ProjectIdea::published()
+            ->with('techs:id')
+            ->orderBy('sort_order')
+            ->get();
+
+        return Inertia::render('projects/create', [
+            'projectIdeas' => ApiResourceTransformer::projectIdeas($projectIdeas),
+        ]);
     }
 
     /**
