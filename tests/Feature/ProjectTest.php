@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\Project;
 use App\Models\JoinRequest;
+use App\Models\Project;
 use App\Models\ProjectInvitation;
 use App\Models\Tech;
 use App\Models\User;
+use App\Services\ProjectService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,7 @@ class ProjectTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private array $techIds;
 
     protected function setUp(): void
@@ -25,7 +27,7 @@ class ProjectTest extends TestCase
 
         // Crear usuario de prueba
         $this->user = User::factory()->create();
-        
+
         // Crear techs de prueba
         $techs = Tech::factory()->count(3)->create();
         $this->techIds = $techs->pluck('id')->toArray();
@@ -60,10 +62,10 @@ class ProjectTest extends TestCase
         // Arrange
         $tech1 = Tech::factory()->create(['slug' => 'react']);
         $tech2 = Tech::factory()->create(['slug' => 'vue']);
-        
+
         $projectWithReact = Project::factory()->create();
         $projectWithReact->techs()->attach($tech1->id);
-        
+
         $projectWithVue = Project::factory()->create();
         $projectWithVue->techs()->attach($tech2->id);
 
@@ -72,7 +74,7 @@ class ProjectTest extends TestCase
 
         // Assert
         $response->assertStatus(200);
-        
+
         // Verificar que hay 1 proyecto en la respuesta
         $content = $response->getContent();
         $this->assertStringContainsString($projectWithReact->title, $content);
@@ -165,7 +167,7 @@ class ProjectTest extends TestCase
     {
         // Arrange
         Storage::fake('public');
-        
+
         $projectData = [
             'title' => 'Mi Proyecto Increíble',
             'description' => 'Este es un proyecto de prueba',
@@ -182,16 +184,37 @@ class ProjectTest extends TestCase
         // Assert
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         // Verificar en la DB
         $this->assertDatabaseHas('projects', [
             'title' => 'Mi Proyecto Increíble',
         ]);
-        
+
         // Verificar relación con techs
         $project = Project::where('title', 'Mi Proyecto Increíble')->first();
         $this->assertNotNull($project);
         $this->assertEquals(3, $project->techs()->count());
+    }
+
+    public function test_can_create_project_when_idea_slug_is_an_empty_string(): void
+    {
+        Storage::fake('public');
+
+        $projectData = [
+            'title' => 'Proyecto sin idea',
+            'description' => 'Enviado con idea_slug vacío',
+            'techs' => $this->techIds,
+            'idea_slug' => '',
+        ];
+
+        $response = $this->actingAs($this->user)->post('/projects', $projectData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('projects', ['title' => 'Proyecto sin idea']);
+
+        $project = Project::where('title', 'Proyecto sin idea')->first();
+        $this->assertSame([], $project->images);
     }
 
     /**
@@ -201,9 +224,9 @@ class ProjectTest extends TestCase
     {
         // Arrange
         Storage::fake('public');
-        
+
         $image = UploadedFile::fake()->create('project.jpg', 100, 'image/jpeg');
-        
+
         $projectData = [
             'title' => 'Proyecto con Imágenes',
             'description' => 'Con fotos',
@@ -217,7 +240,7 @@ class ProjectTest extends TestCase
 
         // Assert
         $response->assertRedirect();
-        
+
         // Verificar en DB
         $project = Project::where('title', 'Proyecto con Imágenes')->first();
         $this->assertNotNull($project);
@@ -283,7 +306,7 @@ class ProjectTest extends TestCase
                 ->component('projects/show')
                 ->has('project')
         );
-        
+
         $response->assertInertia(
             fn ($page) => $page
                 ->where('project.id', $project->id)
@@ -432,7 +455,7 @@ class ProjectTest extends TestCase
 
         // Assert
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('projects', [
             'id' => $project->id,
             'title' => 'Título Actualizado',
@@ -480,7 +503,7 @@ class ProjectTest extends TestCase
     public function test_slug_is_unique_when_creating_project(): void
     {
         // Arrange: Crear proyecto existente con mismo título manualmente
-        $existingProject = new Project();
+        $existingProject = new Project;
         $existingProject->user_id = $this->user->id;
         $existingProject->title = 'Mi Proyecto';
         $existingProject->slug = 'mi-proyecto';
@@ -507,7 +530,7 @@ class ProjectTest extends TestCase
         $this->assertEquals('mi-proyecto-otro', $newProject->slug);
 
         // Now test duplicate slug handling directly via service
-        $service = new \App\Services\ProjectService();
+        $service = new ProjectService;
         $duplicateSlug = $service->generateUniqueSlug('Mi Proyecto');
         $this->assertEquals('mi-proyecto-1', $duplicateSlug);
     }
@@ -813,7 +836,7 @@ class ProjectTest extends TestCase
         Storage::disk($disk)->put($victimRoot, 'b');
         Storage::disk($disk)->put($projectImage, 'c');
 
-        $service = new \App\Services\ProjectService();
+        $service = new ProjectService;
 
         // Act — feed the service a mix of malicious + valid paths
         $service->deleteImages([

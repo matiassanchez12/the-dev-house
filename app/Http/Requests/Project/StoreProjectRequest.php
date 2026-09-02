@@ -47,7 +47,7 @@ class StoreProjectRequest extends FormRequest
                 'min:1',
             ],
             'techs.*' => [
-                'exists:' . (new Tech)->getTable() . ',id',
+                'exists:'.(new Tech)->getTable().',id',
             ],
             'repository_url' => [
                 'nullable',
@@ -65,6 +65,11 @@ class StoreProjectRequest extends FormRequest
             'images.*' => [
                 'image',
                 'max:2048',
+            ],
+            'idea_slug' => [
+                'nullable',
+                'string',
+                'exists:project_ideas,slug',
             ],
         ];
     }
@@ -90,6 +95,7 @@ class StoreProjectRequest extends FormRequest
             'images.max' => 'No puedes subir más de 5 imágenes.',
             'images.*.image' => 'Cada archivo debe ser una imagen.',
             'images.*.max' => 'Cada imagen no puede exceder 2MB.',
+            'idea_slug.exists' => 'La idea seleccionada no es válida.',
         ];
     }
 }

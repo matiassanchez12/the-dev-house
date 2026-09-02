@@ -464,6 +464,9 @@ class ApiResourceTransformer
                 'prefillDescription' => $idea->prefill_description,
                 'prefillVision' => $idea->prefill_vision ?? '',
                 'techIds' => $idea->techs->pluck('id')->map(fn ($id): int => (int) $id)->all(),
+                'illustrationUrl' => $idea->illustration_path
+                    ? StorageUrlHelper::url($idea->illustration_path, self::mediaDisk())
+                    : null,
             ])
             ->all();
     }
