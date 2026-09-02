@@ -48,6 +48,27 @@ export interface Tech {
     }
 }
 
+export type ProjectIdeaCategory =
+    | 'herramientas-dev'
+    | 'clones'
+    | 'alternativas-oss'
+    | 'bots-automatizacion'
+    | 'aprendizaje'
+
+export type ProjectIdeaDifficulty = 'principiante' | 'intermedio' | 'avanzado'
+
+export interface ProjectIdea {
+    slug: string
+    title: string
+    summary: string
+    category: ProjectIdeaCategory
+    difficulty: ProjectIdeaDifficulty | null
+    prefillTitle: string
+    prefillDescription: string
+    prefillVision: string
+    techIds: number[]
+}
+
 export interface ProjectImage {
     path: string
     url: string
