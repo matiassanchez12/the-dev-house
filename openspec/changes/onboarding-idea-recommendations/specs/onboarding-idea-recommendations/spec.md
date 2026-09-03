@@ -85,7 +85,7 @@ Onboarding step 5 MUST render the idea teaser below the existing join-recommenda
 
 ### Requirement: Completion hands off to the create page when an idea is chosen
 
-`POST /onboarding/step-4` MUST accept an optional `idea_slug`. WHEN `idea_slug` is the slug of a published idea, THEN onboarding MUST complete (join requests still sent, `onboarding_completed_at` set) AND the response MUST redirect to `/projects/create?idea=<slug>`. WHEN `idea_slug` is absent or empty, THEN the response MUST redirect to `/dashboard` with unchanged completion behavior. WHEN `idea_slug` is present but not a published idea slug, THEN validation MUST fail with a Spanish message (HTTP 422) AND onboarding MUST NOT complete. `POST /onboarding/skip` MUST always redirect to `/dashboard`.
+`POST /onboarding/step-4` MUST accept an optional `idea_slug`. WHEN `idea_slug` is the slug of a published idea, THEN onboarding MUST complete (join requests still sent, `onboarding_completed_at` set) AND the response MUST redirect to `/projects/create?idea=<slug>`. WHEN `idea_slug` is absent or empty, THEN the response MUST redirect to `/dashboard` with unchanged completion behavior. WHEN `idea_slug` is present but not a published idea slug, THEN validation MUST fail — the response redirects back with a Spanish error on `idea_slug` (Inertia/browser form POSTs surface validation as a redirect-back session error bag, not a raw HTTP 422) — AND onboarding MUST NOT complete. `POST /onboarding/skip` MUST always redirect to `/dashboard`.
 
 #### Scenario: valid idea slug redirects to create (#181)
 
@@ -104,7 +104,7 @@ Onboarding step 5 MUST render the idea teaser below the existing join-recommenda
 
 - GIVEN an `idea_slug` that is unpublished or does not exist
 - WHEN `POST /onboarding/step-4` is submitted with it
-- THEN validation MUST fail with a Spanish message and HTTP 422
+- THEN the response MUST redirect back with a Spanish validation error on `idea_slug`
 - AND `onboarding_completed_at` MUST remain null
 
 #### Scenario: skip always goes to dashboard
@@ -137,5 +137,5 @@ The change MUST NOT break existing assertions: `tests/Feature/OnboardingTest.php
 ## Test Coverage
 
 - `tests/Unit/Services/ProjectIdeaServiceTest.php` (NEW): `publishedForDisplay()` parity — published-only, enum-order-then-`sort_order`, payload shape; `featuredForOnboarding()` — one-per-category, lowest `sort_order`, `id` tie-break, enum order, unpublished exclusion, empty-catalog `[]`.
-- `tests/Feature/OnboardingTest.php` (MODIFIED): index response includes `featuredIdeas`; step-4 with valid slug redirects to `/projects/create?idea=<slug>` with `onboarding_completed_at` set and join requests sent; step-4 with unpublished/unknown slug returns 422; step-4 with empty slug redirects to `/dashboard`; existing skip → `/dashboard` retained.
+- `tests/Feature/OnboardingTest.php` (MODIFIED): index response includes `featuredIdeas`; step-4 with valid slug redirects to `/projects/create?idea=<slug>` with `onboarding_completed_at` set and join requests sent; step-4 with unpublished/unknown slug redirects back with an `idea_slug` session error and does not complete; step-4 with empty slug redirects to `/dashboard`; existing skip → `/dashboard` retained.
 - `resources/js/pages/onboarding/index.test.tsx` (MODIFIED): mock props gain `featuredIdeas` (and `techs` if read); add a step-5 teaser render/select test when the existing file structure allows.

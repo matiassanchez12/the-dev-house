@@ -461,7 +461,7 @@ class OnboardingTest extends TestCase
             'idea_slug' => $idea->slug,
         ]);
 
-        $response->assertSessionHasErrors('idea_slug');
+        $response->assertSessionHasErrors(['idea_slug' => 'La idea seleccionada no es válida.']);
         $this->assertNull($user->fresh()->onboarding_completed_at);
     }
 
