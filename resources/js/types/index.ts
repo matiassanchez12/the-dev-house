@@ -67,6 +67,7 @@ export interface ProjectIdea {
     prefillDescription: string
     prefillVision: string
     techIds: number[]
+    illustrationUrl: string | null
 }
 
 export interface ProjectImage {

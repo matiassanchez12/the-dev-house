@@ -10,12 +10,58 @@ use Database\Seeders\ProjectIdeaSeeder;
 use Database\Seeders\TechSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class ProjectIdeaInspirationTest extends TestCase
 {
     use RefreshDatabase;
+
+    private string $illustrationSourceDir;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // The seeder now writes illustration assets through the media disk;
+        // fake it so no test touches real storage/app/public.
+        Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
+
+        // Point the seeder at an isolated fixture dir so tests control exactly
+        // which sources are present, independent of the committed illustrations.
+        $this->illustrationSourceDir = sys_get_temp_dir().'/project-idea-illustrations-'.uniqid();
+        mkdir($this->illustrationSourceDir, 0777, true);
+        ProjectIdeaSeeder::$illustrationSourceDir = $this->illustrationSourceDir;
+    }
+
+    private function fakeIllustrationSource(string $slug): void
+    {
+        file_put_contents("{$this->illustrationSourceDir}/{$slug}.webp", 'fake-webp-bytes');
+    }
+
+    private function removeIllustrationSource(string $slug): void
+    {
+        $path = "{$this->illustrationSourceDir}/{$slug}.webp";
+
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        ProjectIdeaSeeder::$illustrationSourceDir = null;
+
+        foreach (glob("{$this->illustrationSourceDir}/*") ?: [] as $file) {
+            @unlink($file);
+        }
+        @rmdir($this->illustrationSourceDir);
+
+        parent::tearDown();
+    }
 
     private function openCreatePage(): TestResponse
     {
@@ -178,5 +224,127 @@ class ProjectIdeaInspirationTest extends TestCase
         $dashboard = ProjectIdea::where('slug', 'dashboard-metricas-repos')->first();
         $this->assertNotNull($dashboard);
         $this->assertCount(0, $dashboard->techs);
+    }
+
+    // === Phase 1: illustration_path column ===
+
+    public function test_illustration_path_column_is_nullable_and_mass_assignable(): void
+    {
+        $this->assertTrue(Schema::hasColumn('project_ideas', 'illustration_path'));
+        $this->assertContains('illustration_path', (new ProjectIdea)->getFillable());
+
+        $idea = ProjectIdea::factory()->create();
+        $this->assertNull($idea->fresh()->illustration_path);
+
+        $idea->update(['illustration_path' => 'project-ideas/example.webp']);
+        $this->assertSame('project-ideas/example.webp', $idea->fresh()->illustration_path);
+    }
+
+    public function test_illustration_path_factory_default_is_null(): void
+    {
+        $this->assertNull(ProjectIdea::factory()->make()->illustration_path);
+    }
+
+    public function test_illustration_path_migration_rolls_back_and_reapplies(): void
+    {
+        $migration = require database_path(
+            'migrations/2026_09_02_000300_add_illustration_path_to_project_ideas_table.php'
+        );
+
+        $migration->down();
+        $this->assertFalse(Schema::hasColumn('project_ideas', 'illustration_path'));
+
+        $migration->up();
+        $this->assertTrue(Schema::hasColumn('project_ideas', 'illustration_path'));
+    }
+
+    // === Phase 2: seeder asset pipeline ===
+
+    public function test_seeder_copies_present_illustration_assets_and_leaves_others_null(): void
+    {
+        $this->seed(TechSeeder::class);
+        $this->fakeIllustrationSource('cli-scaffold-proyectos');
+
+        $this->seed(ProjectIdeaSeeder::class);
+
+        Storage::disk('public')->assertExists('project-ideas/cli-scaffold-proyectos.webp');
+        $this->assertSame(
+            'project-ideas/cli-scaffold-proyectos.webp',
+            ProjectIdea::where('slug', 'cli-scaffold-proyectos')->value('illustration_path'),
+        );
+        $this->assertNull(
+            ProjectIdea::where('slug', 'dashboard-metricas-repos')->value('illustration_path'),
+        );
+    }
+
+    public function test_reseed_picks_up_a_newly_added_asset_without_changing_row_or_pivot_counts(): void
+    {
+        $this->seed(TechSeeder::class);
+        $this->seed(ProjectIdeaSeeder::class);
+
+        $this->assertNull(
+            ProjectIdea::where('slug', 'clon-trello-kanban')->value('illustration_path'),
+        );
+
+        $ideaCount = ProjectIdea::count();
+        $pivotCount = DB::table('project_idea_tech')->count();
+
+        $this->fakeIllustrationSource('clon-trello-kanban');
+        $this->seed(ProjectIdeaSeeder::class);
+
+        $this->assertSame($ideaCount, ProjectIdea::count());
+        $this->assertSame($pivotCount, DB::table('project_idea_tech')->count());
+        $this->assertSame(
+            'project-ideas/clon-trello-kanban.webp',
+            ProjectIdea::where('slug', 'clon-trello-kanban')->value('illustration_path'),
+        );
+    }
+
+    public function test_removing_a_source_asset_never_nulls_a_live_illustration_path(): void
+    {
+        $this->seed(TechSeeder::class);
+        $this->fakeIllustrationSource('gestor-snippets-equipo');
+        $this->seed(ProjectIdeaSeeder::class);
+
+        $this->assertSame(
+            'project-ideas/gestor-snippets-equipo.webp',
+            ProjectIdea::where('slug', 'gestor-snippets-equipo')->value('illustration_path'),
+        );
+
+        $this->removeIllustrationSource('gestor-snippets-equipo');
+        $this->seed(ProjectIdeaSeeder::class);
+
+        $this->assertSame(
+            'project-ideas/gestor-snippets-equipo.webp',
+            ProjectIdea::where('slug', 'gestor-snippets-equipo')->value('illustration_path'),
+        );
+    }
+
+    // === Phase 9.1: payload exposes illustrationUrl ===
+
+    public function test_ideas_payload_exposes_illustration_url_when_set_and_null_otherwise(): void
+    {
+        ProjectIdea::factory()->create([
+            'slug' => 'with-illustration',
+            'category' => ProjectIdeaCategory::HerramientasDev,
+            'sort_order' => 1,
+            'illustration_path' => 'project-ideas/with-illustration.webp',
+        ]);
+        ProjectIdea::factory()->create([
+            'slug' => 'without-illustration',
+            'category' => ProjectIdeaCategory::HerramientasDev,
+            'sort_order' => 2,
+            'illustration_path' => null,
+        ]);
+
+        $payload = collect($this->ideasPayload($this->openCreatePage()));
+
+        $withUrl = $payload->firstWhere('slug', 'with-illustration')['illustrationUrl'];
+        $this->assertIsString($withUrl);
+        $this->assertSame(
+            Storage::disk('public')->url('project-ideas/with-illustration.webp'),
+            $withUrl,
+        );
+        $this->assertNull($payload->firstWhere('slug', 'without-illustration')['illustrationUrl']);
     }
 }

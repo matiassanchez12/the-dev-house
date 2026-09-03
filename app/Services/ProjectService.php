@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Models\ProjectIdea;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -80,6 +81,15 @@ class ProjectService
             $imagePaths = $this->uploadImages($data['images']);
         }
 
+        // Fall back to the selected idea's illustration when nothing was uploaded.
+        if (empty($imagePaths) && ! empty($data['idea_slug'])) {
+            $coverPath = $this->resolveIdeaCoverPath($data['idea_slug']);
+
+            if ($coverPath !== null) {
+                $imagePaths = [$coverPath];
+            }
+        }
+
         $project = $user->createdProjects()->create([
             'title' => $data['title'],
             'slug' => $slug,
@@ -95,6 +105,38 @@ class ProjectService
         }
 
         return $project;
+    }
+
+    /**
+     * Copy a project idea's stored illustration into the project image namespace.
+     * Returns null when the idea, the column, or the source file is unavailable,
+     * or when the copy fails — a missing cover must never fail project creation.
+     */
+    private function resolveIdeaCoverPath(string $ideaSlug): ?string
+    {
+        $idea = ProjectIdea::query()->where('slug', $ideaSlug)->first();
+
+        if ($idea === null || $idea->illustration_path === null) {
+            return null;
+        }
+
+        $disk = $this->mediaDisk();
+        $source = $idea->illustration_path;
+
+        if (! Storage::disk($disk)->exists($source)) {
+            return null;
+        }
+
+        $extension = pathinfo($source, PATHINFO_EXTENSION) ?: 'webp';
+        $target = 'projects/'.Str::uuid().'.'.$extension;
+
+        try {
+            Storage::disk($disk)->copy($source, $target);
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return $target;
     }
 
     /**

@@ -80,6 +80,7 @@ function buildIdea(overrides: Partial<ProjectIdea> = {}): ProjectIdea {
         prefillDescription: 'Construí un tablero kanban con listas y tarjetas arrastrables.',
         prefillVision: 'Un gestor de tareas simple para equipos pequeños.',
         techIds: [1, 2],
+        illustrationUrl: null,
         ...overrides,
     }
 }
@@ -163,7 +164,10 @@ describe('projects/create inspiration block', () => {
         await user.click(screen.getByRole('button', { name: 'Usar la idea: Clon de Trello' }))
 
         const keys = setDataSpy.mock.calls.map((call) => call[0])
-        expect(new Set(keys)).toEqual(new Set(['title', 'description', 'vision', 'techs']))
+        expect(new Set(keys)).toEqual(
+            new Set(['title', 'description', 'vision', 'techs', 'idea_slug']),
+        )
+        expect(setDataSpy).toHaveBeenCalledWith('idea_slug', idea.slug)
         expect(setDataSpy).toHaveBeenCalledWith('title', idea.prefillTitle)
         expect(setDataSpy).toHaveBeenCalledWith('description', idea.prefillDescription)
         expect(setDataSpy).toHaveBeenCalledWith('vision', idea.prefillVision)
@@ -184,6 +188,7 @@ describe('projects/create inspiration block', () => {
         expect(setDataSpy).toHaveBeenCalledWith('title', idea.prefillTitle)
         expect(setDataSpy).toHaveBeenCalledWith('vision', idea.prefillVision)
         expect(setDataSpy).toHaveBeenCalledWith('techs', idea.techIds)
+        expect(setDataSpy).toHaveBeenCalledWith('idea_slug', idea.slug)
         expect(setDataSpy.mock.calls.map((call) => call[0])).not.toContain('description')
 
         const callsAfterMount = setDataSpy.mock.calls.length

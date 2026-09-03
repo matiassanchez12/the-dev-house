@@ -1,3 +1,4 @@
+import { Bot, Copy, GraduationCap, Package, Wrench, type LucideIcon } from 'lucide-react'
 import type { ProjectIdea, ProjectIdeaCategory } from '@/types'
 
 export type GroupedProjectIdeas = {
@@ -21,6 +22,24 @@ export const PROJECT_IDEA_CATEGORY_LABELS: Record<ProjectIdeaCategory, string> =
     'alternativas-oss': 'Alternativas open source',
     'bots-automatizacion': 'Bots y automatización',
     aprendizaje: 'Proyectos de aprendizaje',
+}
+
+// 20% palette tint composited over --card (which flips in .dark), mirroring the
+// existing STATUS_GRADIENTS shape. No dark: overrides — theming is token-flip only.
+export const PROJECT_IDEA_CATEGORY_GRADIENTS: Record<ProjectIdeaCategory, string> = {
+    'herramientas-dev': 'from-amber-400/20 to-amber-600/20',
+    clones: 'from-sky-400/20 to-sky-600/20',
+    'alternativas-oss': 'from-emerald-400/20 to-emerald-600/20',
+    'bots-automatizacion': 'from-violet-400/20 to-violet-600/20',
+    aprendizaje: 'from-rose-400/20 to-rose-600/20',
+}
+
+export const PROJECT_IDEA_CATEGORY_ICONS: Record<ProjectIdeaCategory, LucideIcon> = {
+    'herramientas-dev': Wrench,
+    clones: Copy,
+    'alternativas-oss': Package,
+    'bots-automatizacion': Bot,
+    aprendizaje: GraduationCap,
 }
 
 /**
