@@ -4,6 +4,7 @@ namespace App\Http\Requests\Onboarding;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SaveStep4Request extends FormRequest
 {
@@ -30,6 +31,11 @@ class SaveStep4Request extends FormRequest
             'join_requests.*' => [
                 'integer',
             ],
+            'idea_slug' => [
+                'nullable',
+                'string',
+                Rule::exists('project_ideas', 'slug')->where('is_published', true),
+            ],
         ];
     }
 
@@ -43,6 +49,7 @@ class SaveStep4Request extends FormRequest
         return [
             'join_requests.array' => 'El campo join_requests debe ser un arreglo.',
             'join_requests.*.integer' => 'Cada ID de proyecto debe ser un número entero.',
+            'idea_slug.exists' => 'La idea seleccionada no es válida.',
         ];
     }
 
@@ -54,6 +61,7 @@ class SaveStep4Request extends FormRequest
         return [
             'join_requests' => 'solicitudes a proyectos',
             'join_requests.*' => 'proyecto',
+            'idea_slug' => 'idea seleccionada',
         ];
     }
 }

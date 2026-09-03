@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\JoinRequest;
+use App\Enums\ProjectIdeaCategory;
 use App\Models\Project;
+use App\Models\ProjectIdea;
 use App\Models\SocialLink;
+use App\Models\Tech;
 use App\Models\User;
+use App\Services\ProjectIdeaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,7 +31,7 @@ class OnboardingTest extends TestCase
     public function test_user_can_view_onboarding_page(): void
     {
         $user = User::factory()->create();
-        $tech = \App\Models\Tech::factory()->create([
+        $tech = Tech::factory()->create([
             'category' => 'frontend',
             'slug' => 'react',
         ]);
@@ -61,7 +64,7 @@ class OnboardingTest extends TestCase
     public function test_user_can_complete_step_1_techs(): void
     {
         $user = User::factory()->create();
-        $tech = \App\Models\Tech::factory()->create();
+        $tech = Tech::factory()->create();
 
         $response = $this->actingAs($user)->post('/onboarding/step-1', [
             'techs' => [['id' => $tech->id, 'proficiency' => '3']],
@@ -96,9 +99,9 @@ class OnboardingTest extends TestCase
     {
         $user = User::factory()->create();
         $creator = User::factory()->create();
-        $tech = \App\Models\Tech::factory()->create();
+        $tech = Tech::factory()->create();
 
-        $project = \App\Models\Project::factory()->create([
+        $project = Project::factory()->create([
             'user_id' => $creator->id,
         ]);
         $project->techs()->attach($tech->id);
@@ -133,13 +136,13 @@ class OnboardingTest extends TestCase
     public function test_recommendations_returns_matching_projects(): void
     {
         $user = User::factory()->create();
-        $tech = \App\Models\Tech::factory()->create();
+        $tech = Tech::factory()->create();
 
         // Attach tech to user
         $user->techs()->attach($tech->id, ['proficiency' => 'advanced']);
 
         // Create matching project
-        $project = \App\Models\Project::factory()->create(['status' => 'open']);
+        $project = Project::factory()->create(['status' => 'open']);
         $project->techs()->attach($tech->id);
 
         $response = $this->actingAs($user)->get('/onboarding/recommendations');
@@ -267,7 +270,7 @@ class OnboardingTest extends TestCase
     public function test_tech_selection_capped_at_three(): void
     {
         $user = User::factory()->create();
-        $techs = \App\Models\Tech::factory()->count(4)->create();
+        $techs = Tech::factory()->count(4)->create();
 
         $payload = [
             'techs' => $techs->map(fn ($tech) => [
@@ -345,7 +348,7 @@ class OnboardingTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $longUrl = 'https://example.com/' . str_repeat('a', 2048);
+        $longUrl = 'https://example.com/'.str_repeat('a', 2048);
 
         $response = $this->actingAs($user)->post('/onboarding/step-social-links', [
             'links' => [
@@ -374,12 +377,147 @@ class OnboardingTest extends TestCase
     }
 
     /**
+     * TEST 19: Onboarding index exposes featuredIdeas matching the service output.
+     */
+    public function test_onboarding_index_exposes_featured_ideas(): void
+    {
+        $user = User::factory()->create();
+
+        ProjectIdea::factory()->create([
+            'slug' => 'featured-tools',
+            'category' => ProjectIdeaCategory::HerramientasDev,
+            'sort_order' => 1,
+        ]);
+        ProjectIdea::factory()->create([
+            'slug' => 'featured-clone',
+            'category' => ProjectIdeaCategory::Clones,
+            'sort_order' => 1,
+        ]);
+        ProjectIdea::factory()->create([
+            'slug' => 'draft-idea',
+            'category' => ProjectIdeaCategory::Aprendizaje,
+            'sort_order' => 1,
+            'is_published' => false,
+        ]);
+
+        $response = $this->actingAs($user)->get('/onboarding');
+
+        $response->assertOk();
+
+        $expected = app(ProjectIdeaService::class)->featuredForOnboarding();
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('totalSteps', 5)
+                ->where('featuredIdeas', $expected)
+        );
+
+        $this->assertSame(
+            ['featured-tools', 'featured-clone'],
+            collect($response->viewData('page')['props']['featuredIdeas'])->pluck('slug')->all(),
+        );
+    }
+
+    /**
+     * TEST 20: Step 4 with a valid published idea slug completes onboarding and redirects to create.
+     */
+    public function test_step_4_with_valid_idea_slug_redirects_to_create_and_completes(): void
+    {
+        $user = User::factory()->create();
+        $creator = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $creator->id]);
+
+        $idea = ProjectIdea::factory()->create([
+            'slug' => 'handoff-idea',
+            'is_published' => true,
+        ]);
+
+        $response = $this->actingAs($user)->post('/onboarding/step-4', [
+            'join_requests' => [$project->id],
+            'idea_slug' => $idea->slug,
+        ]);
+
+        $response->assertRedirect('/projects/create?idea=handoff-idea');
+        $this->assertNotNull($user->fresh()->onboarding_completed_at);
+        $this->assertDatabaseHas('join_requests', [
+            'user_id' => $user->id,
+            'project_id' => $project->id,
+        ]);
+    }
+
+    /**
+     * TEST 21: Step 4 with an unpublished idea slug is rejected and does not complete onboarding.
+     */
+    public function test_step_4_with_unpublished_idea_slug_is_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $idea = ProjectIdea::factory()->create([
+            'slug' => 'unpublished-idea',
+            'is_published' => false,
+        ]);
+
+        $response = $this->actingAs($user)->post('/onboarding/step-4', [
+            'idea_slug' => $idea->slug,
+        ]);
+
+        $response->assertSessionHasErrors('idea_slug');
+        $this->assertNull($user->fresh()->onboarding_completed_at);
+    }
+
+    /**
+     * TEST 22: Step 4 with an unknown idea slug is rejected.
+     */
+    public function test_step_4_with_unknown_idea_slug_is_rejected(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-4', [
+            'idea_slug' => 'does-not-exist',
+        ]);
+
+        $response->assertSessionHasErrors('idea_slug');
+        $this->assertNull($user->fresh()->onboarding_completed_at);
+    }
+
+    /**
+     * TEST 23: Step 4 with no idea slug still redirects to the dashboard and completes onboarding.
+     */
+    public function test_step_4_without_idea_slug_redirects_to_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-4', [
+            'join_requests' => [],
+        ]);
+
+        $response->assertRedirect('/dashboard');
+        $this->assertNotNull($user->fresh()->onboarding_completed_at);
+    }
+
+    /**
+     * TEST 24: Step 4 with an empty idea slug redirects to the dashboard (ConvertEmptyStringsToNull).
+     */
+    public function test_step_4_with_empty_idea_slug_redirects_to_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/onboarding/step-4', [
+            'idea_slug' => '',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect('/dashboard');
+        $this->assertNotNull($user->fresh()->onboarding_completed_at);
+    }
+
+    /**
      * TEST 18: Complete onboarding flow through all five steps
      */
     public function test_complete_onboarding_flow_all_five_steps(): void
     {
         $user = User::factory()->create();
-        $tech = \App\Models\Tech::factory()->create();
+        $tech = Tech::factory()->create();
         $creator = User::factory()->create();
         $project = Project::factory()->create(['user_id' => $creator->id]);
         $project->techs()->attach($tech->id);
