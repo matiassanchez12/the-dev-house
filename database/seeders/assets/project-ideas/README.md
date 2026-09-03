@@ -1,9 +1,25 @@
 # Project idea illustrations
 
-Drop one illustration per idea here and re-seed to promote it. This directory is
-tracked even though **zero images ship today** — that is a valid terminal state,
-not a degraded one. With no file present, each idea card renders the per-category
-gradient plus icon fallback.
+One illustration per seeded idea. Re-seed after any change to promote it. With no
+file present for a slug, that idea card falls back to the per-category gradient
+plus icon.
+
+## What ships here
+
+15 generated line-art illustrations — a category-tinted gradient plus a motif for
+each idea, in the same visual language as the card fallback. They are produced by
+`generate.mjs` (Node + headless Chrome + ffmpeg), not hand-drawn, so they are
+fully reproducible and carry no third-party licence.
+
+Regenerate all 15:
+
+```
+node database/seeders/assets/project-ideas/generate.mjs   # writes ./svg/*.html
+# then screenshot each with headless chrome and encode to webp (see the script header)
+```
+
+To replace one with a real photo, just drop `<slug>.webp` (1200x675, <=300 KB)
+over the generated file and re-seed.
 
 ## File contract
 

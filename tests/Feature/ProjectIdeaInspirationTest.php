@@ -19,8 +19,7 @@ class ProjectIdeaInspirationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @var list<string> Absolute paths of illustration sources this test created. */
-    private array $createdIllustrationSources = [];
+    private string $illustrationSourceDir;
 
     protected function setUp(): void
     {
@@ -30,44 +29,36 @@ class ProjectIdeaInspirationTest extends TestCase
         // fake it so no test touches real storage/app/public.
         Storage::fake('public');
         config(['filesystems.media_disk' => 'public']);
+
+        // Point the seeder at an isolated fixture dir so tests control exactly
+        // which sources are present, independent of the committed illustrations.
+        $this->illustrationSourceDir = sys_get_temp_dir().'/project-idea-illustrations-'.uniqid();
+        mkdir($this->illustrationSourceDir, 0777, true);
+        ProjectIdeaSeeder::$illustrationSourceDir = $this->illustrationSourceDir;
     }
 
     private function fakeIllustrationSource(string $slug): void
     {
-        $path = database_path("seeders/assets/project-ideas/{$slug}.webp");
-
-        if (! is_dir(dirname($path))) {
-            mkdir(dirname($path), 0777, true);
-        }
-
-        file_put_contents($path, 'fake-webp-bytes');
-        $this->createdIllustrationSources[] = $path;
+        file_put_contents("{$this->illustrationSourceDir}/{$slug}.webp", 'fake-webp-bytes');
     }
 
     private function removeIllustrationSource(string $slug): void
     {
-        $path = database_path("seeders/assets/project-ideas/{$slug}.webp");
+        $path = "{$this->illustrationSourceDir}/{$slug}.webp";
 
         if (is_file($path)) {
             unlink($path);
         }
-
-        $this->createdIllustrationSources = array_values(
-            array_filter($this->createdIllustrationSources, fn ($created) => $created !== $path)
-        );
     }
 
     protected function tearDown(): void
     {
-        // Only remove sources this test wrote — never glob the directory, so a
-        // real committed illustration asset can never be deleted by the suite.
-        foreach ($this->createdIllustrationSources as $file) {
-            if (is_file($file)) {
-                @unlink($file);
-            }
-        }
+        ProjectIdeaSeeder::$illustrationSourceDir = null;
 
-        $this->createdIllustrationSources = [];
+        foreach (glob("{$this->illustrationSourceDir}/*") ?: [] as $file) {
+            @unlink($file);
+        }
+        @rmdir($this->illustrationSourceDir);
 
         parent::tearDown();
     }

@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Storage;
 class ProjectIdeaSeeder extends Seeder
 {
     /**
+     * Directory holding the `<slug>.webp` illustration sources. Overridable so
+     * tests can point at an isolated fixture dir instead of the committed assets.
+     */
+    public static ?string $illustrationSourceDir = null;
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
@@ -78,10 +84,11 @@ class ProjectIdeaSeeder extends Seeder
     private function syncIllustrations(array $slugs, Collection $existing): array
     {
         $disk = config('filesystems.media_disk', 'public');
+        $sourceDir = self::$illustrationSourceDir ?? database_path('seeders/assets/project-ideas');
         $resolved = [];
 
         foreach ($slugs as $slug) {
-            $source = database_path("seeders/assets/project-ideas/{$slug}.webp");
+            $source = "{$sourceDir}/{$slug}.webp";
 
             if (! is_file($source)) {
                 $resolved[$slug] = $existing[$slug] ?? null;
