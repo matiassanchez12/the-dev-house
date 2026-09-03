@@ -15,4 +15,5 @@ export interface SaveStep3Data {
 
 export interface SaveStep4Data {
     join_requests: number[];
+    idea_slug?: string;
 }

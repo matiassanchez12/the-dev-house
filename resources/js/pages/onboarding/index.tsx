@@ -1,7 +1,11 @@
 import Seo from '@/components/seo'
 import { router, usePage } from '@inertiajs/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { SharedPageProps } from '@/types'
+import {
+    OnboardingIdeaTeaser,
+    type FeaturedIdea,
+} from '@/components/onboarding/onboarding-idea-teaser'
 import { toast } from 'sonner'
 import OnboardingLayout from '@/layouts/onboarding'
 import { Button } from '@/components/ui/button'
@@ -37,6 +41,7 @@ interface OnboardingProps extends SharedPageProps {
     allTechs: Tech[]
     userTechs: (Tech & { pivot?: { proficiency?: string } })[]
     totalSteps: number
+    featuredIdeas?: FeaturedIdea[]
 }
 
 const PROFICIENCY_MAP: Record<number, string> = {
@@ -72,8 +77,14 @@ interface Recommendation {
 }
 
 export default function OnboardingIndex() {
-    const { auth, user, allTechs, userTechs, totalSteps, errors } = usePage<OnboardingProps>().props
+    const { auth, user, allTechs, userTechs, totalSteps, errors, featuredIdeas } =
+        usePage<OnboardingProps>().props
     const techGroups = groupTechsByCategory(allTechs)
+    const featuredIdeasList = featuredIdeas ?? []
+    const techNamesById = useMemo(
+        () => new Map(allTechs.map((tech) => [tech.id, tech.name])),
+        [allTechs],
+    )
 
     const [currentStep, setCurrentStep] = useState(1)
     const [processing, setProcessing] = useState(false)
@@ -170,6 +181,7 @@ export default function OnboardingIndex() {
     // Step 5: Recommendations
     const [recommendations, setRecommendations] = useState<Recommendation[]>([])
     const [selectedProjects, setSelectedProjects] = useState<number[]>([])
+    const [selectedIdeaSlug, setSelectedIdeaSlug] = useState<string | null>(null)
     const [loadingRecommendations, setLoadingRecommendations] = useState(false)
     const [loadRecommendationsError, setLoadRecommendationsError] = useState(false)
     const [recommendationsAttempt, setRecommendationsAttempt] = useState(0)
@@ -290,7 +302,10 @@ export default function OnboardingIndex() {
             setProcessing(true)
             router.post(
                 '/onboarding/step-4',
-                { join_requests: selectedProjects },
+                {
+                    join_requests: selectedProjects,
+                    idea_slug: selectedIdeaSlug ?? undefined,
+                },
                 {
                     preserveScroll: true,
                     onError: () =>
@@ -744,6 +759,13 @@ export default function OnboardingIndex() {
                                         </div>
                                     ))
                                 )}
+
+                                <OnboardingIdeaTeaser
+                                    ideas={featuredIdeasList}
+                                    selectedSlug={selectedIdeaSlug}
+                                    onSelect={setSelectedIdeaSlug}
+                                    techNamesById={techNamesById}
+                                />
                             </div>
                         )}
 

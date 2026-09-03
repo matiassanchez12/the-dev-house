@@ -30,6 +30,7 @@ export const step3Schema = z.object({
 
 export const step4Schema = z.object({
     join_requests: z.array(z.number()).nullable(),
+    idea_slug: z.string().optional(),
 });
 
 export type Step1Data = z.infer<typeof step1Schema>;
