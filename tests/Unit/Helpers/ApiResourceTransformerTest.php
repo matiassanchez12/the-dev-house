@@ -43,10 +43,9 @@ class ApiResourceTransformerTest extends TestCase
 
         $payload = ApiResourceTransformer::projectIdeas(collect([$idea->load('techs')]));
 
-        $this->assertSame(
-            Storage::disk('public')->url('project-ideas/cli-scaffold-proyectos.webp'),
-            $payload[0]['illustrationUrl'],
-        );
+        $base = Storage::disk('public')->url('project-ideas/cli-scaffold-proyectos.webp');
+        $this->assertStringStartsWith($base.'?v=', $payload[0]['illustrationUrl']);
+        $this->assertStringEndsWith('v='.$idea->updated_at->getTimestamp(), $payload[0]['illustrationUrl']);
     }
 
     /** @test */

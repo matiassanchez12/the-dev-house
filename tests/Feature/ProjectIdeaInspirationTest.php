@@ -341,8 +341,8 @@ class ProjectIdeaInspirationTest extends TestCase
 
         $withUrl = $payload->firstWhere('slug', 'with-illustration')['illustrationUrl'];
         $this->assertIsString($withUrl);
-        $this->assertSame(
-            Storage::disk('public')->url('project-ideas/with-illustration.webp'),
+        $this->assertStringStartsWith(
+            Storage::disk('public')->url('project-ideas/with-illustration.webp').'?v=',
             $withUrl,
         );
         $this->assertNull($payload->firstWhere('slug', 'without-illustration')['illustrationUrl']);
