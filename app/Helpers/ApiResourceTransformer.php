@@ -465,10 +465,28 @@ class ApiResourceTransformer
                 'prefillVision' => $idea->prefill_vision ?? '',
                 'techIds' => $idea->techs->pluck('id')->map(fn ($id): int => (int) $id)->all(),
                 'illustrationUrl' => $idea->illustration_path
-                    ? StorageUrlHelper::url($idea->illustration_path, self::mediaDisk())
+                    ? self::versionedMediaUrl($idea->illustration_path, $idea->updated_at)
                     : null,
             ])
             ->all();
+    }
+
+    /**
+     * Media-disk URL with a cache-busting `?v=` token derived from the row's
+     * updated_at. The stored illustration path is stable across re-seeds, so
+     * without this a changed illustration keeps serving the cached bytes.
+     */
+    private static function versionedMediaUrl(string $path, ?\DateTimeInterface $updatedAt): ?string
+    {
+        $url = StorageUrlHelper::url($path, self::mediaDisk());
+
+        if ($url === null || $updatedAt === null) {
+            return $url;
+        }
+
+        $separator = str_contains($url, '?') ? '&' : '?';
+
+        return $url.$separator.'v='.$updatedAt->getTimestamp();
     }
 
     /**
