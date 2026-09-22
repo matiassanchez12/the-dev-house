@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use App\Enums\ProjectIdeaCategory;
 use App\Models\JoinRequest;
 use App\Models\ProjectInvitation;
 use Illuminate\Database\Eloquent\Model;
@@ -434,6 +435,58 @@ class ApiResourceTransformer
             'project',
             'applicant',
         ]));
+    }
+
+    /**
+     * Transform a collection of project ideas into the creation-page payload.
+     *
+     * Column names are renamed to camelCase, the pivot is reduced to tech IDs,
+     * and rows are ordered by ProjectIdeaCategory declaration order then sort_order.
+     */
+    public static function projectIdeas(Collection $ideas): array
+    {
+        $categoryOrder = array_flip(ProjectIdeaCategory::values());
+
+        return $ideas
+            ->sortBy(fn (Model $idea): string => sprintf(
+                '%02d-%06d',
+                $categoryOrder[$idea->category->value] ?? 99,
+                (int) $idea->sort_order,
+            ))
+            ->values()
+            ->map(fn (Model $idea): array => [
+                'slug' => $idea->slug,
+                'title' => $idea->title,
+                'summary' => $idea->summary,
+                'category' => $idea->category->value,
+                'difficulty' => $idea->difficulty?->value,
+                'prefillTitle' => $idea->prefill_title,
+                'prefillDescription' => $idea->prefill_description,
+                'prefillVision' => $idea->prefill_vision ?? '',
+                'techIds' => $idea->techs->pluck('id')->map(fn ($id): int => (int) $id)->all(),
+                'illustrationUrl' => $idea->illustration_path
+                    ? self::versionedMediaUrl($idea->illustration_path, $idea->updated_at)
+                    : null,
+            ])
+            ->all();
+    }
+
+    /**
+     * Media-disk URL with a cache-busting `?v=` token derived from the row's
+     * updated_at. The stored illustration path is stable across re-seeds, so
+     * without this a changed illustration keeps serving the cached bytes.
+     */
+    private static function versionedMediaUrl(string $path, ?\DateTimeInterface $updatedAt): ?string
+    {
+        $url = StorageUrlHelper::url($path, self::mediaDisk());
+
+        if ($url === null || $updatedAt === null) {
+            return $url;
+        }
+
+        $separator = str_contains($url, '?') ? '&' : '?';
+
+        return $url.$separator.'v='.$updatedAt->getTimestamp();
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace Tests\Unit\Requests\Project;
 
 use App\Http\Requests\Project\StoreProjectRequest;
+use App\Models\Project;
+use App\Models\ProjectIdea;
 use App\Models\Tech;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +17,7 @@ class StoreProjectRequestTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private array $validTechIds;
 
     protected function setUp(): void
@@ -32,7 +35,8 @@ class StoreProjectRequestTest extends TestCase
      */
     private function validateRequest(array $data): \Illuminate\Validation\Validator
     {
-        $request = new StoreProjectRequest();
+        $request = new StoreProjectRequest;
+
         return Validator::make($data, $request->rules());
     }
 
@@ -56,7 +60,7 @@ class StoreProjectRequestTest extends TestCase
     public function title_must_be_unique(): void
     {
         // Create an existing project with this title
-        $existingProject = \App\Models\Project::factory()->create([
+        $existingProject = Project::factory()->create([
             'title' => 'Existing Project Title',
             'slug' => 'existing-project-title',
         ]);
@@ -249,6 +253,54 @@ class StoreProjectRequestTest extends TestCase
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('demo_url', $validator->errors()->toArray());
+    }
+
+    /** @test */
+    public function idea_slug_null_passes_validation(): void
+    {
+        $data = [
+            'title' => 'My Project',
+            'description' => 'A valid description',
+            'techs' => $this->validTechIds,
+            'idea_slug' => null,
+        ];
+
+        $validator = $this->validateRequest($data);
+
+        $this->assertFalse($validator->fails());
+    }
+
+    /** @test */
+    public function idea_slug_accepts_an_existing_slug(): void
+    {
+        $idea = ProjectIdea::factory()->create(['slug' => 'clon-trello-kanban']);
+
+        $data = [
+            'title' => 'My Project',
+            'description' => 'A valid description',
+            'techs' => $this->validTechIds,
+            'idea_slug' => $idea->slug,
+        ];
+
+        $validator = $this->validateRequest($data);
+
+        $this->assertFalse($validator->fails());
+    }
+
+    /** @test */
+    public function idea_slug_rejects_an_unknown_non_empty_slug(): void
+    {
+        $data = [
+            'title' => 'My Project',
+            'description' => 'A valid description',
+            'techs' => $this->validTechIds,
+            'idea_slug' => 'does-not-exist',
+        ];
+
+        $validator = $this->validateRequest($data);
+
+        $this->assertTrue($validator->fails());
+        $this->assertArrayHasKey('idea_slug', $validator->errors()->toArray());
     }
 
     // === GREEN: Tests pass with valid implementation ===

@@ -33,6 +33,9 @@ final class MilestonesReadStateTest extends TestCase
             Phase::factory()->create([
                 'project_id' => $project->id,
                 'title' => 'Milestone ' . $index,
+                // Keep every milestone pending so list order is deterministic (id desc);
+                // the factory otherwise randomises completed_at, which reorders the feed.
+                'completed_at' => null,
                 'created_at' => now()->subMinutes(13 - $index),
                 'updated_at' => now()->subMinutes(13 - $index),
             ]);

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import OnboardingIndex from './index';
 
 const mockState = vi.hoisted(() => ({
@@ -18,6 +18,20 @@ const mockState = vi.hoisted(() => ({
         ],
         userTechs: [],
         totalSteps: 5,
+        featuredIdeas: [
+            {
+                slug: 'cli-scaffold',
+                title: 'CLI scaffold para proyectos',
+                summary: 'Herramienta de línea de comandos para generar proyectos.',
+                category: 'herramientas-dev',
+                difficulty: 'intermedio',
+                prefillTitle: 'CLI scaffold',
+                prefillDescription: 'desc',
+                prefillVision: '',
+                techIds: [1],
+                illustrationUrl: null,
+            },
+        ],
         errors: {} as Record<string, string>,
     },
 }));
@@ -144,5 +158,63 @@ describe('OnboardingIndex', () => {
         expect(screen.getByRole('alert')).toHaveTextContent('La bio no puede exceder 1000 caracteres.');
 
         mockState.props.errors = {};
+    });
+});
+
+// Step-5 coverage lives in its own describe: the wizard always mounts at step 1,
+// so this drives through steps 1-4 (2 posts + 2 local advances) to reach step 5,
+// then asserts the idea handoff payload. Lower friction than a dedicated file
+// that would duplicate every mock above (design risk #4).
+describe('OnboardingIndex step 5 idea handoff', () => {
+    beforeEach(() => {
+        mockState.post.mockReset();
+        mockState.post.mockImplementation(
+            (
+                _url: string,
+                _data: unknown,
+                options?: { onSuccess?: () => void; onFinish?: () => void },
+            ) => {
+                options?.onSuccess?.();
+                options?.onFinish?.();
+            },
+        );
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: true,
+                json: async () => ({ projects: [] }),
+            }),
+        );
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('posts the selected idea_slug in the step-4 payload after picking an idea', async () => {
+        const user = userEvent.setup();
+
+        render(<OnboardingIndex />);
+
+        // steps 1 -> 2 -> 3 -> 4 -> 5
+        for (let i = 0; i < 4; i++) {
+            await user.click(screen.getByRole('button', { name: 'Siguiente' }));
+        }
+
+        const finalizar = await screen.findByRole('button', { name: 'Finalizar' });
+        expect(
+            screen.getByText('CLI scaffold para proyectos'),
+        ).toBeInTheDocument();
+
+        await user.click(screen.getByRole('radio'));
+        await user.click(finalizar);
+
+        await waitFor(() => {
+            expect(mockState.post).toHaveBeenCalledWith(
+                '/onboarding/step-4',
+                expect.objectContaining({ idea_slug: 'cli-scaffold' }),
+                expect.any(Object),
+            );
+        });
     });
 });

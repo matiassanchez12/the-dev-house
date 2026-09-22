@@ -22,7 +22,35 @@ class MockResizeObserver {
     disconnect = vi.fn();
 }
 
+// jsdom does not implement PointerEvent; @base-ui/react dispatches one on
+// interaction (e.g. Radio.Root). Provide a MouseEvent-backed polyfill.
+class MockPointerEvent extends MouseEvent {
+    public pointerId: number;
+    public pointerType: string;
+    public isPrimary: boolean;
+
+    constructor(type: string, params: PointerEventInit = {}) {
+        super(type, params);
+        this.pointerId = params.pointerId ?? 0;
+        this.pointerType = params.pointerType ?? '';
+        this.isPrimary = params.isPrimary ?? false;
+    }
+}
+
 if (typeof window !== 'undefined') {
+    if (!window.PointerEvent) {
+        window.PointerEvent = MockPointerEvent as unknown as typeof PointerEvent;
+    }
+    if (!Element.prototype.hasPointerCapture) {
+        Element.prototype.hasPointerCapture = vi.fn(() => false);
+    }
+    if (!Element.prototype.setPointerCapture) {
+        Element.prototype.setPointerCapture = vi.fn();
+    }
+    if (!Element.prototype.releasePointerCapture) {
+        Element.prototype.releasePointerCapture = vi.fn();
+    }
+
     Object.defineProperty(window, 'IntersectionObserver', {
         writable: true,
         configurable: true,

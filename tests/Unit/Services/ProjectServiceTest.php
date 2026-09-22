@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Project;
+use App\Models\ProjectIdea;
 use App\Models\Tech;
 use App\Models\User;
 use App\Services\ProjectService;
@@ -81,6 +82,104 @@ class ProjectServiceTest extends TestCase
         $this->assertEquals('new-project', $project->slug);
         $this->assertEquals($this->user->id, $project->user_id);
         $this->assertCount(3, $project->techs);
+    }
+
+    /** @test */
+    public function create_copies_the_idea_illustration_as_cover_when_no_image_is_uploaded(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
+
+        Storage::disk('public')->put('project-ideas/clon-trello-kanban.webp', 'fake-bytes');
+        $idea = ProjectIdea::factory()->create([
+            'slug' => 'clon-trello-kanban',
+            'illustration_path' => 'project-ideas/clon-trello-kanban.webp',
+        ]);
+
+        $project = $this->service->create($this->user, [
+            'title' => 'From Idea',
+            'description' => 'Project description',
+            'techs' => $this->techIds,
+            'idea_slug' => $idea->slug,
+        ]);
+
+        $this->assertCount(1, $project->images);
+        $cover = $project->images[0];
+        $this->assertStringStartsWith('projects/', $cover);
+        $this->assertStringEndsWith('.webp', $cover);
+        $this->assertStringNotContainsString('..', $cover);
+        Storage::disk('public')->assertExists($cover);
+        $this->assertNotSame('project-ideas/clon-trello-kanban.webp', $cover);
+    }
+
+    /** @test */
+    public function create_ignores_the_idea_illustration_when_an_image_is_uploaded(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
+
+        Storage::disk('public')->put('project-ideas/clon-trello-kanban.webp', 'fake-bytes');
+        $idea = ProjectIdea::factory()->create([
+            'slug' => 'clon-trello-kanban',
+            'illustration_path' => 'project-ideas/clon-trello-kanban.webp',
+        ]);
+
+        $upload = UploadedFile::fake()->create('mine.jpg', 100, 'image/jpeg');
+
+        $project = $this->service->create($this->user, [
+            'title' => 'Upload Wins',
+            'description' => 'Project description',
+            'techs' => $this->techIds,
+            'idea_slug' => $idea->slug,
+            'images' => [$upload],
+        ]);
+
+        $this->assertCount(1, $project->images);
+        $this->assertStringNotContainsString('project-ideas/', $project->images[0]);
+        $this->assertStringEndsWith('.jpg', $project->images[0]);
+        // The idea illustration copy would land as a projects/*.webp file — none should exist.
+        $webpCopies = array_filter(
+            Storage::disk('public')->files('projects'),
+            fn ($file) => str_ends_with($file, '.webp'),
+        );
+        $this->assertSame([], array_values($webpCopies));
+    }
+
+    /** @test */
+    public function create_yields_no_images_when_the_idea_has_a_null_illustration_path(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
+
+        $idea = ProjectIdea::factory()->create([
+            'slug' => 'clon-trello-kanban',
+            'illustration_path' => null,
+        ]);
+
+        $project = $this->service->create($this->user, [
+            'title' => 'No Illustration',
+            'description' => 'Project description',
+            'techs' => $this->techIds,
+            'idea_slug' => $idea->slug,
+        ]);
+
+        $this->assertSame([], $project->images);
+    }
+
+    /** @test */
+    public function create_yields_no_images_when_no_idea_slug_and_no_upload(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.media_disk' => 'public']);
+
+        $project = $this->service->create($this->user, [
+            'title' => 'Plain Create',
+            'description' => 'Project description',
+            'techs' => $this->techIds,
+        ]);
+
+        $this->assertSame([], $project->images);
+        $this->assertSame('plain-create', $project->slug);
     }
 
     // === uploadImages tests ===

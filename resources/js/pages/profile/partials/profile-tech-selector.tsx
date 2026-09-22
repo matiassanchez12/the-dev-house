@@ -52,6 +52,9 @@ export default function ProfileTechSelector({
     const [expandedGroups, setExpandedGroups] = useState(
         () =>
             new Set(
+                techGroups
+                    .filter((group) => group.techs.some((tech) => selectedTechIds.has(tech.id)))
+                    .map((group) => group.key),
             ),
     )
 

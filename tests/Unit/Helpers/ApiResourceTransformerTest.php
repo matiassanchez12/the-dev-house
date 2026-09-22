@@ -4,6 +4,7 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\ApiResourceTransformer;
 use App\Models\Project;
+use App\Models\ProjectIdea;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -29,5 +30,33 @@ class ApiResourceTransformerTest extends TestCase
                 'url' => Storage::disk('public')->url('projects/example.jpg'),
             ],
         ], $data['images']);
+    }
+
+    /** @test */
+    public function project_ideas_emit_a_resolved_illustration_url_when_the_path_is_set(): void
+    {
+        config(['filesystems.media_disk' => 'public']);
+
+        $idea = ProjectIdea::factory()->create([
+            'illustration_path' => 'project-ideas/cli-scaffold-proyectos.webp',
+        ]);
+
+        $payload = ApiResourceTransformer::projectIdeas(collect([$idea->load('techs')]));
+
+        $base = Storage::disk('public')->url('project-ideas/cli-scaffold-proyectos.webp');
+        $this->assertStringStartsWith($base.'?v=', $payload[0]['illustrationUrl']);
+        $this->assertStringEndsWith('v='.$idea->updated_at->getTimestamp(), $payload[0]['illustrationUrl']);
+    }
+
+    /** @test */
+    public function project_ideas_emit_a_null_illustration_url_when_the_path_is_null(): void
+    {
+        config(['filesystems.media_disk' => 'public']);
+
+        $idea = ProjectIdea::factory()->create(['illustration_path' => null]);
+
+        $payload = ApiResourceTransformer::projectIdeas(collect([$idea->load('techs')]));
+
+        $this->assertNull($payload[0]['illustrationUrl']);
     }
 }

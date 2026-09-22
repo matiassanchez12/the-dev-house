@@ -8,6 +8,7 @@ export type ProjectFormData = {
     images: File[]
     remove_images?: string[]
     _method?: string
+    idea_slug?: string
 }
 
 export type ProjectFormFieldErrors = Partial<Record<keyof ProjectFormData, string>>
