@@ -7,18 +7,17 @@ use App\Http\Requests\Onboarding\SaveStep2Request;
 use App\Http\Requests\Onboarding\SaveStep3Request;
 use App\Http\Requests\Onboarding\SaveStep4Request;
 use App\Http\Requests\Onboarding\SaveStepSocialLinksRequest;
+use App\Models\Tech;
 use App\Services\OnboardingService;
-use Illuminate\Http\Request;
+use App\Services\ProjectIdeaService;
 use Illuminate\Support\Facades\Auth;
 
 class OnboardingController extends Controller
 {
-    private OnboardingService $onboardingService;
-
-    public function __construct(OnboardingService $onboardingService)
-    {
-        $this->onboardingService = $onboardingService;
-    }
+    public function __construct(
+        private OnboardingService $onboardingService,
+        private ProjectIdeaService $projectIdeaService,
+    ) {}
 
     public function index()
     {
@@ -28,7 +27,7 @@ class OnboardingController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $allTechs = \App\Models\Tech::all();
+        $allTechs = Tech::all();
         $userTechs = $user->techs()->withPivot('proficiency')->get();
 
         return inertia('onboarding/index', [
@@ -36,6 +35,7 @@ class OnboardingController extends Controller
             'allTechs' => $allTechs,
             'userTechs' => $userTechs,
             'totalSteps' => 5,
+            'featuredIdeas' => $this->projectIdeaService->featuredForOnboarding(),
         ]);
     }
 
@@ -49,6 +49,7 @@ class OnboardingController extends Controller
     public function saveStep2(SaveStep2Request $request)
     {
         $this->onboardingService->saveBio(Auth::user(), $request->validated()['bio'] ?? null);
+
         return redirect()->route('onboarding.index');
     }
 
@@ -64,14 +65,25 @@ class OnboardingController extends Controller
         if ($request->hasFile('avatar')) {
             $this->onboardingService->saveAvatar(Auth::user(), $request->file('avatar'));
         }
+
         return redirect()->route('onboarding.index');
     }
 
     public function saveStep4(SaveStep4Request $request)
     {
-        $joinRequests = $request->validated()['join_requests'] ?? [];
-        if (!empty($joinRequests)) {
+        $validated = $request->validated();
+
+        $joinRequests = $validated['join_requests'] ?? [];
+        if (! empty($joinRequests)) {
             $this->onboardingService->sendJoinRequests(Auth::user(), $joinRequests);
+        }
+
+        $ideaSlug = $validated['idea_slug'] ?? null;
+
+        if ($ideaSlug !== null) {
+            $this->onboardingService->complete(Auth::user());
+
+            return redirect()->route('projects.create', ['idea' => $ideaSlug]);
         }
 
         return $this->complete();
@@ -93,7 +105,7 @@ class OnboardingController extends Controller
                     'title' => $project->title,
                     'description' => $project->description,
                     'slug' => $project->slug,
-                    'techs' => $project->techs->map(fn($t) => ['id' => $t->id, 'name' => $t->name]),
+                    'techs' => $project->techs->map(fn ($t) => ['id' => $t->id, 'name' => $t->name]),
                     'creator' => $project->creator ? ['id' => $project->creator->id, 'name' => $project->creator->name] : null,
                 ];
             }),
@@ -103,6 +115,7 @@ class OnboardingController extends Controller
     private function complete()
     {
         $this->onboardingService->complete(Auth::user());
+
         return redirect()->route('dashboard');
     }
 }
