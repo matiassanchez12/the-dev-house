@@ -6,20 +6,41 @@ plus icon.
 
 ## What ships here
 
-15 generated line-art illustrations — a category-tinted gradient plus a motif for
-each idea, in the same visual language as the card fallback. They are produced by
-`generate.mjs` (Node + headless Chrome + ffmpeg), not hand-drawn, so they are
-fully reproducible and carry no third-party licence.
+15 photos, one per seeded idea, sourced from [Unsplash](https://unsplash.com) and
+cropped to the card's 16:9 media block. Every photo is free for commercial use
+under the [Unsplash License](https://unsplash.com/license) with no attribution
+required; the credits below are kept as courtesy, not obligation.
 
-Regenerate all 15:
+| Slug | Photographer | Source |
+| --- | --- | --- |
+| `cli-scaffold-proyectos` | Bernd Dittrich | https://unsplash.com/photos/fmH6yLBwEPw |
+| `dashboard-metricas-repos` | Luke Chesser | https://unsplash.com/photos/JKUTrJ4vK00 |
+| `gestor-snippets-equipo` | Huy Phan | https://unsplash.com/photos/JekEQkNITOQ |
+| `clon-trello-kanban` | Paymo | https://unsplash.com/photos/AmhxmYXwbZM |
+| `clon-spotify-reproductor` | Mustafi Numann | https://unsplash.com/photos/KeI2g1r_R3s |
+| `clon-twitter-hilos` | Swello | https://unsplash.com/photos/7ljc7nkjNcc |
+| `alternativa-linktree` | Szabó Viktor | https://unsplash.com/photos/9VPIy0a-OxE |
+| `alternativa-notas-colaborativas` | Kelly Sikkema | https://unsplash.com/photos/hBdaqrr5Z3k |
+| `acortador-urls-self-hosted` | Taylor Vick | https://unsplash.com/photos/M5tzZtFCOfs |
+| `bot-discord-comunidad` | John Schnobrich | https://unsplash.com/photos/QckxruozjRg |
+| `bot-recordatorios-telegram` | Towfiqu barbhuiya | https://unsplash.com/photos/jOeh3Lv88xA |
+| `pipeline-reportes-automaticos` | Georg Eiermann | https://unsplash.com/photos/Wqc_tlCmzHI |
+| `interprete-lenguaje-juguete` | Markus Winkler | https://unsplash.com/photos/5aiCc8n6tIE |
+| `motor-busqueda-mini` | Daniel Forsman | https://unsplash.com/photos/Ph4ZJrwf4x8 |
+| `clon-redis-en-memoria` | Liam Briese | https://unsplash.com/photos/lYxQ5F9xBDM |
+
+### Replace or add one
+
+Download the full-res JPG from the source URL and re-crop:
 
 ```
-node database/seeders/assets/project-ideas/generate.mjs   # writes ./svg/*.html
-# then screenshot each with headless chrome and encode to webp (see the script header)
+curl -sL "https://unsplash.com/photos/<id>/download?w=2000" -o src.jpg
+ffmpeg -y -i src.jpg \
+  -vf "crop='min(iw,ih*16/9)':'min(ih,iw*9/16)',scale=1200:675:flags=lanczos" \
+  -c:v libwebp -quality 82 <slug>.webp
 ```
 
-To replace one with a real photo, just drop `<slug>.webp` (1200x675, <=300 KB)
-over the generated file and re-seed.
+Then update the table above and re-seed.
 
 ## File contract
 
